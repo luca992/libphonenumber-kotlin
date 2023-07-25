@@ -639,7 +639,7 @@ public class AsYouTypeFormatterTest extends TestMetadataTestCase {
     assertEquals("+52 800 123 45", formatter.inputDigit('5'));
     assertEquals("+52 800 123 456", formatter.inputDigit('6'));
     assertEquals("+52 800 123 4567", formatter.inputDigit('7'));
-    
+
     // +529011234567, proactively ensuring that no formatting is applied, where a format is chosen
     // that would otherwise have led to some digits being dropped.
     formatter.clear();

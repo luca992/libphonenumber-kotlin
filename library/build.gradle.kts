@@ -1,56 +1,81 @@
-apply plugin: 'com.android.library'
-apply plugin: 'maven-publish'
-apply plugin: 'signing'
+plugins {
+    alias(libs.plugins.org.jetbrains.kotlin.multiplatform)
+    alias(libs.plugins.com.android.library)
+    id("maven-publish")
+    id("signing")
+}
 
-def artifactName = rootProject.name
-group rootProject.group
-version rootProject.version
+val artifactName = rootProject.name
+group = rootProject.group
+version = rootProject.version
 
-sourceCompatibility = JavaVersion.VERSION_1_6
-targetCompatibility = JavaVersion.VERSION_1_6
+kotlin {
+    android()
+    jvm()
+    sourceSets {
+        val commonMain by getting
+        val commonTest by getting
+        val jvmMain by getting {
+            dependsOn(commonMain)
+        }
+        val androidMain by getting {
+            dependsOn(commonMain)
+        }
+        val androidUnitTest by getting {
+            dependsOn(commonTest)
+            dependencies {
+                implementation(libs.junit)
+                implementation(libs.mockito.core)
+            }
+        }
+    }
+}
 
 android {
-  namespace 'io.michaelrocks.libphonenumber.android'
-  compileSdkVersion projectCompileSdkVersion
-  buildToolsVersion projectBuildToolsVersion
+    namespace = "io.michaelrocks.libphonenumber.android"
+    compileSdk = 33
 
-  defaultConfig {
-    minSdkVersion projectMinSdkVersion
-    targetSdkVersion projectTargetSdkVersion
+    defaultConfig {
+        minSdk = 14
 
-    versionCode 1
-    versionName version
-  }
-
-  buildTypes {
-    release {
-      minifyEnabled false
+//    versionCode = 1
+//    versionName = version
     }
-  }
 
-  variantFilter { variant ->
-    if (variant.buildType.name != 'release') {
-      variant.setIgnore(true)
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+        }
     }
-  }
 
-  lintOptions {
-    abortOnError false
-  }
-
-  publishing {
-    singleVariant('release') {
-      withSourcesJar()
-      withJavadocJar()
+    sourceSets {
+        named("main") {
+            java.srcDirs("src/androidMain/java")
+        }
+        named("test") {
+            java.srcDirs("src/androidUnitTest/java")
+        }
     }
-  }
+
+//    variantFilter { variant ->
+//        if (variant.buildType.name != "release") {
+//            variant.setIgnore(true)
+//        }
+//    }
+
+    lint {
+        abortOnError = false
+    }
+//
+//  publishing {
+//    singleVariant("release") {
+//      withSourcesJar()
+//      withJavadocJar()
+//    }
+//  }
 }
 
-dependencies {
-  testImplementation "junit:junit:$junitVersion"
-  testImplementation "org.mockito:mockito-core:$mockitoVersion"
-}
-
+/*
 afterEvaluate {
   publishing {
     publications {
@@ -105,3 +130,4 @@ afterEvaluate {
     sign publishing.publications.release
   }
 }
+*/
