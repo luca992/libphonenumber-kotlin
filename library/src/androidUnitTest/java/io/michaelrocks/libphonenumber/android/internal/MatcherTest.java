@@ -17,9 +17,11 @@
 
 package io.michaelrocks.libphonenumber.android.internal;
 
+import io.michaelrocks.libphonenumber.kotlin.internal.MatcherApi;
+import io.michaelrocks.libphonenumber.kotlin.internal.RegexBasedMatcher;
 import junit.framework.TestCase;
 
-import io.michaelrocks.libphonenumber.android.Phonemetadata.PhoneNumberDesc;
+import io.michaelrocks.libphonenumber.kotlin.Phonemetadata.PhoneNumberDesc;
 
 /**
  * Tests that all implementations of {@code MatcherApi} are consistent.

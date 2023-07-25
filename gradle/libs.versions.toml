@@ -26,6 +26,8 @@ androidx-appcompat = "1.6.1"
 rules = "1.5.0"
 runner = "1.5.2"
 
+kermit = "2.0.0-RC4"
+
 
 [libraries]
 
@@ -37,7 +39,6 @@ junit = { module = "junit:junit", version.ref = "junitVersion" }
 
 
 com-squareup-okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
-com-squareup-okio-nodefilesystem = { module = "com.squareup.okio:okio-nodefilesystem", version.ref = "okio" }
 
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 androidx-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "androidx-lifecycle" }
@@ -45,3 +46,5 @@ androidx-startup-runtime = { module = "androidx.startup:startup-runtime", versio
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
 
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoVersion" }
+
+co-touchlab-kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }

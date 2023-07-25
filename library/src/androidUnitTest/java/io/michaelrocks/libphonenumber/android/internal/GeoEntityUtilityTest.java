@@ -17,6 +17,7 @@
 
 package io.michaelrocks.libphonenumber.android.internal;
 
+import io.michaelrocks.libphonenumber.kotlin.internal.GeoEntityUtility;
 import junit.framework.TestCase;
 
 public class GeoEntityUtilityTest extends TestCase {

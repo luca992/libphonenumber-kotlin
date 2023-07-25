@@ -12,14 +12,32 @@ version = rootProject.version
 kotlin {
     android()
     jvm()
+    js(IR){
+        browser()
+        nodejs()
+    }
     sourceSets {
-        val commonMain by getting
+        all {
+            languageSettings.optIn("kotlin.ExperimentalStdlibApi")
+        }
+        val commonMain by getting {
+            dependencies {
+                implementation(libs.com.squareup.okio)
+                implementation(libs.co.touchlab.kermit)
+            }
+        }
         val commonTest by getting
         val jvmMain by getting {
             dependsOn(commonMain)
         }
         val androidMain by getting {
+            dependsOn(jvmMain)
+        }
+        val nonJvmMain by creating {
             dependsOn(commonMain)
+        }
+        val jsMain by getting {
+            dependsOn(nonJvmMain)
         }
         val androidUnitTest by getting {
             dependsOn(commonTest)
@@ -36,7 +54,7 @@ android {
     compileSdk = 33
 
     defaultConfig {
-        minSdk = 14
+        minSdk = 19
 
 //    versionCode = 1
 //    versionName = version
@@ -73,6 +91,12 @@ android {
 //      withJavadocJar()
 //    }
 //  }
+
+    // https://kotlinlang.org/docs/gradle-configure-project.html#gradle-java-toolchains-support
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
 }
 
 /*

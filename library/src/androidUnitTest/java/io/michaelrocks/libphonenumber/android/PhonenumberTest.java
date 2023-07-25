@@ -19,8 +19,8 @@ package io.michaelrocks.libphonenumber.android;
 
 import junit.framework.TestCase;
 
-import io.michaelrocks.libphonenumber.android.Phonenumber.PhoneNumber;
-import io.michaelrocks.libphonenumber.android.Phonenumber.PhoneNumber.CountryCodeSource;
+import io.michaelrocks.libphonenumber.kotlin.Phonenumber.PhoneNumber;
+import io.michaelrocks.libphonenumber.kotlin.Phonenumber.PhoneNumber.CountryCodeSource;
 
 /**
  * Tests for the Phonenumber.PhoneNumber object itself.

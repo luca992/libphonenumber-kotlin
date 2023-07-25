@@ -17,9 +17,10 @@
 
 package io.michaelrocks.libphonenumber.android;
 
+import io.michaelrocks.libphonenumber.kotlin.PhoneNumberMatch;
 import junit.framework.TestCase;
 
-import io.michaelrocks.libphonenumber.android.Phonenumber.PhoneNumber;
+import io.michaelrocks.libphonenumber.kotlin.Phonenumber.PhoneNumber;
 
 /**
  * Tests for {@link PhoneNumberMatch}.

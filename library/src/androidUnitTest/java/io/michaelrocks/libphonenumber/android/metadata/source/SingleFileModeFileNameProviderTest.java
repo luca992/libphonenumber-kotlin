@@ -17,6 +17,8 @@
 
 package io.michaelrocks.libphonenumber.android.metadata.source;
 
+import io.michaelrocks.libphonenumber.kotlin.metadata.source.PhoneMetadataFileNameProvider;
+import io.michaelrocks.libphonenumber.kotlin.metadata.source.SingleFileModeFileNameProvider;
 import junit.framework.TestCase;
 
 public final class SingleFileModeFileNameProviderTest extends TestCase {

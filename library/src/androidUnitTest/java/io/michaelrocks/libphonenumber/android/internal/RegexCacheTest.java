@@ -17,6 +17,7 @@
 
 package io.michaelrocks.libphonenumber.android.internal;
 
+import io.michaelrocks.libphonenumber.kotlin.internal.RegexCache;
 import junit.framework.TestCase;
 
 /**
@@ -37,17 +38,17 @@ public class RegexCacheTest extends TestCase {
     final String regex2 = "(?:12|34)";
     final String regex3 = "[1-3][58]";
 
-    regexCache.getPatternForRegex(regex1);
+    regexCache.getRegexForPattern(regex1);
     assertTrue(regexCache.containsRegex(regex1));
 
-    regexCache.getPatternForRegex(regex2);
+    regexCache.getRegexForPattern(regex2);
     assertTrue(regexCache.containsRegex(regex2));
     assertTrue(regexCache.containsRegex(regex1));
 
-    regexCache.getPatternForRegex(regex1);
+    regexCache.getRegexForPattern(regex1);
     assertTrue(regexCache.containsRegex(regex1));
 
-    regexCache.getPatternForRegex(regex3);
+    regexCache.getRegexForPattern(regex3);
     assertTrue(regexCache.containsRegex(regex3));
 
     assertFalse(regexCache.containsRegex(regex2));

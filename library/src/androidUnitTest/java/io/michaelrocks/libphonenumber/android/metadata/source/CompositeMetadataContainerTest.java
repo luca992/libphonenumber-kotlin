@@ -17,10 +17,11 @@
 
 package io.michaelrocks.libphonenumber.android.metadata.source;
 
+import io.michaelrocks.libphonenumber.kotlin.metadata.source.CompositeMetadataContainer;
 import junit.framework.TestCase;
 
-import io.michaelrocks.libphonenumber.android.Phonemetadata.PhoneMetadata;
-import io.michaelrocks.libphonenumber.android.internal.GeoEntityUtility;
+import io.michaelrocks.libphonenumber.kotlin.Phonemetadata.PhoneMetadata;
+import io.michaelrocks.libphonenumber.kotlin.internal.GeoEntityUtility;
 
 public class CompositeMetadataContainerTest extends TestCase {
 

@@ -17,6 +17,8 @@
 
 package io.michaelrocks.libphonenumber.android.metadata.source;
 
+import io.michaelrocks.libphonenumber.kotlin.metadata.source.MultiFileModeFileNameProvider;
+import io.michaelrocks.libphonenumber.kotlin.metadata.source.PhoneMetadataFileNameProvider;
 import junit.framework.TestCase;
 
 import org.junit.function.ThrowingRunnable;

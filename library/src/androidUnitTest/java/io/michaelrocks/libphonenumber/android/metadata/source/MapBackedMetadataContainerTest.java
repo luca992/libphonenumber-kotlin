@@ -17,9 +17,10 @@
 
 package io.michaelrocks.libphonenumber.android.metadata.source;
 
+import io.michaelrocks.libphonenumber.kotlin.metadata.source.MapBackedMetadataContainer;
 import junit.framework.TestCase;
 
-import io.michaelrocks.libphonenumber.android.Phonemetadata.PhoneMetadata;
+import io.michaelrocks.libphonenumber.kotlin.Phonemetadata.PhoneMetadata;
 
 public class MapBackedMetadataContainerTest extends TestCase {
 
