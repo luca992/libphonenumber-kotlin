@@ -9,7 +9,7 @@ fun main() {
     onWasmReady {
         Window("libphonenumber-kotlin sample") {
             Column(modifier = Modifier.fillMaxSize()) {
-                App("Web")
+//                App("Web")
             }
         }
     }

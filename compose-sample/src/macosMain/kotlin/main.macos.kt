@@ -6,7 +6,7 @@ import platform.AppKit.NSApplication
 fun main() {
     NSApplication.sharedApplication()
     Window("Sample App") {
-        App("Native MacOS")
+//        App("Native MacOS")
     }
     NSApp?.run()
 }
