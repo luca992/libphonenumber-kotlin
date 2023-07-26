@@ -16,6 +16,8 @@
  */
 package io.michaelrocks.libphonenumber.kotlin.metadata.source
 
+import dev.icerock.moko.resources.AssetResource
+
 /**
  * Guard that ensures that metadata bootstrapping process (loading and parsing) is triggered only
  * once per metadata file.
@@ -27,8 +29,8 @@ interface MetadataBootstrappingGuard<T : MetadataContainer> {
      * If metadata from the provided file has not yet been read, invokes loading and parsing from the
      * provided file and adds the result to guarded [MetadataContainer].
      *
-     * @param phoneMetadataFile to read from
+     * @param phoneMetadataResource to read from
      * @return guarded [MetadataContainer]
      */
-    fun getOrBootstrap(phoneMetadataFile: String): T
+    fun getOrBootstrap(phoneMetadataResource: AssetResource): T
 }

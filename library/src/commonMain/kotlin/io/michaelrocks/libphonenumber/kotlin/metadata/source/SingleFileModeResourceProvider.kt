@@ -14,16 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.michaelrocks.libphonenumber.android.metadata.source
+package io.michaelrocks.libphonenumber.kotlin.metadata.source
 
-import io.michaelrocks.libphonenumber.kotlin.metadata.source.PhoneMetadataResourceProvider
-import io.michaelrocks.libphonenumber.kotlin.metadata.source.SingleFileModeResourceProvider
-import junit.framework.TestCase
+import dev.icerock.moko.resources.AssetResource
 
-class SingleFileModeFileNameProviderTest : TestCase() {
-    private val metadataFileNameProvider: PhoneMetadataResourceProvider = SingleFileModeResourceProvider("some/file")
-    fun test_getFor_shouldReturnTheFileNameBase() {
-        val metadataFileName = metadataFileNameProvider.getFor("key1")
-        assertEquals("some/file", metadataFileName)
+/**
+ * [PhoneMetadataResourceProvider] implementation that returns the same metadata file name for
+ * each key
+ */
+class SingleFileModeResourceProvider(private val phoneMetadataFileName: String) : PhoneMetadataResourceProvider {
+    override fun getFor(key: Any): AssetResource {
+        return TODO()
     }
 }

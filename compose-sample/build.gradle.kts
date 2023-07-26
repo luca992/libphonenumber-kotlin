@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.org.jetbrains.kotlin.multiplatform)
     alias(libs.plugins.org.jetbrains.compose)
     alias(libs.plugins.com.android.application)
+    alias(libs.plugins.dev.icerock.mobile.multiplatform.resources)
 }
 
 version = "1.0-SNAPSHOT"
@@ -68,6 +69,7 @@ kotlin {
                 implementation(compose.foundation)
                 implementation(compose.material)
                 implementation(compose.runtime)
+                implementation(libs.dev.icerock.moko.resources)
                 implementation(project(":library"))
             }
         }
@@ -196,4 +198,8 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+}
+
+multiplatformResources {
+    multiplatformResourcesPackage = "io.michaelrocks.libphonenumber.sample"
 }

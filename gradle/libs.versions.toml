@@ -6,6 +6,7 @@ org-jetbrains-kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform"
 com-android-library = { id = "com.android.library", version.ref = "agp" }
 com-android-application = { id = "com.android.application", version.ref = "agp" }
 org-jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose-jb" }
+dev-icerock-mobile-multiplatform-resources = { id = "dev.icerock.mobile.multiplatform-resources", version.ref = "multiplatform-resources" }
 
 [versions]
 
@@ -18,6 +19,7 @@ compose-jb = "1.4.3"
 
 mockitoVersion = "5.4.0"
 okio = "3.4.0"
+multiplatform-resources = "0.23.0"
 
 androidx-activity = "1.7.2"
 
@@ -39,6 +41,7 @@ espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref =
 junit = { module = "junit:junit", version.ref = "junitVersion" }
 
 com-squareup-okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
+dev-icerock-moko-resources = { module = "dev.icerock.moko:resources", version.ref = "multiplatform-resources" }
 
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 androidx-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "androidx-lifecycle" }

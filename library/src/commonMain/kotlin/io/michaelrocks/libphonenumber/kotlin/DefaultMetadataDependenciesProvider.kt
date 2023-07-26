@@ -28,16 +28,16 @@ import kotlin.jvm.JvmOverloads
 class DefaultMetadataDependenciesProvider @JvmOverloads constructor(metadataLoader: MetadataLoader?) {
     val metadataParser = newLenientParser()
     val metadataLoader: MetadataLoader
-    val phoneNumberMetadataFileNameProvider: PhoneMetadataFileNameProvider = MultiFileModeFileNameProvider(
-        "/io/michaelrocks/libphonenumber/android/data/PhoneNumberMetadataProto"
+    val phoneNumberMetadataFileNameProvider: PhoneMetadataResourceProvider = MultiFileModeResourceProvider(
+        "files/io/michaelrocks/libphonenumber/android/data/PhoneNumberMetadataProto"
     )
     val phoneNumberMetadataSource: MetadataSource
-    val shortNumberMetadataFileNameProvider: PhoneMetadataFileNameProvider = MultiFileModeFileNameProvider(
-        "/io/michaelrocks/libphonenumber/android/data/ShortNumberMetadataProto"
+    val shortNumberMetadataFileNameProvider: PhoneMetadataResourceProvider = MultiFileModeResourceProvider(
+        "files/io/michaelrocks/libphonenumber/android/data/ShortNumberMetadataProto"
     )
     val shortNumberMetadataSource: RegionMetadataSource
-    val alternateFormatsMetadataFileNameProvider: PhoneMetadataFileNameProvider = MultiFileModeFileNameProvider(
-        "/io/michaelrocks/libphonenumber/android/data/PhoneNumberAlternateFormatsProto"
+    val alternateFormatsMetadataFileNameProvider: PhoneMetadataResourceProvider = MultiFileModeResourceProvider(
+        "files/io/michaelrocks/libphonenumber/android/data/PhoneNumberAlternateFormatsProto"
     )
     val alternateFormatsMetadataSource: FormattingMetadataSource
 
@@ -62,9 +62,7 @@ class DefaultMetadataDependenciesProvider @JvmOverloads constructor(metadataLoad
     }
 
     val carrierDataDirectory: String
-        get() = "/io/michaelrocks/libphonenumber/android/carrier/data/"
+        get() = "files/io/michaelrocks/libphonenumber/android/carrier/data/"
     val geocodingDataDirectory: String
-        get() = "/io/michaelrocks/libphonenumber/android/geocoding/data/"
+        get() = "files/io/michaelrocks/libphonenumber/android/geocoding/data/"
 }
-
-expect val instance: DefaultMetadataDependenciesProvider

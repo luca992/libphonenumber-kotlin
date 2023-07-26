@@ -20,8 +20,6 @@ import io.michaelrocks.libphonenumber.kotlin.MetadataLoader
 import io.michaelrocks.libphonenumber.kotlin.Phonemetadata.PhoneMetadata
 import io.michaelrocks.libphonenumber.kotlin.internal.GeoEntityUtility.isGeoEntity
 import io.michaelrocks.libphonenumber.kotlin.metadata.init.MetadataParser
-import io.michaelrocks.libphonenumber.kotlin.metadata.source.*
-import io.michaelrocks.libphonenumber.kotlin.metadata.source.BlockingMetadataBootstrappingGuard
 
 /**
  * Implementation of [RegionMetadataSource] guarded by [MetadataBootstrappingGuard]
@@ -31,15 +29,15 @@ import io.michaelrocks.libphonenumber.kotlin.metadata.source.BlockingMetadataBoo
  * implementation can be injected.
  */
 class RegionMetadataSourceImpl(
-    private val phoneMetadataFileNameProvider: PhoneMetadataFileNameProvider,
+    private val phoneMetadataResourceProvider: PhoneMetadataResourceProvider,
     private val bootstrappingGuard: MetadataBootstrappingGuard<MapBackedMetadataContainer<String>>
 ) : RegionMetadataSource {
     constructor(
-        phoneMetadataFileNameProvider: PhoneMetadataFileNameProvider,
+        phoneMetadataResourceProvider: PhoneMetadataResourceProvider,
         metadataLoader: MetadataLoader,
         metadataParser: MetadataParser
     ) : this(
-        phoneMetadataFileNameProvider,
+        phoneMetadataResourceProvider,
         BlockingMetadataBootstrappingGuard<MapBackedMetadataContainer<String>>(
             metadataLoader, metadataParser, MapBackedMetadataContainer.byRegionCode()
         )
@@ -48,7 +46,7 @@ class RegionMetadataSourceImpl(
     override fun getMetadataForRegion(regionCode: String?): PhoneMetadata? {
         require(isGeoEntity(regionCode!!)) { "$regionCode region code is a non-geo entity" }
         return bootstrappingGuard
-            .getOrBootstrap(phoneMetadataFileNameProvider.getFor(regionCode))
+            .getOrBootstrap(phoneMetadataResourceProvider.getFor(regionCode))
             ?.getMetadataBy(regionCode)
     }
 }

@@ -19,11 +19,7 @@ package io.michaelrocks.libphonenumber.kotlin.metadata.source
 import io.michaelrocks.libphonenumber.kotlin.MetadataLoader
 import io.michaelrocks.libphonenumber.kotlin.Phonemetadata.PhoneMetadata
 import io.michaelrocks.libphonenumber.kotlin.metadata.init.MetadataParser
-import io.michaelrocks.libphonenumber.kotlin.metadata.source.BlockingMetadataBootstrappingGuard
-import io.michaelrocks.libphonenumber.kotlin.metadata.source.FormattingMetadataSource
-import io.michaelrocks.libphonenumber.kotlin.metadata.source.MapBackedMetadataContainer
 import io.michaelrocks.libphonenumber.kotlin.metadata.source.MapBackedMetadataContainer.Companion.byCountryCallingCode
-import io.michaelrocks.libphonenumber.kotlin.metadata.source.MetadataBootstrappingGuard
 
 /**
  * Implementation of [FormattingMetadataSource] guarded by [MetadataBootstrappingGuard]
@@ -33,15 +29,15 @@ import io.michaelrocks.libphonenumber.kotlin.metadata.source.MetadataBootstrappi
  * implementation can be injected.
  */
 class FormattingMetadataSourceImpl(
-    private val phoneMetadataFileNameProvider: PhoneMetadataFileNameProvider,
+    private val phoneMetadataResourceProvider: PhoneMetadataResourceProvider,
     private val bootstrappingGuard: MetadataBootstrappingGuard<MapBackedMetadataContainer<Int>>
 ) : FormattingMetadataSource {
     constructor(
-        phoneMetadataFileNameProvider: PhoneMetadataFileNameProvider,
+        phoneMetadataResourceProvider: PhoneMetadataResourceProvider,
         metadataLoader: MetadataLoader?,
         metadataParser: MetadataParser?
     ) : this(
-        phoneMetadataFileNameProvider,
+        phoneMetadataResourceProvider,
         BlockingMetadataBootstrappingGuard<MapBackedMetadataContainer<Int>>(
             metadataLoader!!, metadataParser!!, byCountryCallingCode()
         )
@@ -49,7 +45,7 @@ class FormattingMetadataSourceImpl(
 
     override fun getFormattingMetadataForCountryCallingCode(countryCallingCode: Int): PhoneMetadata? {
         return bootstrappingGuard
-            .getOrBootstrap(phoneMetadataFileNameProvider.getFor(countryCallingCode))
+            .getOrBootstrap(phoneMetadataResourceProvider.getFor(countryCallingCode))
             ?.getMetadataBy(countryCallingCode)
     }
 }

@@ -16,6 +16,7 @@
  */
 package io.michaelrocks.libphonenumber.kotlin.metadata.source
 
+import dev.icerock.moko.resources.AssetResource
 import io.michaelrocks.libphonenumber.kotlin.MetadataLoader
 import io.michaelrocks.libphonenumber.kotlin.Phonemetadata.PhoneMetadata
 import io.michaelrocks.libphonenumber.kotlin.metadata.init.MetadataParser
@@ -33,38 +34,38 @@ internal class BlockingMetadataBootstrappingGuard<T : MetadataContainer>(
     private val metadataContainer: T
 ) : MetadataBootstrappingGuard<T> {
     private val loadedFiles // identity map
-            : MutableMap<String, String> = mutableMapOf()
+            : MutableSet<AssetResource> = mutableSetOf()
 
 
-    override fun getOrBootstrap(phoneMetadataFile: String): T {
-        if (!loadedFiles.containsKey(phoneMetadataFile)) {
-            bootstrapMetadata(phoneMetadataFile)
+    override fun getOrBootstrap(phoneMetadataResource: AssetResource): T {
+        if (!loadedFiles.contains(phoneMetadataResource)) {
+            bootstrapMetadata(phoneMetadataResource)
         }
         return metadataContainer
     }
 
     @Synchronized
-    private fun bootstrapMetadata(phoneMetadataFile: String) {
+    private fun bootstrapMetadata(phoneMetadataResource: AssetResource) {
         // Additional check is needed because multiple threads could pass the first check when calling
         // getOrBootstrap() at the same time for unloaded metadata file
-        if (loadedFiles.containsKey(phoneMetadataFile)) {
+        if (loadedFiles.contains(phoneMetadataResource)) {
             return
         }
-        val phoneMetadata = read(phoneMetadataFile)
+        val phoneMetadata = read(phoneMetadataResource)
         for (metadata in phoneMetadata) {
             metadataContainer.accept(metadata)
         }
-        loadedFiles[phoneMetadataFile] = phoneMetadataFile
+        loadedFiles.add(phoneMetadataResource)
     }
 
-    private fun read(phoneMetadataFile: String): Collection<PhoneMetadata> {
+    private fun read(phoneMetadataResource: AssetResource): Collection<PhoneMetadata> {
         return try {
-            val metadataStream = metadataLoader.loadMetadata(phoneMetadataFile)
+            val metadataStream = metadataLoader.loadMetadata(phoneMetadataResource)
             metadataParser.parse(metadataStream)
         } catch (e: IllegalArgumentException) {
-            throw IllegalStateException("Failed to read file $phoneMetadataFile", e)
+            throw IllegalStateException("Failed to read file ${phoneMetadataResource.originalPath}", e)
         } catch (e: IllegalStateException) {
-            throw IllegalStateException("Failed to read file $phoneMetadataFile", e)
+            throw IllegalStateException("Failed to read file ${phoneMetadataResource.originalPath}", e)
         }
     }
 }

@@ -16,13 +16,13 @@
  */
 package io.michaelrocks.libphonenumber.android.metadata.source
 
-import io.michaelrocks.libphonenumber.kotlin.metadata.source.MultiFileModeFileNameProvider
-import io.michaelrocks.libphonenumber.kotlin.metadata.source.PhoneMetadataFileNameProvider
+import io.michaelrocks.libphonenumber.kotlin.metadata.source.MultiFileModeResourceProvider
+import io.michaelrocks.libphonenumber.kotlin.metadata.source.PhoneMetadataResourceProvider
 import junit.framework.TestCase
 import org.junit.Assert
 
 class MultiFileModeFileNameProviderTest : TestCase() {
-    private val metadataFileNameProvider: PhoneMetadataFileNameProvider = MultiFileModeFileNameProvider("some/file")
+    private val metadataFileNameProvider: PhoneMetadataResourceProvider = MultiFileModeResourceProvider("some/file")
     fun test_getFor_shouldAppendKeyToTheBase() {
         val metadataFileName = metadataFileNameProvider.getFor("key1")
         assertEquals("some/file_key1", metadataFileName)

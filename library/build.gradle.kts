@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.org.jetbrains.kotlin.multiplatform)
     alias(libs.plugins.com.android.library)
+    alias(libs.plugins.dev.icerock.mobile.multiplatform.resources)
     id("maven-publish")
     id("signing")
 }
@@ -10,25 +11,23 @@ group = rootProject.group
 version = rootProject.version
 
 object Targets {
+    // limited by moko resources https://github.com/icerockdev/moko-resources/issues/73
     val iosTargets = arrayOf("iosArm64", "iosX64", "iosSimulatorArm64")
     val tvosTargets = arrayOf("tvosArm64", "tvosX64", "tvosSimulatorArm64")
-    val watchosTargets = arrayOf(
-        "watchosArm32", "watchosArm64", "watchosX64", "watchosSimulatorArm64", "watchosDeviceArm64"
-    )
+    val watchosTargets = arrayOf("watchosArm32", "watchosArm64", "watchosX64", "watchosSimulatorArm64", "watchosDeviceArm64")
     val macosTargets = arrayOf("macosX64", "macosArm64")
     val darwinTargets = iosTargets + tvosTargets + watchosTargets + macosTargets
-    val linuxTargets = arrayOf("linuxX64", "linuxArm64")
-    val mingwTargets = arrayOf("mingwX64")
-    val androidTargets = arrayOf(
-        "androidNativeArm32", "androidNativeArm64", "androidNativeX86", "androidNativeX64",
-    )
-    val nativeTargets = linuxTargets + darwinTargets + mingwTargets
+
+    val linuxTargets = emptyArray<String>() // arrayOf("linuxX64", "linuxArm64")
+    val mingwTargets = emptyArray<String>() // arrayOf("mingwX64")
+    val androidTargets = arrayOf("androidNativeArm32", "androidNativeArm64", "androidNativeX86", "androidNativeX64")
+    val nativeTargets = linuxTargets + darwinTargets + mingwTargets + androidTargets
 }
 
 kotlin {
     androidTarget()
     jvm()
-    js(IR){
+    js(IR) {
         browser()
         nodejs()
     }
@@ -48,14 +47,18 @@ kotlin {
             dependencies {
                 implementation(libs.com.squareup.okio)
                 implementation(libs.co.touchlab.kermit)
+                implementation(libs.dev.icerock.moko.resources)
             }
         }
         val commonTest by getting
-        val jvmMain by getting {
+        val jvmCommonMain by creating {
             dependsOn(commonMain)
         }
+        val jvmMain by getting {
+            dependsOn(jvmCommonMain)
+        }
         val androidMain by getting {
-            dependsOn(jvmMain)
+            dependsOn(jvmCommonMain)
         }
         val nonJvmMain by creating {
             dependsOn(commonMain)
@@ -107,37 +110,33 @@ android {
         }
     }
 
-    sourceSets {
-        named("main") {
-            java.srcDirs("src/androidMain/java")
-        }
-        named("test") {
-            java.srcDirs("src/androidUnitTest/java")
-        }
-    }
 
-//    variantFilter { variant ->
-//        if (variant.buildType.name != "release") {
-//            variant.setIgnore(true)
+//    androidComponents.beforeVariants { variantBuilder ->
+//        if (variantBuilder.name != "release") {
+//            variantBuilder.enable = false
 //        }
 //    }
 
     lint {
         abortOnError = false
     }
-//
-//  publishing {
-//    singleVariant("release") {
-//      withSourcesJar()
-//      withJavadocJar()
-//    }
-//  }
+
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+            withJavadocJar()
+        }
+    }
 
     // https://kotlinlang.org/docs/gradle-configure-project.html#gradle-java-toolchains-support
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+}
+
+multiplatformResources {
+    multiplatformResourcesPackage = "io.michaelrocks.libphonenumber"
 }
 
 /*

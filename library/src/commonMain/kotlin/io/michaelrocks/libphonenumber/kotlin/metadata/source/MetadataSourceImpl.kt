@@ -29,15 +29,15 @@ import io.michaelrocks.libphonenumber.kotlin.metadata.init.MetadataParser
  * implementation can be injected.
  */
 class MetadataSourceImpl(
-    private val phoneMetadataFileNameProvider: PhoneMetadataFileNameProvider,
+    private val phoneMetadataResourceProvider: PhoneMetadataResourceProvider,
     private val bootstrappingGuard: MetadataBootstrappingGuard<CompositeMetadataContainer>
 ) : MetadataSource {
     constructor(
-        phoneMetadataFileNameProvider: PhoneMetadataFileNameProvider,
+        phoneMetadataResourceProvider: PhoneMetadataResourceProvider,
         metadataLoader: MetadataLoader?,
         metadataParser: MetadataParser?
     ) : this(
-        phoneMetadataFileNameProvider,
+        phoneMetadataResourceProvider,
         BlockingMetadataBootstrappingGuard<CompositeMetadataContainer>(
             metadataLoader!!, metadataParser!!, CompositeMetadataContainer()
         )
@@ -46,14 +46,14 @@ class MetadataSourceImpl(
     override fun getMetadataForNonGeographicalRegion(countryCallingCode: Int): PhoneMetadata? {
         require(!isGeoEntity(countryCallingCode)) { "$countryCallingCode calling code belongs to a geo entity" }
         return bootstrappingGuard
-            .getOrBootstrap(phoneMetadataFileNameProvider.getFor(countryCallingCode))
+            .getOrBootstrap(phoneMetadataResourceProvider.getFor(countryCallingCode))
             .getMetadataBy(countryCallingCode)
     }
 
     override fun getMetadataForRegion(regionCode: String?): PhoneMetadata? {
         require(isGeoEntity(regionCode!!)) { "$regionCode region code is a non-geo entity" }
         return bootstrappingGuard
-            .getOrBootstrap(phoneMetadataFileNameProvider.getFor(regionCode))
+            .getOrBootstrap(phoneMetadataResourceProvider.getFor(regionCode))
             .getMetadataBy(regionCode)
     }
 }

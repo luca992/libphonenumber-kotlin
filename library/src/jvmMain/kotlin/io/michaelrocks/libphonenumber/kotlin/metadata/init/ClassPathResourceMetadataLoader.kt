@@ -17,6 +17,7 @@
 package io.michaelrocks.libphonenumber.kotlin.metadata.init
 
 import co.touchlab.kermit.Logger
+import dev.icerock.moko.resources.AssetResource
 import io.michaelrocks.libphonenumber.kotlin.MetadataLoader
 import io.michaelrocks.libphonenumber.kotlin.io.InputStream
 
@@ -25,10 +26,11 @@ import io.michaelrocks.libphonenumber.kotlin.io.InputStream
  * resources.
  */
 class ClassPathResourceMetadataLoader : MetadataLoader {
-    override fun loadMetadata(metadataFileName: String): InputStream? {
-        val inputStream = ClassPathResourceMetadataLoader::class.java.getResourceAsStream(metadataFileName)
+    override fun loadMetadata(phoneMetadataResource: AssetResource): InputStream? {
+        val inputStream =
+            phoneMetadataResource.resourcesClassLoader.getResourceAsStream(phoneMetadataResource.filePath)
         if (inputStream == null) {
-            logger.w(String.format("File %s not found", metadataFileName))
+            logger.w(String.format("File %s not found", phoneMetadataResource.filePath))
         }
         return inputStream
     }

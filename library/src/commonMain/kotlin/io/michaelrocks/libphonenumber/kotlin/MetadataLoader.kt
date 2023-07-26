@@ -16,6 +16,7 @@
  */
 package io.michaelrocks.libphonenumber.kotlin
 
+import dev.icerock.moko.resources.AssetResource
 import io.michaelrocks.libphonenumber.kotlin.io.InputStream
 
 
@@ -31,10 +32,9 @@ interface MetadataLoader {
      * Returns an input stream corresponding to the metadata to load. This method may be called
      * concurrently so implementations must be thread-safe.
      *
-     * @param metadataFileName  file name (including path) of metadata to load. File path is an
-     * absolute class path like /io/michaelrocks/libphonenumber/android/data/PhoneNumberMetadataProto
+     * @param phoneMetadataResource  the moko resources AssetResource to load
      * @return  the input stream for the metadata file. The library will close this stream
      * after it is done. Return null in case the metadata file could not be found
      */
-    fun loadMetadata(metadataFileName: String): InputStream?
+    fun loadMetadata(phoneMetadataResource: AssetResource): InputStream?
 }
