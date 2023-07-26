@@ -9,12 +9,36 @@ val artifactName = rootProject.name
 group = rootProject.group
 version = rootProject.version
 
+object Targets {
+    val iosTargets = arrayOf("iosArm64", "iosX64", "iosSimulatorArm64")
+    val tvosTargets = arrayOf("tvosArm64", "tvosX64", "tvosSimulatorArm64")
+    val watchosTargets = arrayOf(
+        "watchosArm32", "watchosArm64", "watchosX64", "watchosSimulatorArm64", "watchosDeviceArm64"
+    )
+    val macosTargets = arrayOf("macosX64", "macosArm64")
+    val darwinTargets = iosTargets + tvosTargets + watchosTargets + macosTargets
+    val linuxTargets = arrayOf("linuxX64", "linuxArm64")
+    val mingwTargets = arrayOf("mingwX64")
+    val androidTargets = arrayOf(
+        "androidNativeArm32", "androidNativeArm64", "androidNativeX86", "androidNativeX64",
+    )
+    val nativeTargets = linuxTargets + darwinTargets + mingwTargets
+}
+
 kotlin {
     androidTarget()
     jvm()
     js(IR){
         browser()
         nodejs()
+    }
+//    wasm{
+//        browser()
+//        nodejs()
+//        d8()
+//    }
+    for (target in Targets.nativeTargets) {
+        targets.add(presets.getByName(target).createTarget(target))
     }
     sourceSets {
         all {
@@ -36,6 +60,9 @@ kotlin {
         val nonJvmMain by creating {
             dependsOn(commonMain)
         }
+        val nonJvmTest by creating {
+            dependsOn(commonTest)
+        }
         val jsMain by getting {
             dependsOn(nonJvmMain)
         }
@@ -44,6 +71,20 @@ kotlin {
             dependencies {
                 implementation(libs.junit)
                 implementation(libs.mockito.core)
+            }
+        }
+        val nativeMain by creating {
+            dependsOn(nonJvmMain)
+        }
+        val nativeTest by creating {
+            dependsOn(nonJvmTest)
+        }
+        Targets.nativeTargets.forEach { target ->
+            getByName("${target}Main") {
+                dependsOn(nativeMain)
+            }
+            getByName("${target}Test") {
+                dependsOn(nativeTest)
             }
         }
     }

@@ -176,7 +176,6 @@ class Phonemetadata private constructor() {
             return this
         }
 
-        @Throws(IOException::class)
         override fun writeExternal(out: ObjectOutput) {
             out.writeUTF(pattern)
             out.writeUTF(format)
@@ -196,7 +195,6 @@ class Phonemetadata private constructor() {
             out.writeBoolean(nationalPrefixOptionalWhenFormatting)
         }
 
-        @Throws(IOException::class)
         override fun readExternal(input: ObjectInput) {
             setPattern(input.readUTF())
             setFormat(input.readUTF())
@@ -338,7 +336,6 @@ class Phonemetadata private constructor() {
             return nationalNumberPattern == other.nationalNumberPattern && possibleLength_ == other.possibleLength_ && possibleLengthLocalOnly_ == other.possibleLengthLocalOnly_ && exampleNumber == other.exampleNumber
         }
 
-        @Throws(IOException::class)
         override fun writeExternal(objectOutput: ObjectOutput) {
             objectOutput.writeBoolean(hasNationalNumberPattern)
             if (hasNationalNumberPattern) {
@@ -360,7 +357,6 @@ class Phonemetadata private constructor() {
             }
         }
 
-        @Throws(IOException::class)
         override fun readExternal(objectInput: ObjectInput) {
             if (objectInput.readBoolean()) {
                 setNationalNumberPattern(objectInput.readUTF())
@@ -1022,7 +1018,6 @@ class Phonemetadata private constructor() {
             return this
         }
 
-        @Throws(IOException::class)
         override fun writeExternal(objectOutput: ObjectOutput) {
             objectOutput.writeBoolean(hasGeneralDesc)
             if (hasGeneralDesc) {
@@ -1134,7 +1129,6 @@ class Phonemetadata private constructor() {
             objectOutput.writeBoolean(mobileNumberPortableRegion_)
         }
 
-        @Throws(IOException::class)
         override fun readExternal(objectInput: ObjectInput) {
             var hasDesc = objectInput.readBoolean()
             if (hasDesc) {
@@ -1318,7 +1312,6 @@ class Phonemetadata private constructor() {
             return this
         }
 
-        @Throws(IOException::class)
         override fun writeExternal(objectOutput: ObjectOutput) {
             val size = metadataCount
             objectOutput.writeInt(size)
@@ -1327,7 +1320,6 @@ class Phonemetadata private constructor() {
             }
         }
 
-        @Throws(IOException::class)
         override fun readExternal(objectInput: ObjectInput) {
             val size = objectInput.readInt()
             for (i in 0 until size) {

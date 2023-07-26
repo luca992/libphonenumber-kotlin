@@ -1,6 +1,7 @@
 package io.michaelrocks.libphonenumber.kotlin.io
 
-actual open class ObjectInputStream: InputStream(), ObjectInput, ObjectStreamConstants {
+actual open class ObjectInputStream actual constructor(inputStream: InputStream) : InputStream(), ObjectInput,
+    ObjectStreamConstants {
     override fun readFully(b: ByteArray?) {
         TODO("Not yet implemented")
     }
