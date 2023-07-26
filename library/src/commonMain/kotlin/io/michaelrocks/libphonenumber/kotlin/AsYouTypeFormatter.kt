@@ -23,6 +23,7 @@ import io.michaelrocks.libphonenumber.kotlin.Phonemetadata
 import io.michaelrocks.libphonenumber.kotlin.Phonemetadata.PhoneMetadata
 import io.michaelrocks.libphonenumber.kotlin.Phonemetadata.PhoneMetadata.Companion.newBuilder
 import io.michaelrocks.libphonenumber.kotlin.internal.RegexCache
+import io.michaelrocks.libphonenumber.kotlin.util.InplaceStringBuilder
 import kotlin.math.min
 
 /**
@@ -44,12 +45,12 @@ class AsYouTypeFormatter internal constructor(
     private val phoneUtil: PhoneNumberUtil, private val defaultCountry: String
 ) {
     private var currentOutput = ""
-    private val formattingTemplate = StringBuilder()
+    private val formattingTemplate = InplaceStringBuilder()
 
     // The pattern from numberFormat that is currently used to create formattingTemplate.
     private var currentFormattingPattern = ""
-    private val accruedInput = StringBuilder()
-    private val accruedInputWithoutFormatting = StringBuilder()
+    private val accruedInput = InplaceStringBuilder()
+    private val accruedInputWithoutFormatting = InplaceStringBuilder()
 
     // This indicates whether AsYouTypeFormatter is currently doing the formatting.
     private var ableToFormat = true
@@ -78,7 +79,7 @@ class AsYouTypeFormatter internal constructor(
     // This contains anything that has been entered so far preceding the national significant number,
     // and it is formatted (e.g. with space inserted). For example, this can contain IDD, country
     // code, and/or NDD, etc.
-    private val prefixBeforeNationalNumber = StringBuilder()
+    private val prefixBeforeNationalNumber = InplaceStringBuilder()
     private var shouldAddSpaceAfterNationalPrefix = false
 
     // @VisibleForTesting
@@ -86,7 +87,7 @@ class AsYouTypeFormatter internal constructor(
     // formatting.
     var extractedNationalPrefix = ""
         private set
-    private val nationalNumber = StringBuilder()
+    private val nationalNumber = InplaceStringBuilder()
     private val possibleFormats: MutableList<Phonemetadata.NumberFormat> = ArrayList()
 
     // A cache for frequently used country-specific regular expressions.
@@ -578,7 +579,7 @@ class AsYouTypeFormatter internal constructor(
         if (nationalNumber.length == 0) {
             return false
         }
-        val numberWithoutCountryCallingCode = StringBuilder()
+        val numberWithoutCountryCallingCode = InplaceStringBuilder()
         val countryCode = phoneUtil.extractCountryCode(nationalNumber, numberWithoutCountryCallingCode)
         if (countryCode == 0) {
             return false

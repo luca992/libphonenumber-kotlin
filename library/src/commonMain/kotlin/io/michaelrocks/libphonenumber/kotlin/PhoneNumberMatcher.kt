@@ -25,6 +25,7 @@ import io.michaelrocks.libphonenumber.kotlin.PhoneNumberUtil.PhoneNumberFormat
 import io.michaelrocks.libphonenumber.kotlin.Phonenumber.PhoneNumber
 import io.michaelrocks.libphonenumber.kotlin.Phonenumber.PhoneNumber.CountryCodeSource
 import io.michaelrocks.libphonenumber.kotlin.internal.RegexCache
+import io.michaelrocks.libphonenumber.kotlin.util.InplaceStringBuilder
 
 /**
  * A stateful class that finds and extracts telephone numbers from [text][CharSequence].
@@ -279,7 +280,7 @@ class PhoneNumberMatcher(
         fun checkGroups(
             util: PhoneNumberUtil,
             number: PhoneNumber,
-            normalizedCandidate: StringBuilder,
+            normalizedCandidate: InplaceStringBuilder,
             expectedNumberGroups: Array<String>
         ): Boolean
     }
@@ -549,7 +550,7 @@ class PhoneNumberMatcher(
         fun allNumberGroupsAreExactlyPresent(
             util: PhoneNumberUtil,
             number: PhoneNumber,
-            normalizedCandidate: StringBuilder,
+            normalizedCandidate: InplaceStringBuilder,
             formattedNumberGroups: Array<String>
         ): Boolean {
             val candidateGroups = PhoneNumberUtil.NON_DIGITS_PATTERN.split(normalizedCandidate.toString())
@@ -707,7 +708,7 @@ class PhoneNumberMatcher(
                 }
                 // Normalize the remainder.
                 val rawInputCopy = normalizeDigitsOnly(number.rawInput)
-                val rawInput = StringBuilder(rawInputCopy)
+                val rawInput = InplaceStringBuilder(rawInputCopy)
                 // Check if we found a national prefix and/or carrier code at the start of the raw input, and
                 // return the result.
                 return util.maybeStripNationalPrefixAndCarrierCode(rawInput, metadata, null)

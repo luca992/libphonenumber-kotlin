@@ -22,6 +22,7 @@
 package io.michaelrocks.libphonenumber.kotlin
 
 import io.michaelrocks.libphonenumber.kotlin.io.Serializable
+import io.michaelrocks.libphonenumber.kotlin.util.InplaceStringBuilder
 
 class Phonenumber private constructor() {
     class PhoneNumber : Serializable {
@@ -289,7 +290,7 @@ class Phonenumber private constructor() {
         }
 
         override fun toString(): String {
-            val outputString = StringBuilder()
+            val outputString = InplaceStringBuilder()
             outputString.append("Country Code: ").append(countryCode)
             outputString.append(" National Number: ").append(nationalNumber)
             if (hasItalianLeadingZero() && isItalianLeadingZero) {
