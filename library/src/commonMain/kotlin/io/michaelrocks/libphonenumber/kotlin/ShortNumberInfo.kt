@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.michaelrocks.libphonenumber.android
+package io.michaelrocks.libphonenumber.kotlin
 
 import co.touchlab.kermit.Logger
 import io.michaelrocks.libphonenumber.kotlin.CountryCodeToRegionCodeMap.countryCodeToRegionCodeMap
@@ -379,7 +379,7 @@ class ShortNumberInfo internal constructor(// MatcherApi supports the basic matc
         allowPrefixMatch: Boolean
     ): Boolean {
         val possibleNumber = PhoneNumberUtil.extractPossibleNumber(number)
-        if (PhoneNumberUtil.PLUS_CHARS_PATTERN.matcher(possibleNumber).lookingAt()) {
+        if (PhoneNumberUtil.PLUS_CHARS_PATTERN.matchesAt(possibleNumber, 0)) {
             // Returns false if the number starts with a plus sign. We don't believe dialing the country
             // code before emergency numbers (e.g. +1911) works, but later, if that proves to work, we can
             // add additional logic here to handle it.

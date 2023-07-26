@@ -14,18 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.michaelrocks.libphonenumber.android.metadata
+package io.michaelrocks.libphonenumber.kotlin.metadata
 
-import io.michaelrocks.libphonenumber.android.metadata.init.ClassPathResourceMetadataLoader
 import io.michaelrocks.libphonenumber.kotlin.MetadataLoader
 import io.michaelrocks.libphonenumber.kotlin.metadata.init.MetadataParser.Companion.newLenientParser
 import io.michaelrocks.libphonenumber.kotlin.metadata.source.*
+import kotlin.jvm.JvmOverloads
 
 /**
  * Provides metadata init and source dependencies when metadata is stored in multi-file mode and
  * loaded as a classpath resource.
  */
-class DefaultMetadataDependenciesProvider @JvmOverloads constructor(metadataLoader: MetadataLoader? = ClassPathResourceMetadataLoader()) {
+class DefaultMetadataDependenciesProvider @JvmOverloads constructor(metadataLoader: MetadataLoader?) {
     val metadataParser = newLenientParser()
     val metadataLoader: MetadataLoader
     val phoneNumberMetadataFileNameProvider: PhoneMetadataFileNameProvider = MultiFileModeFileNameProvider(
@@ -65,8 +65,6 @@ class DefaultMetadataDependenciesProvider @JvmOverloads constructor(metadataLoad
         get() = "/io/michaelrocks/libphonenumber/android/carrier/data/"
     val geocodingDataDirectory: String
         get() = "/io/michaelrocks/libphonenumber/android/geocoding/data/"
-
-    companion object {
-        val instance = DefaultMetadataDependenciesProvider()
-    }
 }
+
+expect val instance: DefaultMetadataDependenciesProvider

@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2017 Michael Rozumyanskiy
+ * Copyright (C) 2022 The Libphonenumber Authors
+ * Copyright (C) 2022 Michael Rozumyanskiy
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.michaelrocks.libphonenumber.android.metadata.source
+package io.michaelrocks.libphonenumber.kotlin.metadata.init
 
-import android.content.res.AssetManager
+import co.touchlab.kermit.Logger
 import io.michaelrocks.libphonenumber.kotlin.MetadataLoader
 import io.michaelrocks.libphonenumber.kotlin.io.InputStream
-import okio.IOException
 
-class AssetsMetadataLoader(private val assetManager: AssetManager) : MetadataLoader {
+/**
+ * A [MetadataLoader] implementation that reads phone number metadata files as classpath
+ * resources.
+ */
+class ClassPathResourceMetadataLoader : MetadataLoader {
     override fun loadMetadata(metadataFileName: String): InputStream? {
-        val assetFileName = metadataFileName.substring(1)
-        return try {
-            assetManager.open(assetFileName)
-        } catch (exception: IOException) {
-            null
+        val inputStream = ClassPathResourceMetadataLoader::class.java.getResourceAsStream(metadataFileName)
+        if (inputStream == null) {
+            logger.w(String.format("File %s not found", metadataFileName))
         }
+        return inputStream
+    }
+
+    companion object {
+        private val logger = Logger.withTag(
+            ClassPathResourceMetadataLoader::class.simpleName.toString()
+        )
     }
 }

@@ -24,9 +24,9 @@
 //import java.util.List;
 //import java.util.Set;
 //
-//import io.michaelrocks.libphonenumber.android.PhoneNumberUtil.PhoneNumberFormat;
-//import io.michaelrocks.libphonenumber.android.PhoneNumberUtil.PhoneNumberType;
-//import io.michaelrocks.libphonenumber.android.PhoneNumberUtil.ValidationResult;
+//import io.michaelrocks.libphonenumber.kotlin.PhoneNumberUtil.PhoneNumberFormat;
+//import io.michaelrocks.libphonenumber.kotlin.PhoneNumberUtil.PhoneNumberType;
+//import io.michaelrocks.libphonenumber.kotlin.PhoneNumberUtil.ValidationResult;
 //import io.michaelrocks.libphonenumber.kotlin.Phonemetadata.NumberFormat;
 //import io.michaelrocks.libphonenumber.kotlin.Phonemetadata.PhoneMetadata;
 //import io.michaelrocks.libphonenumber.kotlin.Phonenumber.PhoneNumber;

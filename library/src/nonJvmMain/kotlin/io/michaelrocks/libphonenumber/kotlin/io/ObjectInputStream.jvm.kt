@@ -53,7 +53,7 @@ actual open class ObjectInputStream: InputStream(), ObjectInput, ObjectStreamCon
         TODO("Not yet implemented")
     }
 
-    override fun readLine(): String? {
+    override fun readLine(): String {
         TODO("Not yet implemented")
     }
 

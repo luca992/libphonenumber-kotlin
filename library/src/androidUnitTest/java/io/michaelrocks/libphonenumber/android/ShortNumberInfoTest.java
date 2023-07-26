@@ -18,7 +18,7 @@
 //package io.michaelrocks.libphonenumber.android;
 //
 //import io.michaelrocks.libphonenumber.kotlin.Phonenumber.PhoneNumber;
-//import io.michaelrocks.libphonenumber.android.metadata.init.ClassPathResourceMetadataLoader;
+//import io.michaelrocks.libphonenumber.kotlin.metadata.init.ClassPathResourceMetadataLoader;
 //
 ///**
 // * Unit tests for ShortNumberInfo.java

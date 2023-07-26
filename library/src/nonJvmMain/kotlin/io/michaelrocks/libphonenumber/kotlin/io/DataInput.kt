@@ -2,34 +2,34 @@ package io.michaelrocks.libphonenumber.kotlin.io
 
 actual interface DataInput {
 
-    fun readFully(b: ByteArray?)
+    actual fun readFully(b: ByteArray?)
 
-    fun readFully(b: ByteArray?, off: Int, len: Int)
+    actual fun readFully(b: ByteArray?, off: Int, len: Int)
 
-    fun skipBytes(n: Int): Int
+    actual fun skipBytes(n: Int): Int
 
-    fun readBoolean(): Boolean
+    actual fun readBoolean(): Boolean
 
-    fun readByte(): Byte
+    actual fun readByte(): Byte
 
-    fun readUnsignedByte(): Int
+    actual fun readUnsignedByte(): Int
 
-    fun readShort(): Short
+    actual fun readShort(): Short
 
 
-    fun readUnsignedShort(): Int
+    actual fun readUnsignedShort(): Int
 
-    fun readChar(): Char
+    actual fun readChar(): Char
 
-    fun readInt(): Int
+    actual fun readInt(): Int
 
-    fun readLong(): Long
+    actual fun readLong(): Long
 
-    fun readFloat(): Float
+    actual fun readFloat(): Float
 
-    fun readDouble(): Double
+    actual fun readDouble(): Double
 
-    fun readLine(): String?
+    actual fun readLine(): String
 
-    fun readUTF(): String
+    actual fun readUTF(): String
 }

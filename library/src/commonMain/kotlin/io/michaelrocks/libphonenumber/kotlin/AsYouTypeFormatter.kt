@@ -16,15 +16,13 @@
  */
 package io.michaelrocks.libphonenumber.android
 
-import io.michaelrocks.libphonenumber.android.PhoneNumberUtil
-import io.michaelrocks.libphonenumber.android.PhoneNumberUtil.Companion.formattingRuleHasFirstGroupOnly
-import io.michaelrocks.libphonenumber.android.PhoneNumberUtil.Companion.normalizeDiallableCharsOnly
+import io.michaelrocks.libphonenumber.kotlin.PhoneNumberUtil
+import io.michaelrocks.libphonenumber.kotlin.PhoneNumberUtil.Companion.formattingRuleHasFirstGroupOnly
+import io.michaelrocks.libphonenumber.kotlin.PhoneNumberUtil.Companion.normalizeDiallableCharsOnly
 import io.michaelrocks.libphonenumber.kotlin.Phonemetadata
 import io.michaelrocks.libphonenumber.kotlin.Phonemetadata.PhoneMetadata
 import io.michaelrocks.libphonenumber.kotlin.Phonemetadata.PhoneMetadata.Companion.newBuilder
 import io.michaelrocks.libphonenumber.kotlin.internal.RegexCache
-import java.util.regex.Matcher
-import java.util.regex.Pattern
 import kotlin.math.min
 
 /**
@@ -43,8 +41,7 @@ import kotlin.math.min
  * @author Shaopeng Jia
  */
 class AsYouTypeFormatter internal constructor(
-    private val phoneUtil: PhoneNumberUtil,
-    private val defaultCountry: String
+    private val phoneUtil: PhoneNumberUtil, private val defaultCountry: String
 ) {
     private var currentOutput = ""
     private val formattingTemplate = StringBuilder()
@@ -130,9 +127,9 @@ class AsYouTypeFormatter internal constructor(
             }
             if (createFormattingTemplate(numberFormat)) {
                 currentFormattingPattern = pattern
-                shouldAddSpaceAfterNationalPrefix = NATIONAL_PREFIX_SEPARATORS_PATTERN.matcher(
+                shouldAddSpaceAfterNationalPrefix = NATIONAL_PREFIX_SEPARATORS_PATTERN.containsMatchIn(
                     numberFormat.nationalPrefixFormattingRule
-                ).find()
+                )
                 // With a new formatting template, the matched position using the old template needs to be
                 // reset.
                 lastMatchPosition = 0
@@ -155,26 +152,22 @@ class AsYouTypeFormatter internal constructor(
             // prefix.
             if (extractedNationalPrefix.length > 0 && formattingRuleHasFirstGroupOnly(
                     format.nationalPrefixFormattingRule
-                )
-                && !format.nationalPrefixOptionalWhenFormatting
-                && !format.hasDomesticCarrierCodeFormattingRule()
+                ) && !format.nationalPrefixOptionalWhenFormatting && !format.hasDomesticCarrierCodeFormattingRule()
             ) {
                 // If it is a national number that had a national prefix, any rules that aren't valid with a
                 // national prefix should be excluded. A rule that has a carrier-code formatting rule is
                 // kept since the national prefix might actually be an extracted carrier code - we don't
                 // distinguish between these when extracting it in the AYTF.
                 continue
-            } else if (extractedNationalPrefix.length == 0 && !isCompleteNumber
-                && !formattingRuleHasFirstGroupOnly(
+            } else if (extractedNationalPrefix.length == 0 && !isCompleteNumber && !formattingRuleHasFirstGroupOnly(
                     format.nationalPrefixFormattingRule
-                )
-                && !format.nationalPrefixOptionalWhenFormatting
+                ) && !format.nationalPrefixOptionalWhenFormatting
             ) {
                 // This number was entered without a national prefix, and this formatting rule requires one,
                 // so we discard it.
                 continue
             }
-            if (ELIGIBLE_FORMAT_PATTERN.matcher(format.format).matches()) {
+            if (ELIGIBLE_FORMAT_PATTERN.matches(format.format)) {
                 possibleFormats.add(format)
             }
         }
@@ -191,13 +184,11 @@ class AsYouTypeFormatter internal constructor(
                 continue
             }
             val lastLeadingDigitsPattern =
-                min(indexOfLeadingDigitsPattern.toDouble(), (format.leadingDigitsPatternCount - 1).toDouble())
-                    .toInt()
-            val leadingDigitsPattern: Pattern = regexCache.getRegexForPattern(
+                min(indexOfLeadingDigitsPattern.toDouble(), (format.leadingDigitsPatternCount - 1).toDouble()).toInt()
+            val leadingDigitsPattern = regexCache.getRegexForPattern(
                 format.getLeadingDigitsPattern(lastLeadingDigitsPattern)
             )
-            val m = leadingDigitsPattern.matcher(leadingDigits)
-            if (!m.lookingAt()) {
+            if (!leadingDigitsPattern.matchesAt(leadingDigits, 0)) {
                 it.remove()
             }
         }
@@ -220,9 +211,9 @@ class AsYouTypeFormatter internal constructor(
         // Creates a phone number consisting only of the digit 9 that matches the
         // numberPattern by applying the pattern to the longestPhoneNumber string.
         val longestPhoneNumber = "999999999999999"
-        val m: Matcher = regexCache.getRegexForPattern(numberPattern).matcher(longestPhoneNumber)
-        m.find() // this will always succeed
-        val aPhoneNumber = m.group()
+        // this will always succeed
+        val m = regexCache.getRegexForPattern(numberPattern).find(longestPhoneNumber)!!
+        val aPhoneNumber = m.groups[0]!!.value
         // No formatting template can be created if the number of digits entered so far is longer than
         // the maximum the current formatting rule can accommodate.
         if (aPhoneNumber.length < nationalNumber.length) {
@@ -403,9 +394,7 @@ class AsYouTypeFormatter internal constructor(
     }
 
     private fun isDigitOrLeadingPlusSign(nextChar: Char): Boolean {
-        return (Character.isDigit(nextChar)
-                || (accruedInput.length == 1
-                && PhoneNumberUtil.PLUS_CHARS_PATTERN.matcher(nextChar.toString()).matches()))
+        return (nextChar.isDigit() || (accruedInput.length == 1 && PhoneNumberUtil.PLUS_CHARS_PATTERN.matches(nextChar.toString())))
     }
 
     /**
@@ -414,12 +403,12 @@ class AsYouTypeFormatter internal constructor(
      */
     fun attemptToFormatAccruedDigits(): String {
         for (numberFormat in possibleFormats) {
-            val m: Regex = regexCache.getRegexForPattern(numberFormat.pattern).matcher(nationalNumber)
-            if (m.matches()) {
-                shouldAddSpaceAfterNationalPrefix = NATIONAL_PREFIX_SEPARATORS_PATTERN.matcher(
+            val r: Regex = regexCache.getRegexForPattern(numberFormat.pattern)
+            if (r.matches(nationalNumber)) {
+                shouldAddSpaceAfterNationalPrefix = NATIONAL_PREFIX_SEPARATORS_PATTERN.containsMatchIn(
                     numberFormat.nationalPrefixFormattingRule
-                ).find()
-                val formattedNumber: String = m.replaceAll(numberFormat.format)
+                )
+                val formattedNumber: String = numberFormat.pattern.replace(r, numberFormat.format)
                 // Check that we did not remove nor add any extra digits when we matched
                 // this formatting pattern. This usually happens after we entered the last
                 // digit during AYTF. Eg: In case of MX, we swallow mobile token (1) when
@@ -450,9 +439,7 @@ class AsYouTypeFormatter internal constructor(
             var accruedInputIndex = 0
             var currentOutputIndex = 0
             while (accruedInputIndex < positionToRemember && currentOutputIndex < currentOutput.length) {
-                if (accruedInputWithoutFormatting[accruedInputIndex]
-                    == currentOutput[currentOutputIndex]
-                ) {
+                if (accruedInputWithoutFormatting[accruedInputIndex] == currentOutput[currentOutputIndex]) {
                     accruedInputIndex++
                 }
                 currentOutputIndex++
@@ -467,14 +454,11 @@ class AsYouTypeFormatter internal constructor(
      */
     private fun appendNationalNumber(nationalNumber: String): String {
         val prefixBeforeNationalNumberLength = prefixBeforeNationalNumber.length
-        return if (shouldAddSpaceAfterNationalPrefix && prefixBeforeNationalNumberLength > 0 && (prefixBeforeNationalNumber[prefixBeforeNationalNumberLength - 1]
-                    != SEPARATOR_BEFORE_NATIONAL_NUMBER)
-        ) {
+        return if (shouldAddSpaceAfterNationalPrefix && prefixBeforeNationalNumberLength > 0 && (prefixBeforeNationalNumber[prefixBeforeNationalNumberLength - 1] != SEPARATOR_BEFORE_NATIONAL_NUMBER)) {
             // We want to add a space after the national prefix if the national prefix formatting rule
             // indicates that this would normally be done, with the exception of the case where we already
             // appended a space because the NDD was surprisingly long.
-            (String(prefixBeforeNationalNumber) + SEPARATOR_BEFORE_NATIONAL_NUMBER
-                    + nationalNumber)
+            (prefixBeforeNationalNumber.toString() + SEPARATOR_BEFORE_NATIONAL_NUMBER + nationalNumber)
         } else {
             prefixBeforeNationalNumber.toString() + nationalNumber
         }
@@ -536,22 +520,21 @@ class AsYouTypeFormatter internal constructor(
             prefixBeforeNationalNumber.append('1').append(SEPARATOR_BEFORE_NATIONAL_NUMBER)
             isCompleteNumber = true
         } else if (currentMetadata!!.hasNationalPrefixForParsing()) {
-            val nationalPrefixForParsing: Pattern =
-                regexCache.getRegexForPattern(currentMetadata!!.nationalPrefixForParsing)
-            val m = nationalPrefixForParsing.matcher(nationalNumber)
+            val nationalPrefixForParsing = regexCache.getRegexForPattern(currentMetadata!!.nationalPrefixForParsing)
+            val m = nationalPrefixForParsing.matchAt(nationalNumber, 0)
             // Since some national prefix patterns are entirely optional, check that a national prefix
             // could actually be extracted.
-            if (m.lookingAt() && m.end() > 0) {
+            if (m != null && m.range.last > 0) {
                 // When the national prefix is detected, we use international formatting rules instead of
                 // national ones, because national formatting rules could contain local formatting rules
                 // for numbers entered without area code.
                 isCompleteNumber = true
-                startOfNationalNumber = m.end()
+                startOfNationalNumber = m.range.last
                 prefixBeforeNationalNumber.append(nationalNumber.substring(0, startOfNationalNumber))
             }
         }
         val nationalPrefix = nationalNumber.substring(0, startOfNationalNumber)
-        nationalNumber.delete(0, startOfNationalNumber)
+        nationalNumber.removeRange(0, startOfNationalNumber)
         return nationalPrefix
     }
 
@@ -563,14 +546,13 @@ class AsYouTypeFormatter internal constructor(
      * defaultCountry.
      */
     private fun attemptToExtractIdd(): Boolean {
-        val internationalPrefix: Pattern = regexCache.getRegexForPattern(
-            "\\" + PhoneNumberUtil.PLUS_SIGN + "|"
-                    + currentMetadata!!.internationalPrefix
+        val internationalPrefix = regexCache.getRegexForPattern(
+            "\\" + PhoneNumberUtil.PLUS_SIGN + "|" + currentMetadata!!.internationalPrefix
         )
-        val iddMatcher = internationalPrefix.matcher(accruedInputWithoutFormatting)
-        if (iddMatcher.lookingAt()) {
+        val iddMatchResult = internationalPrefix.matchAt(accruedInputWithoutFormatting, 0)
+        if (iddMatchResult != null) {
             isCompleteNumber = true
-            val startOfCountryCallingCode = iddMatcher.end()
+            val startOfCountryCallingCode = iddMatchResult.range.last
             nationalNumber.setLength(0)
             nationalNumber.append(accruedInputWithoutFormatting.substring(startOfCountryCallingCode))
             prefixBeforeNationalNumber.setLength(0)
@@ -629,7 +611,7 @@ class AsYouTypeFormatter internal constructor(
             accruedInputWithoutFormatting.append(nextChar)
         } else {
             val radix = 10
-            normalizedChar = Character.forDigit(nextChar.digitToIntOrNull(radix) ?: -1, radix)
+            normalizedChar = (nextChar.digitToIntOrNull(radix) ?: -1).digitToChar(radix)
             accruedInputWithoutFormatting.append(normalizedChar)
             nationalNumber.append(normalizedChar)
         }
@@ -640,8 +622,10 @@ class AsYouTypeFormatter internal constructor(
     }
 
     private fun inputDigitHelper(nextChar: Char): String {
+        TODO()
         // Note that formattingTemplate is not guaranteed to have a value, it could be empty, e.g.
         // when the next digit is entered after extracting an IDD or NDD.
+        /*
         val digitMatcher = DIGIT_PATTERN.matcher(formattingTemplate)
         return if (digitMatcher.find(lastMatchPosition)) {
             val tempTemplate = digitMatcher.replaceFirst(nextChar.toString())
@@ -657,6 +641,7 @@ class AsYouTypeFormatter internal constructor(
             currentFormattingPattern = ""
             accruedInput.toString()
         }
+        */
     }
 
     companion object {
@@ -671,15 +656,13 @@ class AsYouTypeFormatter internal constructor(
         // prevents invalid punctuation (such as the star sign in Israeli star numbers) getting into the
         // output of the AYTF. We require that the first group is present in the output pattern to ensure
         // no data is lost while formatting; when we format as you type, this should always be the case.
-        private val ELIGIBLE_FORMAT_PATTERN = Pattern.compile(
-            "[" + PhoneNumberUtil.VALID_PUNCTUATION + "]*"
-                    + "\\$1" + "[" + PhoneNumberUtil.VALID_PUNCTUATION + "]*(\\$\\d"
-                    + "[" + PhoneNumberUtil.VALID_PUNCTUATION + "]*)*"
+        private val ELIGIBLE_FORMAT_PATTERN = Regex(
+            "[" + PhoneNumberUtil.VALID_PUNCTUATION + "]*" + "\\$1" + "[" + PhoneNumberUtil.VALID_PUNCTUATION + "]*(\\$\\d" + "[" + PhoneNumberUtil.VALID_PUNCTUATION + "]*)*"
         )
 
         // A set of characters that, if found in a national prefix formatting rules, are an indicator to
         // us that we should separate the national prefix from the number when formatting.
-        private val NATIONAL_PREFIX_SEPARATORS_PATTERN = Pattern.compile("[- ]")
+        private val NATIONAL_PREFIX_SEPARATORS_PATTERN = Regex("[- ]")
 
         // This is the minimum length of national number accrued that is required to trigger the
         // formatter. The first element of the leadingDigitsPattern of each numberFormat contains a
@@ -689,6 +672,6 @@ class AsYouTypeFormatter internal constructor(
         // The digits that have not been entered yet will be represented by a \u2008, the punctuation
         // space.
         private const val DIGIT_PLACEHOLDER = "\u2008"
-        private val DIGIT_PATTERN = Pattern.compile(DIGIT_PLACEHOLDER)
+        private val DIGIT_PATTERN = Regex(DIGIT_PLACEHOLDER)
     }
 }

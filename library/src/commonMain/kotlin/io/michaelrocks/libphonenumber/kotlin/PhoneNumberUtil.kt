@@ -14,15 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.michaelrocks.libphonenumber.android
+package io.michaelrocks.libphonenumber.kotlin
 
-import android.content.Context
 import co.touchlab.kermit.Logger
-import io.michaelrocks.libphonenumber.android.PhoneNumberMatcher.NumberGroupingChecker
-import io.michaelrocks.libphonenumber.android.metadata.DefaultMetadataDependenciesProvider
-import io.michaelrocks.libphonenumber.android.metadata.source.AssetsMetadataLoader
+import io.michaelrocks.libphonenumber.android.AsYouTypeFormatter
 import io.michaelrocks.libphonenumber.kotlin.*
 import io.michaelrocks.libphonenumber.kotlin.CountryCodeToRegionCodeMap.countryCodeToRegionCodeMap
+import io.michaelrocks.libphonenumber.kotlin.PhoneNumberMatcher.NumberGroupingChecker
 import io.michaelrocks.libphonenumber.kotlin.Phonemetadata.NumberFormat.Companion.newBuilder
 import io.michaelrocks.libphonenumber.kotlin.Phonemetadata.PhoneMetadata
 import io.michaelrocks.libphonenumber.kotlin.Phonemetadata.PhoneNumberDesc
@@ -30,11 +28,13 @@ import io.michaelrocks.libphonenumber.kotlin.Phonenumber.PhoneNumber
 import io.michaelrocks.libphonenumber.kotlin.Phonenumber.PhoneNumber.CountryCodeSource
 import io.michaelrocks.libphonenumber.kotlin.internal.RegexBasedMatcher.Companion.create
 import io.michaelrocks.libphonenumber.kotlin.internal.RegexCache
+import io.michaelrocks.libphonenumber.kotlin.metadata.DefaultMetadataDependenciesProvider
 import io.michaelrocks.libphonenumber.kotlin.metadata.source.MetadataSource
 import io.michaelrocks.libphonenumber.kotlin.metadata.source.MetadataSourceImpl
-import java.util.*
-import java.util.regex.Matcher
-import java.util.regex.Pattern
+import kotlin.jvm.JvmField
+import kotlin.jvm.JvmOverloads
+import kotlin.jvm.JvmStatic
+import kotlin.jvm.Volatile
 
 /**
  * Utility for international phone numbers. Functionality includes formatting, parsing and
@@ -73,26 +73,21 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
      * use the PhoneNumber class.
      */
     enum class PhoneNumberFormat {
-        E164,
-        INTERNATIONAL,
-        NATIONAL,
-        RFC3966
+        E164, INTERNATIONAL, NATIONAL, RFC3966
     }
 
     /**
      * Type of phone numbers.
      */
     enum class PhoneNumberType {
-        FIXED_LINE,
-        MOBILE,
+        FIXED_LINE, MOBILE,
 
         // In some regions (e.g. the USA), it is impossible to distinguish between fixed-line and
         // mobile numbers by looking at the phone number itself.
         FIXED_LINE_OR_MOBILE,
 
         // Freephone lines
-        TOLL_FREE,
-        PREMIUM_RATE,
+        TOLL_FREE, PREMIUM_RATE,
 
         // The cost of this call is shared between the caller and the recipient, and is hence typically
         // less than PREMIUM_RATE calls. See // http://en.wikipedia.org/wiki/Shared_Cost_Service for
@@ -105,8 +100,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         // A personal number is associated with a particular person, and may be routed to either a
         // MOBILE or FIXED_LINE number. Some more information can be found here:
         // http://en.wikipedia.org/wiki/Personal_Numbers
-        PERSONAL_NUMBER,
-        PAGER,
+        PERSONAL_NUMBER, PAGER,
 
         // Used for "Universal Access Numbers" or "Company Numbers". They may be further routed to
         // specific offices, but allow one number to be used for a company.
@@ -124,11 +118,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
      * Types of phone number matches. See detailed description beside the isNumberMatch() method.
      */
     enum class MatchType {
-        NOT_A_NUMBER,
-        NO_MATCH,
-        SHORT_NSN_MATCH,
-        NSN_MATCH,
-        EXACT_MATCH
+        NOT_A_NUMBER, NO_MATCH, SHORT_NSN_MATCH, NSN_MATCH, EXACT_MATCH
     }
 
     /**
@@ -174,10 +164,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
          */
         POSSIBLE {
             override fun verify(
-                number: PhoneNumber,
-                candidate: CharSequence,
-                util: PhoneNumberUtil,
-                matcher: PhoneNumberMatcher
+                number: PhoneNumber, candidate: CharSequence, util: PhoneNumberUtil, matcher: PhoneNumberMatcher
             ): Boolean {
                 return util.isPossibleNumber(number)
             }
@@ -190,13 +177,11 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
          */
         VALID {
             override fun verify(
-                number: PhoneNumber,
-                candidate: CharSequence,
-                util: PhoneNumberUtil,
-                matcher: PhoneNumberMatcher
+                number: PhoneNumber, candidate: CharSequence, util: PhoneNumberUtil, matcher: PhoneNumberMatcher
             ): Boolean {
-                return if ((!util.isValidNumber(number)
-                            || !PhoneNumberMatcher.containsOnlyValidXChars(number, candidate.toString(), util))
+                return if ((!util.isValidNumber(number) || !PhoneNumberMatcher.containsOnlyValidXChars(
+                        number, candidate.toString(), util
+                    ))
                 ) {
                     false
                 } else PhoneNumberMatcher.isNationalPrefixPresentIfRequired(number, util)
@@ -218,27 +203,27 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
          */
         STRICT_GROUPING {
             override fun verify(
-                number: PhoneNumber,
-                candidate: CharSequence,
-                util: PhoneNumberUtil,
-                matcher: PhoneNumberMatcher
+                number: PhoneNumber, candidate: CharSequence, util: PhoneNumberUtil, matcher: PhoneNumberMatcher
             ): Boolean {
                 val candidateString = candidate.toString()
-                return if ((!util.isValidNumber(number)
-                            || !PhoneNumberMatcher.containsOnlyValidXChars(number, candidateString, util)
-                            || PhoneNumberMatcher.containsMoreThanOneSlashInNationalNumber(number, candidateString)
-                            || !PhoneNumberMatcher.isNationalPrefixPresentIfRequired(number, util))
+                return if ((!util.isValidNumber(number) || !PhoneNumberMatcher.containsOnlyValidXChars(
+                        number, candidateString, util
+                    ) || PhoneNumberMatcher.containsMoreThanOneSlashInNationalNumber(
+                        number, candidateString
+                    ) || !PhoneNumberMatcher.isNationalPrefixPresentIfRequired(number, util))
                 ) {
                     false
-                } else matcher.checkNumberGroupingIsValid(
-                    number,
-                    candidate,
-                    util,
-                    NumberGroupingChecker { util, number, normalizedCandidate, expectedNumberGroups ->
-                        PhoneNumberMatcher.allNumberGroupsRemainGrouped(
-                            util, number, normalizedCandidate, expectedNumberGroups
-                        )
-                    })
+                } else {
+                    TODO()
+//                    matcher.checkNumberGroupingIsValid(number,
+//                        candidate,
+//                        util,
+//                        NumberGroupingChecker { util, number, normalizedCandidate, expectedNumberGroups ->
+//                            PhoneNumberMatcher.allNumberGroupsRemainGrouped(
+//                                util, number, normalizedCandidate, expectedNumberGroups
+//                            )
+//                        })
+                }
             }
         },
 
@@ -256,39 +241,34 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
          */
         EXACT_GROUPING {
             override fun verify(
-                number: PhoneNumber,
-                candidate: CharSequence,
-                util: PhoneNumberUtil,
-                matcher: PhoneNumberMatcher
+                number: PhoneNumber, candidate: CharSequence, util: PhoneNumberUtil, matcher: PhoneNumberMatcher
             ): Boolean {
                 val candidateString = candidate.toString()
-                return if ((!util.isValidNumber(number)
-                            || !PhoneNumberMatcher.containsOnlyValidXChars(number, candidateString, util)
-                            || PhoneNumberMatcher.containsMoreThanOneSlashInNationalNumber(number, candidateString)
-                            || !PhoneNumberMatcher.isNationalPrefixPresentIfRequired(number, util))
+                return if ((!util.isValidNumber(number) || !PhoneNumberMatcher.containsOnlyValidXChars(
+                        number, candidateString, util
+                    ) || PhoneNumberMatcher.containsMoreThanOneSlashInNationalNumber(
+                        number, candidateString
+                    ) || !PhoneNumberMatcher.isNationalPrefixPresentIfRequired(number, util))
                 ) {
                     false
-                } else matcher.checkNumberGroupingIsValid(
-                    number, candidate, util, object : NumberGroupingChecker {
-                        override fun checkGroups(
-                            util: PhoneNumberUtil, number: PhoneNumber,
-                            normalizedCandidate: StringBuilder,
-                            expectedNumberGroups: Array<String>
-                        ): Boolean {
-                            return PhoneNumberMatcher.allNumberGroupsAreExactlyPresent(
-                                util, number, normalizedCandidate, expectedNumberGroups
-                            )
-                        }
-                    })
+                } else matcher.checkNumberGroupingIsValid(number, candidate, util, object : NumberGroupingChecker {
+                    override fun checkGroups(
+                        util: PhoneNumberUtil,
+                        number: PhoneNumber,
+                        normalizedCandidate: StringBuilder,
+                        expectedNumberGroups: Array<String>
+                    ): Boolean {
+                        return PhoneNumberMatcher.allNumberGroupsAreExactlyPresent(
+                            util, number, normalizedCandidate, expectedNumberGroups
+                        )
+                    }
+                })
             }
         };
 
         /** Returns true if `number` is a verified number according to this leniency.  */
         abstract fun verify(
-            number: PhoneNumber,
-            candidate: CharSequence,
-            util: PhoneNumberUtil,
-            matcher: PhoneNumberMatcher
+            number: PhoneNumber, candidate: CharSequence, util: PhoneNumberUtil, matcher: PhoneNumberMatcher
         ): Boolean
     }
 
@@ -297,14 +277,13 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
     var shortNumberInfo: ShortNumberInfo? = null
         get() {
             if (field == null) {
-                synchronized(this) {
-                    if (field == null) {
-                        field = ShortNumberInfo(
-                            create(),
-                            metadataDependenciesProvider.shortNumberMetadataSource
-                        )
-                    }
+//                synchronized(this) {
+                if (field == null) {
+                    field = ShortNumberInfo(
+                        create(), metadataDependenciesProvider.shortNumberMetadataSource
+                    )
                 }
+//                }
             }
             return field
         }
@@ -353,8 +332,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         // If we discover this, remove the non-geo entity from the set of supported regions and log.
         if (supportedRegions.remove(REGION_CODE_FOR_NON_GEO_ENTITY)) {
             logger.w(
-                "invalid metadata (country calling code was mapped to the non-geo "
-                        + "entity as well as specific region(s))"
+                "invalid metadata (country calling code was mapped to the non-geo " + "entity as well as specific region(s))"
             )
         }
         nanpaRegions.addAll(countryCallingCodeToRegionCodeMap[NANPA_COUNTRY_CODE]!!)
@@ -470,8 +448,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
             copiedProto = number
         }
         val nationalSignificantNumber = format(
-            copiedProto,
-            PhoneNumberFormat.INTERNATIONAL
+            copiedProto, PhoneNumberFormat.INTERNATIONAL
         )
         val numberGroups = NON_DIGITS_PATTERN.split(nationalSignificantNumber)
         // The pattern will start with "+COUNTRY_CODE " so the first group will always be the empty
@@ -501,7 +478,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
      * library supports
      */
     fun getSupportedRegions(): Set<String> {
-        return Collections.unmodifiableSet(supportedRegions)
+        return supportedRegions
     }
 
     val supportedGlobalNetworkCallingCodes: Set<Int>
@@ -511,7 +488,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
          * @return  an unordered set of the country calling codes for every non-geographical entity the
          * library supports
          */
-        get() = Collections.unmodifiableSet(countryCodesForNonGeographicalRegion)
+        get() = countryCodesForNonGeographicalRegion
     val supportedCallingCodes: Set<Int>
         /**
          * Returns all country calling codes the library has metadata for, covering both non-geographical
@@ -522,14 +499,14 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
          * @return  an unordered set of the country calling codes for every geographical and
          * non-geographical entity the library supports
          */
-        get() = Collections.unmodifiableSet(countryCallingCodeToRegionCodeMap.keys)
+        get() = countryCallingCodeToRegionCodeMap.keys
 
     /**
      * Returns the types we have metadata for based on the PhoneMetadata object passed in, which must
      * be non-null.
      */
     private fun getSupportedTypesForMetadata(metadata: PhoneMetadata?): Set<PhoneNumberType> {
-        val types: MutableSet<PhoneNumberType> = TreeSet()
+        val types: MutableSet<PhoneNumberType> = mutableSetOf()
         for (type in PhoneNumberType.values()) {
             if (type == PhoneNumberType.FIXED_LINE_OR_MOBILE || type == PhoneNumberType.UNKNOWN) {
                 // Never return FIXED_LINE_OR_MOBILE (it is a convenience type, and represents that a
@@ -540,7 +517,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
                 types.add(type)
             }
         }
-        return Collections.unmodifiableSet(types)
+        return types
     }
 
     /**
@@ -553,7 +530,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
     fun getSupportedTypesForRegion(regionCode: String): Set<PhoneNumberType> {
         if (!isValidRegionCode(regionCode)) {
             logger.w("Invalid or unknown region code provided: $regionCode")
-            return Collections.unmodifiableSet(TreeSet())
+            return setOf()
         }
         val metadata = getMetadataForRegion(regionCode)
         return getSupportedTypesForMetadata(metadata)
@@ -572,10 +549,9 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         val metadata = getMetadataForNonGeographicalRegion(countryCallingCode)
         if (metadata == null) {
             logger.w(
-                "Unknown country calling code for a non-geographical entity "
-                        + "provided: " + countryCallingCode
+                "Unknown country calling code for a non-geographical entity " + "provided: " + countryCallingCode
             )
-            return Collections.unmodifiableSet(TreeSet())
+            return setOf()
         }
         return getSupportedTypesForMetadata(metadata)
     }
@@ -596,8 +572,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
     fun isNumberGeographical(phoneNumberType: PhoneNumberType, countryCallingCode: Int): Boolean {
         return phoneNumberType == PhoneNumberType.FIXED_LINE || phoneNumberType == PhoneNumberType.FIXED_LINE_OR_MOBILE || (GEO_MOBILE_COUNTRIES!!.contains(
             countryCallingCode
-        )
-                && phoneNumberType == PhoneNumberType.MOBILE)
+        ) && phoneNumberType == PhoneNumberType.MOBILE)
     }
 
     /**
@@ -650,8 +625,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
      * a parameter to decrease object creation when invoked many times.
      */
     fun format(
-        number: PhoneNumber, numberFormat: PhoneNumberFormat,
-        formattedNumber: StringBuilder
+        number: PhoneNumber, numberFormat: PhoneNumberFormat, formattedNumber: StringBuilder
     ) {
         // Clear the StringBuilder first.
         formattedNumber.setLength(0)
@@ -662,8 +636,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
             // of the national number needs to be applied. Extensions are not formatted.
             formattedNumber.append(nationalSignificantNumber)
             prefixNumberWithCountryCallingCode(
-                countryCallingCode, PhoneNumberFormat.E164,
-                formattedNumber
+                countryCallingCode, PhoneNumberFormat.E164, formattedNumber
             )
             return
         }
@@ -695,9 +668,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
      * @return  the formatted phone number
      */
     fun formatByPattern(
-        number: PhoneNumber,
-        numberFormat: PhoneNumberFormat,
-        userDefinedFormats: List<Phonemetadata.NumberFormat>
+        number: PhoneNumber, numberFormat: PhoneNumberFormat, userDefinedFormats: List<Phonemetadata.NumberFormat>
     ): String {
         val countryCallingCode = number.countryCode
         val nationalSignificantNumber = getNationalSignificantNumber(number)
@@ -770,14 +741,12 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         val formattedNumber = StringBuilder(20)
         formattedNumber.append(
             formatNsn(
-                nationalSignificantNumber, metadata,
-                PhoneNumberFormat.NATIONAL, carrierCode
+                nationalSignificantNumber, metadata, PhoneNumberFormat.NATIONAL, carrierCode
             )
         )
         maybeAppendFormattedExtension(number, metadata, PhoneNumberFormat.NATIONAL, formattedNumber)
         prefixNumberWithCountryCallingCode(
-            countryCallingCode, PhoneNumberFormat.NATIONAL,
-            formattedNumber
+            countryCallingCode, PhoneNumberFormat.NATIONAL, formattedNumber
         )
         return formattedNumber.toString()
     }
@@ -809,8 +778,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
      * none is found
      */
     fun formatNationalNumberWithPreferredCarrierCode(
-        number: PhoneNumber,
-        fallbackCarrierCode: CharSequence?
+        number: PhoneNumber, fallbackCarrierCode: CharSequence?
     ): String {
         return formatNationalNumberWithCarrierCode(
             number,  // Historically, we set this to an empty string when parsing with raw input if none was
@@ -833,8 +801,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
      * @return  the formatted phone number
      */
     fun formatNumberForMobileDialing(
-        number: PhoneNumber, regionCallingFrom: String,
-        withFormatting: Boolean
+        number: PhoneNumber, regionCallingFrom: String, withFormatting: Boolean
     ): String {
         val countryCallingCode = number.countryCode
         if (!hasValidCountryCallingCode(countryCallingCode)) {
@@ -848,8 +815,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         val isValidNumber = (numberType != PhoneNumberType.UNKNOWN)
         if ((regionCallingFrom == regionCode)) {
             val isFixedLineOrMobile =
-                ((numberType == PhoneNumberType.FIXED_LINE) || (numberType == PhoneNumberType.MOBILE)
-                        || (numberType == PhoneNumberType.FIXED_LINE_OR_MOBILE))
+                ((numberType == PhoneNumberType.FIXED_LINE) || (numberType == PhoneNumberType.MOBILE) || (numberType == PhoneNumberType.FIXED_LINE_OR_MOBILE))
             // Carrier codes may be needed in some countries. We handle this here.
             if ((regionCode == "BR") && isFixedLineOrMobile) {
                 // Historically, we set this to an empty string when parsing with raw input if none was
@@ -857,8 +823,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
                 // reason, we treat the empty string the same as if it isn't set at all.
                 formattedNumber =
                     if (numberNoExt.preferredDomesticCarrierCode.length > 0) formatNationalNumberWithPreferredCarrierCode(
-                        numberNoExt,
-                        ""
+                        numberNoExt, ""
                     ).also {
                         formattedNumber =
                             it // Brazilian fixed line and mobile numbers need to be dialed with a carrier code when
@@ -870,9 +835,11 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
                 // internationally, since that always works, except for numbers which might potentially be
                 // short numbers, which are always dialled in national format.
                 val regionMetadata = getMetadataForRegion(regionCallingFrom)
-                if ((canBeInternationallyDialled(numberNoExt)
-                            && testNumberLength(getNationalSignificantNumber(numberNoExt), regionMetadata)
-                            != ValidationResult.TOO_SHORT)
+                if ((canBeInternationallyDialled(numberNoExt) && testNumberLength(
+                        getNationalSignificantNumber(
+                            numberNoExt
+                        ), regionMetadata
+                    ) != ValidationResult.TOO_SHORT)
                 ) {
                     formattedNumber = format(numberNoExt, PhoneNumberFormat.INTERNATIONAL)
                 } else {
@@ -882,8 +849,9 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
                 // For non-geographical countries, and Mexican, Chilean, and Uzbek fixed line and mobile
                 // numbers, we output international format for numbers that can be dialed internationally as
                 // that always works.
-                if ((((regionCode == REGION_CODE_FOR_NON_GEO_ENTITY) || ((((regionCode == "MX") || (regionCode == "CL") || (regionCode == "UZ"))) && isFixedLineOrMobile))
-                            && canBeInternationallyDialled(numberNoExt))
+                if ((((regionCode == REGION_CODE_FOR_NON_GEO_ENTITY) || ((((regionCode == "MX") || (regionCode == "CL") || (regionCode == "UZ"))) && isFixedLineOrMobile)) && canBeInternationallyDialled(
+                        numberNoExt
+                    ))
                 ) {
                     formattedNumber = format(numberNoExt, PhoneNumberFormat.INTERNATIONAL)
                 } else {
@@ -895,8 +863,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
             // is not a valid regular length phone number, we treat it as if it cannot be internationally
             // dialled.
             return if (withFormatting) format(numberNoExt, PhoneNumberFormat.INTERNATIONAL) else format(
-                numberNoExt,
-                PhoneNumberFormat.E164
+                numberNoExt, PhoneNumberFormat.E164
             )
         }
         return if (withFormatting) formattedNumber else normalizeDiallableCharsOnly(formattedNumber)
@@ -922,15 +889,11 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
      * @return  the formatted phone number
      */
     fun formatOutOfCountryCallingNumber(
-        number: PhoneNumber,
-        regionCallingFrom: String
+        number: PhoneNumber, regionCallingFrom: String
     ): String {
         if (!isValidRegionCode(regionCallingFrom)) {
-            logger.log(
-                Level.WARNING,
-                "Trying to format number from invalid region "
-                        + regionCallingFrom
-                        + ". International formatting applied."
+            logger.w(
+                "Trying to format number from invalid region " + regionCallingFrom + ". International formatting applied."
             )
             return format(number, PhoneNumberFormat.INTERNATIONAL)
         }
@@ -964,7 +927,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         var internationalPrefixForFormatting: String? = ""
         if (metadataForRegionCallingFrom.hasPreferredInternationalPrefix()) {
             internationalPrefixForFormatting = metadataForRegionCallingFrom.preferredInternationalPrefix
-        } else if (SINGLE_INTERNATIONAL_PREFIX.matcher(internationalPrefix).matches()) {
+        } else if (SINGLE_INTERNATIONAL_PREFIX.matches(internationalPrefix)) {
             internationalPrefixForFormatting = internationalPrefix
         }
         val regionCode = getRegionCodeForCountryCode(countryCallingCode)
@@ -974,17 +937,14 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
             formatNsn(nationalSignificantNumber, metadataForRegion, PhoneNumberFormat.INTERNATIONAL)
         val formattedNumber = StringBuilder(formattedNationalNumber)
         maybeAppendFormattedExtension(
-            number, metadataForRegion, PhoneNumberFormat.INTERNATIONAL,
-            formattedNumber
+            number, metadataForRegion, PhoneNumberFormat.INTERNATIONAL, formattedNumber
         )
         if (internationalPrefixForFormatting!!.length > 0) {
             formattedNumber.insert(0, " ").insert(0, countryCallingCode).insert(0, " ")
                 .insert(0, internationalPrefixForFormatting)
         } else {
             prefixNumberWithCountryCallingCode(
-                countryCallingCode,
-                PhoneNumberFormat.INTERNATIONAL,
-                formattedNumber
+                countryCallingCode, PhoneNumberFormat.INTERNATIONAL, formattedNumber
             )
         }
         return formattedNumber.toString()
@@ -1028,7 +988,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
             CountryCodeSource.FROM_NUMBER_WITHOUT_PLUS_SIGN -> formattedNumber =
                 format(number, PhoneNumberFormat.INTERNATIONAL).substring(1)
 
-            CountryCodeSource.FROM_DEFAULT_COUNTRY -> {
+            CountryCodeSource.FROM_DEFAULT_COUNTRY -> run {
                 val regionCode = getRegionCodeForCountryCode(number.countryCode)
                 // We strip non-digits from the NDD here, and from the raw input later, so that we can
                 // compare them easily.
@@ -1038,7 +998,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
                     // If the region doesn't have a national prefix at all, we can safely return the national
                     // format without worrying about a national prefix being added.
                     formattedNumber = nationalFormat
-                    break
+                    return@run
                 }
                 // Otherwise, we check if the original number was entered with a national prefix.
                 if (rawInputContainsNationalPrefix(
@@ -1047,7 +1007,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
                 ) {
                     // If so, we can safely return the national format.
                     formattedNumber = nationalFormat
-                    break
+                    return@run
                 }
                 // Metadata cannot be null here because getNddPrefixForRegion() (above) returns null if
                 // there is no metadata for the region.
@@ -1061,7 +1021,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
                 // as they would also not have a country calling code and we would have exited earlier).
                 if (formatRule == null) {
                     formattedNumber = nationalFormat
-                    break
+                    return@run
                 }
                 // When the format we apply to this number doesn't contain national prefix, we can just
                 // return the national format.
@@ -1072,14 +1032,14 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
                 val indexOfFirstGroup = candidateNationalPrefixRule.indexOf("$1")
                 if (indexOfFirstGroup <= 0) {
                     formattedNumber = nationalFormat
-                    break
+                    return@run
                 }
                 candidateNationalPrefixRule = candidateNationalPrefixRule.substring(0, indexOfFirstGroup)
                 candidateNationalPrefixRule = normalizeDigitsOnly(candidateNationalPrefixRule)
                 if (candidateNationalPrefixRule.length == 0) {
                     // National prefix not used when formatting this number.
                     formattedNumber = nationalFormat
-                    break
+                    return@run
                 }
                 // Otherwise, we need to remove the national prefix from our output.
                 val numFormatCopy = newBuilder()
@@ -1090,20 +1050,20 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
                 formattedNumber = formatByPattern(number, PhoneNumberFormat.NATIONAL, numberFormats)
             }
 
-            else -> {
+            else -> run {
                 val regionCode = getRegionCodeForCountryCode(number.countryCode)
                 val nationalPrefix = getNddPrefixForRegion(regionCode, true)
                 val nationalFormat = format(number, PhoneNumberFormat.NATIONAL)
                 if (nationalPrefix == null || nationalPrefix.length == 0) {
                     formattedNumber = nationalFormat
-                    break
+                    return@run
                 }
                 if (rawInputContainsNationalPrefix(
                         number.rawInput, nationalPrefix, regionCode
                     )
                 ) {
                     formattedNumber = nationalFormat
-                    break
+                    return@run
                 }
                 val metadata = getMetadataForRegion(regionCode)
                 val nationalNumber = getNationalSignificantNumber(number)
@@ -1112,19 +1072,19 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
                 )
                 if (formatRule == null) {
                     formattedNumber = nationalFormat
-                    break
+                    return@run
                 }
                 var candidateNationalPrefixRule = formatRule.nationalPrefixFormattingRule
                 val indexOfFirstGroup = candidateNationalPrefixRule.indexOf("$1")
                 if (indexOfFirstGroup <= 0) {
                     formattedNumber = nationalFormat
-                    break
+                    return@run
                 }
                 candidateNationalPrefixRule = candidateNationalPrefixRule.substring(0, indexOfFirstGroup)
                 candidateNationalPrefixRule = normalizeDigitsOnly(candidateNationalPrefixRule)
                 if (candidateNationalPrefixRule.length == 0) {
                     formattedNumber = nationalFormat
-                    break
+                    return@run
                 }
                 val numFormatCopy = newBuilder()
                 numFormatCopy.mergeFrom(formatRule)
@@ -1137,8 +1097,8 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         val rawInput = number.rawInput
         // If no digit is inserted/removed/modified as a result of our formatting, we return the
         // formatted phone number; otherwise we return the raw input the user entered.
-        if (formattedNumber != null && rawInput.length > 0) {
-            val normalizedFormattedNumber = normalizeDiallableCharsOnly(formattedNumber)
+        if (formattedNumber != null && rawInput.isNotEmpty()) {
+            val normalizedFormattedNumber = normalizeDiallableCharsOnly(formattedNumber!!)
             val normalizedRawInput = normalizeDiallableCharsOnly(rawInput)
             if (normalizedFormattedNumber != normalizedRawInput) {
                 formattedNumber = rawInput
@@ -1150,8 +1110,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
     // Check if rawInput, which is assumed to be in the national format, has a national prefix. The
     // national prefix is assumed to be in digits-only form.
     private fun rawInputContainsNationalPrefix(
-        rawInput: String, nationalPrefix: String,
-        regionCode: String
+        rawInput: String, nationalPrefix: String, regionCode: String
     ): Boolean {
         val normalizedNationalNumber = normalizeDigitsOnly(rawInput)
         return if (normalizedNationalNumber.startsWith(nationalPrefix)) {
@@ -1204,8 +1163,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
      * @return  the formatted phone number
      */
     fun formatOutOfCountryKeepingAlphaChars(
-        number: PhoneNumber,
-        regionCallingFrom: String
+        number: PhoneNumber, regionCallingFrom: String
     ): String {
         var rawInput = number.rawInput
         // If there is no raw input, then we can't keep alpha characters because there aren't any.
@@ -1238,15 +1196,14 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
             if (isNANPACountry(regionCallingFrom)) {
                 return "$countryCode $rawInput"
             }
-        } else if ((metadataForRegionCallingFrom != null
-                    && countryCode == getCountryCodeForValidRegion(regionCallingFrom))
+        } else if ((metadataForRegionCallingFrom != null && countryCode == getCountryCodeForValidRegion(
+                regionCallingFrom
+            ))
         ) {
             val formattingPattern = chooseFormattingPatternForNumber(
-                metadataForRegionCallingFrom.numberFormatList,
-                nationalNumber
-            )
-                ?: // If no pattern above is matched, we format the original input.
-                return rawInput
+                metadataForRegionCallingFrom.numberFormatList, nationalNumber
+            ) ?: // If no pattern above is matched, we format the original input.
+            return rawInput
             val newFormat = newBuilder()
             newFormat.mergeFrom(formattingPattern)
             // The first group is the first group of digits that the user wrote together.
@@ -1266,17 +1223,16 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         // international prefix.
         if (metadataForRegionCallingFrom != null) {
             val internationalPrefix = metadataForRegionCallingFrom.internationalPrefix
-            internationalPrefixForFormatting = if (SINGLE_INTERNATIONAL_PREFIX.matcher(internationalPrefix)
-                    .matches()
-            ) internationalPrefix else metadataForRegionCallingFrom.preferredInternationalPrefix
+            internationalPrefixForFormatting = if (SINGLE_INTERNATIONAL_PREFIX.matches(internationalPrefix)) {
+                internationalPrefix
+            } else metadataForRegionCallingFrom.preferredInternationalPrefix
         }
         val formattedNumber = StringBuilder(rawInput)
         val regionCode = getRegionCodeForCountryCode(countryCode)
         // Metadata cannot be null because the country calling code is valid.
         val metadataForRegion = getMetadataForRegionOrCallingCode(countryCode, regionCode)
         maybeAppendFormattedExtension(
-            number, metadataForRegion,
-            PhoneNumberFormat.INTERNATIONAL, formattedNumber
+            number, metadataForRegion, PhoneNumberFormat.INTERNATIONAL, formattedNumber
         )
         if (internationalPrefixForFormatting.length > 0) {
             formattedNumber.insert(0, " ").insert(0, countryCode).insert(0, " ")
@@ -1285,17 +1241,12 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
             // Invalid region entered as country-calling-from (so no metadata was found for it) or the
             // region chosen has multiple international dialling prefixes.
             if (!isValidRegionCode(regionCallingFrom)) {
-                logger.log(
-                    Level.WARNING,
-                    ("Trying to format number from invalid region "
-                            + regionCallingFrom
-                            + ". International formatting applied.")
+                logger.w(
+                    "Trying to format number from invalid region $regionCallingFrom. International formatting applied."
                 )
             }
             prefixNumberWithCountryCallingCode(
-                countryCode,
-                PhoneNumberFormat.INTERNATIONAL,
-                formattedNumber
+                countryCode, PhoneNumberFormat.INTERNATIONAL, formattedNumber
             )
         }
         return formattedNumber.toString()
@@ -1312,9 +1263,8 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         // If leading zero(s) have been set, we prefix this now. Note this is not a national prefix.
         val nationalNumber = StringBuilder()
         if (number.isItalianLeadingZero && number.numberOfLeadingZeros > 0) {
-            val zeros = CharArray(number.numberOfLeadingZeros)
-            Arrays.fill(zeros, '0')
-            nationalNumber.append(String(zeros))
+            val zeros = CharArray(number.numberOfLeadingZeros) { '0' }
+            nationalNumber.append(zeros)
         }
         nationalNumber.append(number.nationalNumber)
         return nationalNumber.toString()
@@ -1324,9 +1274,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
      * A helper function that is used by format and formatByPattern.
      */
     private fun prefixNumberWithCountryCallingCode(
-        countryCallingCode: Int,
-        numberFormat: PhoneNumberFormat,
-        formattedNumber: StringBuilder
+        countryCallingCode: Int, numberFormat: PhoneNumberFormat, formattedNumber: StringBuilder
     ) {
         when (numberFormat) {
             PhoneNumberFormat.E164 -> {
@@ -1356,10 +1304,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
     // carrierCode is specified, this will be inserted into the formatted string to replace $CC.
     // Simple wrapper of formatNsn for the common case of no carrier code.
     private fun formatNsn(
-        number: String,
-        metadata: PhoneMetadata?,
-        numberFormat: PhoneNumberFormat,
-        carrierCode: CharSequence? = null
+        number: String, metadata: PhoneMetadata?, numberFormat: PhoneNumberFormat, carrierCode: CharSequence? = null
     ): String {
         val intlNumberFormats = metadata!!.intlNumberFormatList
         // When the intlNumberFormats exists, we use that to format national number for the
@@ -1371,17 +1316,15 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
     }
 
     fun chooseFormattingPatternForNumber(
-        availableFormats: List<Phonemetadata.NumberFormat>,
-        nationalNumber: String?
+        availableFormats: List<Phonemetadata.NumberFormat>, nationalNumber: String
     ): Phonemetadata.NumberFormat? {
         for (numFormat in availableFormats) {
             val size = numFormat.leadingDigitsPatternCount
             if (size == 0 || regexCache.getRegexForPattern( // We always use the last leading_digits_pattern, as it is the most detailed.
                     numFormat.getLeadingDigitsPattern(size - 1)
-                ).matcher(nationalNumber).lookingAt()
+                ).matchesAt(nationalNumber, 0)
             ) {
-                val m: Matcher = regexCache.getRegexForPattern(numFormat.pattern).matcher(nationalNumber)
-                if (m.matches()) {
+                if (regexCache.getRegexForPattern(numFormat.pattern).matches(nationalNumber)) {
                     return numFormat
                 }
             }
@@ -1391,9 +1334,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
 
     // Simple wrapper of formatNsnUsingPattern for the common case of no carrier code.
     fun formatNsnUsingPattern(
-        nationalNumber: String,
-        formattingPattern: Phonemetadata.NumberFormat,
-        numberFormat: PhoneNumberFormat
+        nationalNumber: String, formattingPattern: Phonemetadata.NumberFormat, numberFormat: PhoneNumberFormat
     ): String {
         return formatNsnUsingPattern(nationalNumber, formattingPattern, numberFormat, null)
     }
@@ -1406,37 +1347,38 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         numberFormat: PhoneNumberFormat,
         carrierCode: CharSequence?
     ): String {
-        var numberFormatRule: String? = formattingPattern.format
-        val m: Matcher = regexCache.getRegexForPattern(formattingPattern.pattern).matcher(nationalNumber)
+        var numberFormatRule = formattingPattern.format
+        val formattingPatternRegex = regexCache.getRegexForPattern(formattingPattern.pattern)
         var formattedNationalNumber = ""
         if (numberFormat == PhoneNumberFormat.NATIONAL && carrierCode != null && carrierCode.length > 0 && formattingPattern.domesticCarrierCodeFormattingRule.length > 0) {
             // Replace the $CC in the formatting rule with the desired carrier code.
             var carrierCodeFormattingRule = formattingPattern.domesticCarrierCodeFormattingRule
-            carrierCodeFormattingRule = carrierCodeFormattingRule.replace(CC_STRING, carrierCode)
+            carrierCodeFormattingRule = carrierCodeFormattingRule.replace(CC_STRING, carrierCode.toString())
             // Now replace the $FG in the formatting rule with the first group and the carrier code
             // combined in the appropriate way.
-            numberFormatRule = FIRST_GROUP_PATTERN.matcher(numberFormatRule)
-                .replaceFirst(carrierCodeFormattingRule)
-            formattedNationalNumber = m.replaceAll(numberFormatRule)
+            numberFormatRule = numberFormatRule.replaceFirst(FIRST_GROUP_PATTERN, carrierCodeFormattingRule)
+            formattedNationalNumber = nationalNumber.replace(formattingPatternRegex, numberFormatRule)
         } else {
             // Use the national prefix formatting rule instead.
             val nationalPrefixFormattingRule = formattingPattern.nationalPrefixFormattingRule
             formattedNationalNumber =
-                if (numberFormat == PhoneNumberFormat.NATIONAL && nationalPrefixFormattingRule != null && nationalPrefixFormattingRule.length > 0) {
-                    val firstGroupMatcher = FIRST_GROUP_PATTERN.matcher(numberFormatRule)
-                    m.replaceAll(firstGroupMatcher.replaceFirst(nationalPrefixFormattingRule))
+                if (numberFormat == PhoneNumberFormat.NATIONAL && nationalPrefixFormattingRule.isNotEmpty()) {
+                    nationalNumber.replace(
+                        formattingPatternRegex,
+                        numberFormatRule.replaceFirst(FIRST_GROUP_PATTERN, nationalPrefixFormattingRule)
+                    )
                 } else {
-                    m.replaceAll(numberFormatRule)
+                    nationalNumber.replace(formattingPatternRegex, numberFormatRule)
                 }
         }
         if (numberFormat == PhoneNumberFormat.RFC3966) {
             // Strip any leading punctuation.
-            val matcher = SEPARATOR_PATTERN.matcher(formattedNationalNumber)
-            if (matcher.lookingAt()) {
-                formattedNationalNumber = matcher.replaceFirst("")
+            val matchResult = SEPARATOR_PATTERN.matchAt(formattedNationalNumber, 0)
+            if (matchResult != null) {
+                formattedNationalNumber = formattedNationalNumber.replaceFirst(SEPARATOR_PATTERN, "")
             }
             // Replace the rest with a dash between each number group.
-            formattedNationalNumber = matcher.reset(formattedNationalNumber).replaceAll("-")
+            formattedNationalNumber = formattedNationalNumber.replace(SEPARATOR_PATTERN, "-")
         }
         return formattedNationalNumber
     }
@@ -1474,8 +1416,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         // breadth of valid number lengths and we may have to make it very short before we get an
         // invalid number.
         val desc = getNumberDescByType(
-            getMetadataForRegion(regionCode),
-            PhoneNumberType.FIXED_LINE
+            getMetadataForRegion(regionCode), PhoneNumberType.FIXED_LINE
         )
         if (!desc!!.hasExampleNumber()) {
             // This shouldn't happen; we have a test for this.
@@ -1531,7 +1472,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
                 return parse(desc.exampleNumber, regionCode)
             }
         } catch (e: NumberParseException) {
-            logger.log(Level.SEVERE, e.toString())
+            logger.e(e.toString())
         }
         return null
     }
@@ -1561,7 +1502,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
                     return parse("+" + countryCallingCode + desc.exampleNumber, UNKNOWN_REGION)
                 }
             } catch (e: NumberParseException) {
-                logger.log(Level.SEVERE, e.toString())
+                logger.e(e.toString())
             }
         }
         // There are no example numbers of this type for any country in the library.
@@ -1583,22 +1524,25 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
             // entities, this is not the case, so we have to go through different types to find the
             // example number. We don't check fixed-line or personal number since they aren't used by
             // non-geographical entities (if this changes, a unit-test will catch this.)
-            for (desc: PhoneNumberDesc? in Arrays.asList(
-                metadata.mobile, metadata.tollFree,
-                metadata.sharedCost, metadata.voip, metadata.voicemail,
-                metadata.uan, metadata.premiumRate
+            for (desc: PhoneNumberDesc? in listOf(
+                metadata.mobile,
+                metadata.tollFree,
+                metadata.sharedCost,
+                metadata.voip,
+                metadata.voicemail,
+                metadata.uan,
+                metadata.premiumRate
             )) {
                 try {
                     if (desc != null && desc.hasExampleNumber()) {
                         return parse("+" + countryCallingCode + desc.exampleNumber, UNKNOWN_REGION)
                     }
                 } catch (e: NumberParseException) {
-                    logger.log(Level.SEVERE, e.toString())
+                    logger.e(e.toString())
                 }
             }
         } else {
-            logger.log(
-                Level.WARNING,
+            logger.w(
                 "Invalid or unknown country calling code provided: $countryCallingCode"
             )
         }
@@ -1610,9 +1554,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
      * an extension specified.
      */
     private fun maybeAppendFormattedExtension(
-        number: PhoneNumber, metadata: PhoneMetadata?,
-        numberFormat: PhoneNumberFormat,
-        formattedNumber: StringBuilder
+        number: PhoneNumber, metadata: PhoneMetadata?, numberFormat: PhoneNumberFormat, formattedNumber: StringBuilder
     ) {
         if (number.hasExtension() && number.extension.length > 0) {
             if (numberFormat == PhoneNumberFormat.RFC3966) {
@@ -1696,9 +1638,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         }
         // Otherwise, test to see if the number is mobile. Only do this if certain that the patterns for
         // mobile and fixed line aren't the same.
-        return if ((!metadata.sameMobileAndFixedLinePattern
-                    && isNumberMatchingDesc(nationalNumber, metadata.mobile))
-        ) {
+        return if ((!metadata.sameMobileAndFixedLinePattern && isNumberMatchingDesc(nationalNumber, metadata.mobile))) {
             PhoneNumberType.MOBILE
         } else PhoneNumberType.UNKNOWN
     }
@@ -1733,8 +1673,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
             countryCallingCode
         )
         ensureMetadataIsNonNull(
-            phoneMetadata,
-            "Missing metadata for country code $countryCallingCode"
+            phoneMetadata, "Missing metadata for country code $countryCallingCode"
         )
         return phoneMetadata
     }
@@ -1748,9 +1687,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         return if (possibleLengths.size > 0 && !possibleLengths.contains(actualLength)) {
             false
         } else matcherApi.matchNationalNumber(
-            nationalNumber,
-            (numberDesc),
-            false
+            nationalNumber, (numberDesc), false
         )
     }
 
@@ -1789,9 +1726,9 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
     fun isValidNumberForRegion(number: PhoneNumber, regionCode: String?): Boolean {
         val countryCode = number.countryCode
         val metadata = getMetadataForRegionOrCallingCode(countryCode, regionCode)
-        if (metadata == null
-            || (REGION_CODE_FOR_NON_GEO_ENTITY != regionCode
-                    && countryCode != getCountryCodeForValidRegion(regionCode))
+        if (metadata == null || (REGION_CODE_FOR_NON_GEO_ENTITY != regionCode && countryCode != getCountryCodeForValidRegion(
+                regionCode
+            ))
         ) {
             // Either the region code was invalid, or the country calling code for this number does not
             // match that of the region code.
@@ -1814,7 +1751,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         val countryCode = number.countryCode
         val regions = countryCallingCodeToRegionCodeMap[countryCode]
         if (regions == null) {
-            logger.log(Level.INFO, "Missing/invalid country_code ($countryCode)")
+            logger.i("Missing/invalid country_code ($countryCode)")
             return null
         }
         return if (regions.size == 1) {
@@ -1825,8 +1762,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
     }
 
     private fun getRegionCodeForNumberFromRegionList(
-        number: PhoneNumber,
-        regionCodes: List<String>
+        number: PhoneNumber, regionCodes: List<String>
     ): String? {
         val nationalNumber = getNationalSignificantNumber(number)
         for (regionCode in regionCodes) {
@@ -1834,9 +1770,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
             // Metadata cannot be null because the region codes come from the country calling code map.
             val metadata = getMetadataForRegion(regionCode)
             if (metadata!!.hasLeadingDigits()) {
-                if (regexCache.getRegexForPattern(metadata.leadingDigits)
-                        .matcher(nationalNumber).lookingAt()
-                ) {
+                if (regexCache.getRegexForPattern(metadata.leadingDigits).matchesAt(nationalNumber, 0)) {
                     return regionCode
                 }
             } else if (getNumberTypeHelper(nationalNumber, metadata) != PhoneNumberType.UNKNOWN) {
@@ -1866,7 +1800,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
      */
     fun getRegionCodesForCountryCode(countryCallingCode: Int): List<String> {
         val regionCodes = countryCallingCodeToRegionCodeMap[countryCallingCode]
-        return Collections.unmodifiableList(regionCodes ?: ArrayList(0))
+        return regionCodes ?: ArrayList(0)
     }
 
     /**
@@ -1878,11 +1812,8 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
      */
     fun getCountryCodeForRegion(regionCode: String?): Int {
         if (!isValidRegionCode(regionCode)) {
-            logger.log(
-                Level.WARNING,
-                "Invalid or missing region code ("
-                        + (regionCode ?: "null")
-                        + ") provided."
+            logger.w(
+                "Invalid or missing region code (" + (regionCode ?: "null") + ") provided."
             )
             return 0
         }
@@ -1898,8 +1829,8 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
      * @throws IllegalArgumentException if the region is invalid
      */
     private fun getCountryCodeForValidRegion(regionCode: String?): Int {
-        val metadata = getMetadataForRegion(regionCode)
-            ?: throw IllegalArgumentException("Invalid region code: $regionCode")
+        val metadata =
+            getMetadataForRegion(regionCode) ?: throw IllegalArgumentException("Invalid region code: $regionCode")
         return metadata.countryCode
     }
 
@@ -1921,11 +1852,8 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
     fun getNddPrefixForRegion(regionCode: String?, stripNonDigits: Boolean): String? {
         val metadata = getMetadataForRegion(regionCode)
         if (metadata == null) {
-            logger.log(
-                Level.WARNING,
-                "Invalid or missing region code ("
-                        + (regionCode ?: "null")
-                        + ") provided."
+            logger.w(
+                "Invalid or missing region code (" + (regionCode ?: "null") + ") provided."
             )
             return null
         }
@@ -1968,7 +1896,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         }
         val strippedNumber = StringBuilder(number)
         maybeStripExtension(strippedNumber)
-        return VALID_ALPHA_PHONE_PATTERN.matcher(strippedNumber).matches()
+        return VALID_ALPHA_PHONE_PATTERN.matches(strippedNumber)
     }
 
     /**
@@ -1984,8 +1912,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
      */
     fun isPossibleNumber(number: PhoneNumber): Boolean {
         val result = isPossibleNumberWithReason(number)
-        return (result == ValidationResult.IS_POSSIBLE
-                || result == ValidationResult.IS_POSSIBLE_LOCAL_ONLY)
+        return (result == ValidationResult.IS_POSSIBLE || result == ValidationResult.IS_POSSIBLE_LOCAL_ONLY)
     }
 
     /**
@@ -2002,8 +1929,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
      */
     fun isPossibleNumberForType(number: PhoneNumber, type: PhoneNumberType): Boolean {
         val result = isPossibleNumberForTypeWithReason(number, type)
-        return (result == ValidationResult.IS_POSSIBLE
-                || result == ValidationResult.IS_POSSIBLE_LOCAL_ONLY)
+        return (result == ValidationResult.IS_POSSIBLE || result == ValidationResult.IS_POSSIBLE_LOCAL_ONLY)
     }
     /**
      * Helper method to check a number against possible lengths for this number type, and determine
@@ -2023,8 +1949,8 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         // as the parent, this is missing, so we fall back to the general desc (where no numbers of the
         // type exist at all, there is one possible length (-1) which is guaranteed not to match the
         // length of any real phone number).
-        var possibleLengths =
-            if (descForType!!.possibleLengthList.isEmpty()) metadata!!.generalDesc!!.possibleLengthList else descForType.possibleLengthList
+        val possibleLengths =
+            (if (descForType!!.possibleLengthList.isEmpty()) metadata!!.generalDesc!!.possibleLengthList else descForType.possibleLengthList).toMutableList()
         var localLengths: List<Int?> = descForType.possibleLengthLocalOnlyList
         if (type == PhoneNumberType.FIXED_LINE_OR_MOBILE) {
             if (!descHasPossibleNumberData(getNumberDescByType(metadata, PhoneNumberType.FIXED_LINE))) {
@@ -2034,21 +1960,20 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
             } else {
                 val mobileDesc = getNumberDescByType(metadata, PhoneNumberType.MOBILE)
                 if (descHasPossibleNumberData(mobileDesc)) {
-                    // Merge the mobile data in if there was any. We have to make a copy to do this.
-                    possibleLengths = ArrayList(possibleLengths)
+                    // Merge the mobile data in if there was any.
                     // Note that when adding the possible lengths from mobile, we have to again check they
                     // aren't empty since if they are this indicates they are the same as the general desc and
                     // should be obtained from there.
                     possibleLengths.addAll(if (mobileDesc!!.possibleLengthCount == 0) metadata!!.generalDesc!!.possibleLengthList else mobileDesc.possibleLengthList)
                     // The current list is sorted; we need to merge in the new list and re-sort (duplicates
                     // are okay). Sorting isn't so expensive because the lists are very small.
-                    Collections.sort(possibleLengths)
+                    possibleLengths.sort()
                     if (localLengths.isEmpty()) {
-                        localLengths = mobileDesc!!.possibleLengthLocalOnlyList
+                        localLengths = mobileDesc.possibleLengthLocalOnlyList
                     } else {
                         localLengths = ArrayList(localLengths)
-                        localLengths.addAll(mobileDesc!!.possibleLengthLocalOnlyList)
-                        Collections.sort(localLengths)
+                        localLengths.addAll(mobileDesc.possibleLengthLocalOnlyList)
+                        possibleLengths.sort()
                     }
                 }
             }
@@ -2195,9 +2120,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         do {
             nationalNumber /= 10
             numberCopy.setNationalNumber(nationalNumber)
-            if (isPossibleNumberWithReason(numberCopy) == ValidationResult.TOO_SHORT
-                || nationalNumber == 0L
-            ) {
+            if (isPossibleNumberWithReason(numberCopy) == ValidationResult.TOO_SHORT || nationalNumber == 0L) {
                 return false
             }
         } while (!isValidNumber(numberCopy))
@@ -2212,7 +2135,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
      * @return  an [io.michaelrocks.libphonenumber.android.AsYouTypeFormatter] object, which can be used
      * to format phone numbers in the specific region "as you type"
      */
-    fun getAsYouTypeFormatter(regionCode: String?): AsYouTypeFormatter {
+    fun getAsYouTypeFormatter(regionCode: String): AsYouTypeFormatter {
         return AsYouTypeFormatter(this, regionCode)
     }
 
@@ -2273,8 +2196,10 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
     // @VisibleForTesting
     @Throws(NumberParseException::class)
     fun maybeExtractCountryCode(
-        number: CharSequence, defaultRegionMetadata: PhoneMetadata?,
-        nationalNumber: StringBuilder, keepRawInput: Boolean,
+        number: CharSequence,
+        defaultRegionMetadata: PhoneMetadata?,
+        nationalNumber: StringBuilder,
+        keepRawInput: Boolean,
         phoneNumber: PhoneNumber
     ): Int {
         if (number.length == 0) {
@@ -2294,8 +2219,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
             if (fullNumber.length <= MIN_LENGTH_FOR_NSN) {
                 throw NumberParseException(
                     NumberParseException.ErrorType.TOO_SHORT_AFTER_IDD,
-                    "Phone number had an IDD, but after this was not "
-                            + "long enough to be a viable phone number."
+                    "Phone number had an IDD, but after this was not " + "long enough to be a viable phone number."
                 )
             }
             val potentialCountryCode = extractCountryCode(fullNumber, nationalNumber)
@@ -2307,8 +2231,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
             // If this fails, they must be using a strange country calling code that we don't recognize,
             // or that doesn't exist.
             throw NumberParseException(
-                NumberParseException.ErrorType.INVALID_COUNTRY_CODE,
-                "Country calling code supplied was not recognised."
+                NumberParseException.ErrorType.INVALID_COUNTRY_CODE, "Country calling code supplied was not recognised."
             )
         } else if (defaultRegionMetadata != null) {
             // Check to see if the number starts with the country calling code for the default region. If
@@ -2326,9 +2249,11 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
                 // If the number was not valid before but is valid now, or if it was too long before, we
                 // consider the number with the country calling code stripped to be a better result and
                 // keep that instead.
-                if ((!matcherApi.matchNationalNumber(fullNumber, generalDesc!!, false)
-                            && matcherApi.matchNationalNumber(potentialNationalNumber, generalDesc, false))
-                    || testNumberLength(fullNumber, defaultRegionMetadata) == ValidationResult.TOO_LONG
+                if ((!matcherApi.matchNationalNumber(
+                        fullNumber, generalDesc!!, false
+                    ) && matcherApi.matchNationalNumber(
+                        potentialNationalNumber, generalDesc, false
+                    )) || testNumberLength(fullNumber, defaultRegionMetadata) == ValidationResult.TOO_LONG
                 ) {
                     nationalNumber.append(potentialNationalNumber)
                     if (keepRawInput) {
@@ -2348,20 +2273,20 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
      * Strips the IDD from the start of the number if present. Helper function used by
      * maybeStripInternationalPrefixAndNormalize.
      */
-    private fun parsePrefixAsIdd(iddPattern: Pattern, number: StringBuilder): Boolean {
-        val m = iddPattern.matcher(number)
-        if (m.lookingAt()) {
-            val matchEnd = m.end()
+    private fun parsePrefixAsIdd(iddPattern: Regex, number: StringBuilder): Boolean {
+        val m = iddPattern.matchAt(number, 0)
+        if (m != null) {
+            val matchEnd = m.range.last
             // Only strip this if the first digit after the match is not a 0, since country calling codes
             // cannot begin with 0.
-            val digitMatcher = CAPTURING_DIGIT_PATTERN.matcher(number.substring(matchEnd))
-            if (digitMatcher.find()) {
-                val normalizedGroup = normalizeDigitsOnly(digitMatcher.group(1))
+            val digitMatcher = CAPTURING_DIGIT_PATTERN.find(number.substring(matchEnd))
+            if (digitMatcher != null) {
+                val normalizedGroup = normalizeDigitsOnly(digitMatcher.groupValues[1])
                 if (normalizedGroup == "0") {
                     return false
                 }
             }
-            number.delete(0, matchEnd)
+            number.removeRange(0, matchEnd)
             return true
         }
         return false
@@ -2381,26 +2306,24 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
      */
     // @VisibleForTesting
     fun maybeStripInternationalPrefixAndNormalize(
-        number: StringBuilder,
-        possibleIddPrefix: String?
+        number: StringBuilder, possibleIddPrefix: String?
     ): CountryCodeSource {
         if (number.length == 0) {
             return CountryCodeSource.FROM_DEFAULT_COUNTRY
         }
         // Check to see if the number begins with one or more plus signs.
-        val m = PLUS_CHARS_PATTERN.matcher(number)
-        if (m.lookingAt()) {
-            number.delete(0, m.end())
+        val m = PLUS_CHARS_PATTERN.matchAt(number, 0)
+        if (m != null) {
+            number.removeRange(0, m.range.last)
             // Can now normalize the rest of the number since we've consumed the "+" sign at the start.
             normalize(number)
             return CountryCodeSource.FROM_NUMBER_WITH_PLUS_SIGN
         }
         // Attempt to parse the first digits as an international prefix.
-        val iddPattern: Pattern = regexCache.getRegexForPattern(possibleIddPrefix!!)
+        val iddPattern = regexCache.getRegexForPattern(possibleIddPrefix!!)
         normalize(number)
         return if (parsePrefixAsIdd(
-                iddPattern,
-                number
+                iddPattern, number
             )
         ) CountryCodeSource.FROM_NUMBER_WITH_IDD else CountryCodeSource.FROM_DEFAULT_COUNTRY
     }
@@ -2425,44 +2348,45 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
             return false
         }
         // Attempt to parse the first digits as a national prefix.
-        val prefixMatcher: Matcher = regexCache.getRegexForPattern(possibleNationalPrefix).matcher(number)
-        if (prefixMatcher.lookingAt()) {
+        val prefixMatchRegex = regexCache.getRegexForPattern(possibleNationalPrefix)
+        val prefixMatchResult = prefixMatchRegex.matchAt(number, 0)
+        if (prefixMatchResult != null) {
             val generalDesc = metadata.generalDesc
             // Check if the original number is viable.
             val isViableOriginalNumber = matcherApi.matchNationalNumber(number, generalDesc!!, false)
             // prefixMatcher.group(numOfGroups) == null implies nothing was captured by the capturing
             // groups in possibleNationalPrefix; therefore, no transformation is necessary, and we just
             // remove the national prefix.
-            val numOfGroups = prefixMatcher.groupCount()
+            val numOfGroups = prefixMatchResult.groups.size
             val transformRule = metadata.nationalPrefixTransformRule
-            return if (transformRule == null || transformRule.length == 0 || prefixMatcher.group(numOfGroups) == null) {
+            return if (transformRule == null || transformRule.length == 0 || prefixMatchResult.groups[numOfGroups] == null) {
                 // If the original number was viable, and the resultant number is not, we return.
-                if (isViableOriginalNumber
-                    && !matcherApi.matchNationalNumber(
-                        number.substring(prefixMatcher.end()), generalDesc, false
+                if (isViableOriginalNumber && !matcherApi.matchNationalNumber(
+                        number.substring(prefixMatchResult.range.last), generalDesc, false
                     )
                 ) {
                     return false
                 }
-                if (carrierCode != null && numOfGroups > 0 && prefixMatcher.group(numOfGroups) != null) {
-                    carrierCode.append(prefixMatcher.group(1))
+                if (carrierCode != null && numOfGroups > 0 && prefixMatchResult.groups[numOfGroups] != null) {
+                    carrierCode.append(prefixMatchResult.groups[1])
                 }
-                number.delete(0, prefixMatcher.end())
+                number.removeRange(0, prefixMatchResult.range.last)
                 true
             } else {
                 // Check that the resultant number is still viable. If not, return. Check this by copying
                 // the string buffer and making the transformation on the copy first.
                 val transformedNumber = StringBuilder(number)
-                transformedNumber.replace(0, numberLength, prefixMatcher.replaceFirst(transformRule))
-                if (isViableOriginalNumber
-                    && !matcherApi.matchNationalNumber(transformedNumber.toString(), generalDesc, false)
+                transformedNumber.replaceRange(0, numberLength, number.replaceFirst(prefixMatchRegex, transformRule))
+                if (isViableOriginalNumber && !matcherApi.matchNationalNumber(
+                        transformedNumber.toString(), generalDesc, false
+                    )
                 ) {
                     return false
                 }
                 if (carrierCode != null && numOfGroups > 1) {
-                    carrierCode.append(prefixMatcher.group(1))
+                    carrierCode.append(prefixMatchResult.groups[1])
                 }
-                number.replace(0, number.length, transformedNumber.toString())
+                number.replaceRange(0, number.length, transformedNumber.toString())
                 true
             }
         }
@@ -2478,20 +2402,20 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
      */
     // @VisibleForTesting
     fun maybeStripExtension(number: StringBuilder): String {
-        val m = EXTN_PATTERN.matcher(number)
+        val m = EXTN_PATTERN.find(number)
         // If we find a potential extension, and the number preceding this is a viable number, we assume
         // it is an extension.
-        if (m.find() && isViablePhoneNumber(number.substring(0, m.start()))) {
+        if (m != null && isViablePhoneNumber(number.substring(0, m.range.first))) {
             // The numbers are captured into groups in the regular expression.
             var i = 1
-            val length = m.groupCount()
+            val length = m.groupValues.size
             while (i <= length) {
-                if (m.group(i) != null) {
+                if (m.groups[i] != null) {
                     // We go through the capturing groups until we find one that captured some digits. If none
                     // did, then we will return the empty string.
-                    val extension = m.group(i)
-                    number.delete(m.start(), number.length)
-                    return extension
+                    val extension = m.groups[i]
+                    number.removeRange(m.range.first, number.length)
+                    return extension.toString()
                 }
                 i++
             }
@@ -2507,9 +2431,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
     private fun checkRegionForParsing(numberToParse: CharSequence?, defaultRegion: String?): Boolean {
         if (!isValidRegionCode(defaultRegion)) {
             // If the number is null or empty, we can't infer the region.
-            if (numberToParse == null || numberToParse.length == 0
-                || !PLUS_CHARS_PATTERN.matcher(numberToParse).lookingAt()
-            ) {
+            if (numberToParse == null || numberToParse.length == 0 || !PLUS_CHARS_PATTERN.matchesAt(numberToParse, 0)) {
                 return false
             }
         }
@@ -2593,8 +2515,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
      */
     @Throws(NumberParseException::class)
     fun parseAndKeepRawInput(
-        numberToParse: CharSequence?, defaultRegion: String?,
-        phoneNumber: PhoneNumber
+        numberToParse: CharSequence?, defaultRegion: String?, phoneNumber: PhoneNumber
     ) {
         parseHelper(numberToParse, defaultRegion, true, true, phoneNumber)
     }
@@ -2623,16 +2544,19 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
      */
     @JvmOverloads
     fun findNumbers(
-        text: CharSequence?, defaultRegion: String?, leniency: Leniency? = Leniency.VALID,
+        text: CharSequence?,
+        defaultRegion: String?,
+        leniency: Leniency? = Leniency.VALID,
         maxTries: Long = Long.MAX_VALUE
     ): Iterable<PhoneNumberMatch> {
-        return object : Iterable<PhoneNumberMatch?> {
-            override fun iterator(): Iterator<PhoneNumberMatch> {
-                return PhoneNumberMatcher(
-                    this@PhoneNumberUtil, text, defaultRegion, leniency, maxTries
-                )
-            }
-        }
+        TODO()
+//        return object : Iterable<PhoneNumberMatch> {
+//            override fun iterator(): Iterator<PhoneNumberMatch> {
+//                return PhoneNumberMatcher(
+//                    this@PhoneNumberUtil, text, defaultRegion, leniency, maxTries
+//                )
+//            }
+//        }
     }
 
     /**
@@ -2646,18 +2570,19 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
      */
     @Throws(NumberParseException::class)
     private fun parseHelper(
-        numberToParse: CharSequence?, defaultRegion: String?,
-        keepRawInput: Boolean, checkRegion: Boolean, phoneNumber: PhoneNumber
+        numberToParse: CharSequence?,
+        defaultRegion: String?,
+        keepRawInput: Boolean,
+        checkRegion: Boolean,
+        phoneNumber: PhoneNumber
     ) {
         if (numberToParse == null) {
             throw NumberParseException(
-                NumberParseException.ErrorType.NOT_A_NUMBER,
-                "The phone number supplied was null."
+                NumberParseException.ErrorType.NOT_A_NUMBER, "The phone number supplied was null."
             )
         } else if (numberToParse.length > MAX_INPUT_STRING_LENGTH) {
             throw NumberParseException(
-                NumberParseException.ErrorType.TOO_LONG,
-                "The string supplied was too long to parse."
+                NumberParseException.ErrorType.TOO_LONG, "The string supplied was too long to parse."
             )
         }
         val nationalNumber = StringBuilder()
@@ -2665,8 +2590,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         buildNationalNumberForParsing(numberBeingParsed, nationalNumber)
         if (!isViablePhoneNumber(nationalNumber)) {
             throw NumberParseException(
-                NumberParseException.ErrorType.NOT_A_NUMBER,
-                "The string supplied did not seem to be a phone number."
+                NumberParseException.ErrorType.NOT_A_NUMBER, "The string supplied did not seem to be a phone number."
             )
         }
 
@@ -2674,8 +2598,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         // sign so the number's region can be determined.
         if (checkRegion && !checkRegionForParsing(nationalNumber, defaultRegion)) {
             throw NumberParseException(
-                NumberParseException.ErrorType.INVALID_COUNTRY_CODE,
-                "Missing or invalid default region."
+                NumberParseException.ErrorType.INVALID_COUNTRY_CODE, "Missing or invalid default region."
             )
         }
         if (keepRawInput) {
@@ -2697,19 +2620,18 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
             // been created, and just remove the prefix, rather than taking in a string and then
             // outputting a string buffer.
             countryCode = maybeExtractCountryCode(
-                nationalNumber, regionMetadata,
-                normalizedNationalNumber, keepRawInput, phoneNumber
+                nationalNumber, regionMetadata, normalizedNationalNumber, keepRawInput, phoneNumber
             )
         } catch (e: NumberParseException) {
-            val matcher = PLUS_CHARS_PATTERN.matcher(nationalNumber)
-            if (e.errorType === NumberParseException.ErrorType.INVALID_COUNTRY_CODE
-                && matcher.lookingAt()
-            ) {
+            val matchResult = PLUS_CHARS_PATTERN.find(nationalNumber, 0)
+            if (e.errorType === NumberParseException.ErrorType.INVALID_COUNTRY_CODE && matchResult != null) {
                 // Strip the plus-char, and try again.
                 countryCode = maybeExtractCountryCode(
-                    nationalNumber.substring(matcher.end()),
-                    regionMetadata, normalizedNationalNumber,
-                    keepRawInput, phoneNumber
+                    nationalNumber.substring(matchResult.range.last),
+                    regionMetadata,
+                    normalizedNationalNumber,
+                    keepRawInput,
+                    phoneNumber
                 )
                 if (countryCode == 0) {
                     throw NumberParseException(
@@ -2740,8 +2662,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         }
         if (normalizedNationalNumber.length < MIN_LENGTH_FOR_NSN) {
             throw NumberParseException(
-                NumberParseException.ErrorType.TOO_SHORT_NSN,
-                "The string supplied is too short to be a phone number."
+                NumberParseException.ErrorType.TOO_SHORT_NSN, "The string supplied is too short to be a phone number."
             )
         }
         if (regionMetadata != null) {
@@ -2762,14 +2683,12 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         val lengthOfNationalNumber = normalizedNationalNumber.length
         if (lengthOfNationalNumber < MIN_LENGTH_FOR_NSN) {
             throw NumberParseException(
-                NumberParseException.ErrorType.TOO_SHORT_NSN,
-                "The string supplied is too short to be a phone number."
+                NumberParseException.ErrorType.TOO_SHORT_NSN, "The string supplied is too short to be a phone number."
             )
         }
         if (lengthOfNationalNumber > MAX_LENGTH_FOR_NSN) {
             throw NumberParseException(
-                NumberParseException.ErrorType.TOO_LONG,
-                "The string supplied is too long to be a phone number."
+                NumberParseException.ErrorType.TOO_LONG, "The string supplied is too long to be a phone number."
             )
         }
         setItalianLeadingZerosForPhoneNumber(normalizedNationalNumber, phoneNumber)
@@ -2811,8 +2730,9 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         }
         return if (phoneContext.length == 0) {
             false
-        } else (RFC3966_GLOBAL_NUMBER_DIGITS_PATTERN.matcher(phoneContext).matches()
-                || RFC3966_DOMAINNAME_PATTERN.matcher(phoneContext).matches())
+        } else (RFC3966_GLOBAL_NUMBER_DIGITS_PATTERN.matches(phoneContext) || RFC3966_DOMAINNAME_PATTERN.matches(
+            phoneContext
+        ))
 
         // Does phone-context value match pattern of global-number-digits or domainname
     }
@@ -2827,8 +2747,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         val phoneContext = extractPhoneContext(numberToParse, indexOfPhoneContext)
         if (!isPhoneContextValid(phoneContext)) {
             throw NumberParseException(
-                NumberParseException.ErrorType.NOT_A_NUMBER,
-                "The phone-context value is invalid."
+                NumberParseException.ErrorType.NOT_A_NUMBER, "The phone-context value is invalid."
             )
         }
         if (phoneContext != null) {
@@ -2859,7 +2778,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         // appear at the same time with isdn-subaddress according to paragraph 5.3 of the RFC3966 spec,
         val indexOfIsdn = nationalNumber.indexOf(RFC3966_ISDN_SUBADDRESS)
         if (indexOfIsdn > 0) {
-            nationalNumber.delete(indexOfIsdn, nationalNumber.length)
+            nationalNumber.removeRange(indexOfIsdn, indexOfIsdn + nationalNumber.length)
         }
         // If both phone context and isdn-subaddress are absent but other parameters are present, the
         // parameters are left in nationalNumber. This is because we are concerned about deleting
@@ -2894,9 +2813,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         val firstNumber = copyCoreFieldsOnly(firstNumberIn)
         val secondNumber = copyCoreFieldsOnly(secondNumberIn)
         // Early exit if both had extensions and these are different.
-        if (firstNumber.hasExtension() && secondNumber.hasExtension()
-            && firstNumber.extension != secondNumber.extension
-        ) {
+        if (firstNumber.hasExtension() && secondNumber.hasExtension() && firstNumber.extension != secondNumber.extension) {
             return MatchType.NO_MATCH
         }
         val firstNumberCountryCode = firstNumber.countryCode
@@ -2905,8 +2822,9 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         if (firstNumberCountryCode != 0 && secondNumberCountryCode != 0) {
             if (firstNumber.exactlySameAs(secondNumber)) {
                 return MatchType.EXACT_MATCH
-            } else if (firstNumberCountryCode == secondNumberCountryCode
-                && isNationalNumberSuffixOfTheOther(firstNumber, secondNumber)
+            } else if (firstNumberCountryCode == secondNumberCountryCode && isNationalNumberSuffixOfTheOther(
+                    firstNumber, secondNumber
+                )
             ) {
                 // A SHORT_NSN_MATCH occurs if there is a difference because of the presence or absence of
                 // an 'Italian leading zero', the presence or absence of an extension, or one NSN being a
@@ -2930,14 +2848,14 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
 
     // Returns true when one national number is the suffix of the other or both are the same.
     private fun isNationalNumberSuffixOfTheOther(
-        firstNumber: PhoneNumber,
-        secondNumber: PhoneNumber
+        firstNumber: PhoneNumber, secondNumber: PhoneNumber
     ): Boolean {
         val firstNumberNationalNumber = firstNumber.nationalNumber.toString()
         val secondNumberNationalNumber = secondNumber.nationalNumber.toString()
         // Note that endsWith returns true if the numbers are equal.
-        return (firstNumberNationalNumber.endsWith(secondNumberNationalNumber)
-                || secondNumberNationalNumber.endsWith(firstNumberNationalNumber))
+        return (firstNumberNationalNumber.endsWith(secondNumberNationalNumber) || secondNumberNationalNumber.endsWith(
+            firstNumberNationalNumber
+        ))
     }
 
     /**
@@ -3062,7 +2980,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         private val logger = Logger.withTag(PhoneNumberUtil::class.simpleName.toString())
 
         /** Flags to use when compiling regular expressions for phone numbers.  */
-        const val REGEX_FLAGS = Pattern.UNICODE_CASE or Pattern.CASE_INSENSITIVE
+        val REGEX_FLAGS = setOf(RegexOption.IGNORE_CASE, RegexOption.IGNORE_CASE)
 
         // The minimum and maximum length of the national significant number.
         private const val MIN_LENGTH_FOR_NSN = 2
@@ -3084,20 +3002,20 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         // Map of country calling codes that use a mobile token before the area code. One example of when
         // this is relevant is when determining the length of the national destination code, which should
         // be the length of the area code plus the length of the mobile token.
-        private val MOBILE_TOKEN_MAPPINGS: Map<Int, String>? = null
+        private var MOBILE_TOKEN_MAPPINGS: Map<Int, String>? = null
 
         // Set of country codes that have geographically assigned mobile numbers (see GEO_MOBILE_COUNTRIES
         // below) which are not based on *area codes*. For example, in China mobile numbers start with a
         // carrier indicator, and beyond that are geographically assigned: this carrier indicator is not
         // considered to be an area code.
-        private val GEO_MOBILE_COUNTRIES_WITHOUT_MOBILE_AREA_CODES: Set<Int>? = null
+        private var GEO_MOBILE_COUNTRIES_WITHOUT_MOBILE_AREA_CODES: Set<Int>? = null
 
         // Set of country calling codes that have geographically assigned mobile numbers. This may not be
         // complete; we add calling codes case by case, as we find geographical mobile numbers or hear
         // from user reports. Note that countries like the US, where we can't distinguish between
         // fixed-line or mobile numbers, are not listed here, since we consider FIXED_LINE_OR_MOBILE to be
         // a possibly geographically-related type anyway (like FIXED_LINE).
-        private val GEO_MOBILE_COUNTRIES: Set<Int>? = null
+        private var GEO_MOBILE_COUNTRIES: Set<Int>? = null
 
         // The PLUS_SIGN signifies the international prefix.
         const val PLUS_SIGN = '+'
@@ -3110,33 +3028,32 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         // A map that contains characters that are essential when dialling. That means any of the
         // characters in this map must not be removed from a number when dialling, otherwise the call
         // will not reach the intended destination.
-        private val DIALLABLE_CHAR_MAPPINGS: Map<Char, Char>? = null
+        private var DIALLABLE_CHAR_MAPPINGS: Map<Char, Char>? = null
 
         // Only upper-case variants of alpha characters are stored.
-        private val ALPHA_MAPPINGS: Map<Char, Char>? = null
+        private var ALPHA_MAPPINGS: Map<Char, Char>? = null
 
         // For performance reasons, amalgamate both into one map.
-        private val ALPHA_PHONE_MAPPINGS: Map<Char, Char>? = null
+        private var ALPHA_PHONE_MAPPINGS: Map<Char, Char>? = null
 
         // Separate map of all symbols that we wish to retain when formatting alpha numbers. This
         // includes digits, ASCII letters and number grouping symbols such as "-" and " ".
-        private val ALL_PLUS_NUMBER_GROUPING_SYMBOLS: Map<Char, Char>? = null
+        private var ALL_PLUS_NUMBER_GROUPING_SYMBOLS: Map<Char, Char>? = null
 
         init {
             val mobileTokenMap = HashMap<Int, String>()
             mobileTokenMap[54] = "9"
-            MOBILE_TOKEN_MAPPINGS = Collections.unmodifiableMap(mobileTokenMap)
+            MOBILE_TOKEN_MAPPINGS = mobileTokenMap
             val geoMobileCountriesWithoutMobileAreaCodes = HashSet<Int>()
             geoMobileCountriesWithoutMobileAreaCodes.add(86) // China
-            GEO_MOBILE_COUNTRIES_WITHOUT_MOBILE_AREA_CODES =
-                Collections.unmodifiableSet(geoMobileCountriesWithoutMobileAreaCodes)
+            GEO_MOBILE_COUNTRIES_WITHOUT_MOBILE_AREA_CODES = geoMobileCountriesWithoutMobileAreaCodes
             val geoMobileCountries = HashSet<Int>()
             geoMobileCountries.add(52) // Mexico
             geoMobileCountries.add(54) // Argentina
             geoMobileCountries.add(55) // Brazil
             geoMobileCountries.add(62) // Indonesia: some prefixes only (fixed CMDA wireless)
             geoMobileCountries.addAll(geoMobileCountriesWithoutMobileAreaCodes)
-            GEO_MOBILE_COUNTRIES = Collections.unmodifiableSet(geoMobileCountries)
+            GEO_MOBILE_COUNTRIES = geoMobileCountries
 
             // Simple ASCII digits map used to populate ALPHA_PHONE_MAPPINGS and
             // ALL_PLUS_NUMBER_GROUPING_SYMBOLS.
@@ -3178,20 +3095,20 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
             alphaMap['X'] = '9'
             alphaMap['Y'] = '9'
             alphaMap['Z'] = '9'
-            ALPHA_MAPPINGS = Collections.unmodifiableMap(alphaMap)
+            ALPHA_MAPPINGS = alphaMap
             val combinedMap = HashMap<Char, Char>(100)
-            combinedMap.putAll(ALPHA_MAPPINGS)
+            combinedMap.putAll(ALPHA_MAPPINGS as HashMap<Char, Char>)
             combinedMap.putAll(asciiDigitMappings)
-            ALPHA_PHONE_MAPPINGS = Collections.unmodifiableMap(combinedMap)
+            ALPHA_PHONE_MAPPINGS = combinedMap
             val diallableCharMap = HashMap<Char, Char>()
             diallableCharMap.putAll(asciiDigitMappings)
             diallableCharMap[PLUS_SIGN] = PLUS_SIGN
             diallableCharMap['*'] = '*'
             diallableCharMap['#'] = '#'
-            DIALLABLE_CHAR_MAPPINGS = Collections.unmodifiableMap(diallableCharMap)
+            DIALLABLE_CHAR_MAPPINGS = diallableCharMap
             val allPlusNumberGroupings = HashMap<Char, Char>()
             // Put (lower letter -> upper letter) and (upper letter -> upper letter) mappings.
-            for (c in ALPHA_MAPPINGS.keys) {
+            for (c in (ALPHA_MAPPINGS as HashMap<Char, Char>).keys) {
                 allPlusNumberGroupings[c.lowercaseChar()] = c
                 allPlusNumberGroupings[c] = c
             }
@@ -3213,7 +3130,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
             allPlusNumberGroupings['\u2060'] = ' '
             allPlusNumberGroupings['.'] = '.'
             allPlusNumberGroupings['\uFF0E'] = '.'
-            ALL_PLUS_NUMBER_GROUPING_SYMBOLS = Collections.unmodifiableMap(allPlusNumberGroupings)
+            ALL_PLUS_NUMBER_GROUPING_SYMBOLS = allPlusNumberGroupings
         }
 
         // Pattern that makes it easy to distinguish whether a region has a single international dialing
@@ -3222,7 +3139,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         // signals waiting for the tone. If there are multiple available international prefixes in a
         // region, they will be represented as a regex string that always contains one or more characters
         // that are not ASCII digits or a tilde.
-        private val SINGLE_INTERNATIONAL_PREFIX = Pattern.compile("[\\d]+(?:[~\u2053\u223C\uFF5E][\\d]+)?")
+        private val SINGLE_INTERNATIONAL_PREFIX = Regex("[\\d]+(?:[~\u2053\u223C\uFF5E][\\d]+)?")
 
         // Regular expression of acceptable punctuation found in phone numbers, used to find numbers in
         // text and to decide what is a viable phone number. This excludes diallable characters.
@@ -3230,21 +3147,20 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         // square brackets, parentheses and tildes. It also includes the letter 'x' as that is found as a
         // placeholder for carrier information in some phone numbers. Full-width variants are also
         // present.
-        const val VALID_PUNCTUATION = ("-x\u2010-\u2015\u2212\u30FC\uFF0D-\uFF0F "
-                + "\u00A0\u00AD\u200B\u2060\u3000()\uFF08\uFF09\uFF3B\uFF3D.\\[\\]/~\u2053\u223C\uFF5E")
+        const val VALID_PUNCTUATION =
+            ("-x\u2010-\u2015\u2212\u30FC\uFF0D-\uFF0F " + "\u00A0\u00AD\u200B\u2060\u3000()\uFF08\uFF09\uFF3B\uFF3D.\\[\\]/~\u2053\u223C\uFF5E")
         private const val DIGITS = "\\p{Nd}"
 
         // We accept alpha characters in phone numbers, ASCII only, upper and lower case.
-        private val VALID_ALPHA =
-            (ALPHA_MAPPINGS!!.keys.toTypedArray().contentToString().replace("[, \\[\\]]".toRegex(), "")
-                    + ALPHA_MAPPINGS.keys.toTypedArray().contentToString().lowercase(Locale.getDefault())
-                .replace("[, \\[\\]]".toRegex(), ""))
+        private val VALID_ALPHA = (ALPHA_MAPPINGS!!.keys.toTypedArray().contentToString()
+            .replace("[, \\[\\]]".toRegex(), "") + ALPHA_MAPPINGS!!.keys.toTypedArray().contentToString().lowercase()
+            .replace("[, \\[\\]]".toRegex(), ""))
         const val PLUS_CHARS = "+\uFF0B"
 
         @JvmField
-        val PLUS_CHARS_PATTERN = Pattern.compile("[" + PLUS_CHARS + "]+")
-        private val SEPARATOR_PATTERN = Pattern.compile("[" + VALID_PUNCTUATION + "]+")
-        private val CAPTURING_DIGIT_PATTERN = Pattern.compile("(" + DIGITS + ")")
+        val PLUS_CHARS_PATTERN = Regex("[" + PLUS_CHARS + "]+")
+        private val SEPARATOR_PATTERN = Regex("[" + VALID_PUNCTUATION + "]+")
+        private val CAPTURING_DIGIT_PATTERN = Regex("(" + DIGITS + ")")
 
         // Regular expression of acceptable characters that may start a phone number for the purposes of
         // parsing. This allows us to strip away meaningless prefixes to phone numbers that may be
@@ -3253,7 +3169,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         // not include other punctuation, as this will be stripped later during parsing and is of no
         // information value when parsing a number.
         private val VALID_START_CHAR = "[" + PLUS_CHARS + DIGITS + "]"
-        private val VALID_START_CHAR_PATTERN = Pattern.compile(VALID_START_CHAR)
+        private val VALID_START_CHAR_PATTERN = Regex(VALID_START_CHAR)
 
         // Regular expression of characters typically used to start a second phone number for the purposes
         // of parsing. This allows us to strip off parts of the number that are actually the start of
@@ -3263,7 +3179,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         private const val SECOND_NUMBER_START = "[\\\\/] *x"
 
         @JvmField
-        val SECOND_NUMBER_START_PATTERN = Pattern.compile(SECOND_NUMBER_START)
+        val SECOND_NUMBER_START_PATTERN = Regex(SECOND_NUMBER_START)
 
         // Regular expression of trailing characters that we want to remove. We remove all characters that
         // are not alpha or numerical characters. The hash character is retained here, as it may signify
@@ -3271,11 +3187,11 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         private const val UNWANTED_END_CHARS = "[[\\P{N}&&\\P{L}]&&[^#]]+$"
 
         @JvmField
-        val UNWANTED_END_CHAR_PATTERN = Pattern.compile(UNWANTED_END_CHARS)
+        val UNWANTED_END_CHAR_PATTERN = Regex(UNWANTED_END_CHARS)
 
         // We use this pattern to check if the phone number has at least three letters in it - if so, then
         // we treat it as a number where some phone-number digits are represented by letters.
-        private val VALID_ALPHA_PHONE_PATTERN = Pattern.compile("(?:.*?[A-Za-z]){3}.*")
+        private val VALID_ALPHA_PHONE_PATTERN = Regex("(?:.*?[A-Za-z]){3}.*")
 
         // Regular expression of viable phone numbers. This is location independent. Checks we have at
         // least three leading digits, and only valid punctuation, alpha characters and
@@ -3293,9 +3209,8 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         // have alpha-characters and punctuation.
         //
         // Note VALID_PUNCTUATION starts with a -, so must be the first in the range.
-        private val VALID_PHONE_NUMBER = (DIGITS + "{" + MIN_LENGTH_FOR_NSN + "}" + "|"
-                + "[" + PLUS_CHARS + "]*+(?:[" + VALID_PUNCTUATION + STAR_SIGN + "]*" + DIGITS + "){3,}["
-                + VALID_PUNCTUATION + STAR_SIGN + VALID_ALPHA + DIGITS + "]*")
+        private val VALID_PHONE_NUMBER =
+            (DIGITS + "{" + MIN_LENGTH_FOR_NSN + "}" + "|" + "[" + PLUS_CHARS + "]*+(?:[" + VALID_PUNCTUATION + STAR_SIGN + "]*" + DIGITS + "){3,}[" + VALID_PUNCTUATION + STAR_SIGN + VALID_ALPHA + DIGITS + "]*")
 
         // Default extension prefix to use when formatting. This will be put in front of any extension
         // component of the number, after the main national number is formatted. For example, if you wish
@@ -3317,7 +3232,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         private val RFC3966_PHONE_DIGIT = "(" + DIGITS + "|" + RFC3966_VISUAL_SEPARATOR + ")"
         private val RFC3966_GLOBAL_NUMBER_DIGITS =
             "^\\" + PLUS_SIGN + RFC3966_PHONE_DIGIT + "*" + DIGITS + RFC3966_PHONE_DIGIT + "*$"
-        val RFC3966_GLOBAL_NUMBER_DIGITS_PATTERN = Pattern.compile(RFC3966_GLOBAL_NUMBER_DIGITS)
+        val RFC3966_GLOBAL_NUMBER_DIGITS_PATTERN = Regex(RFC3966_GLOBAL_NUMBER_DIGITS)
 
         // Regular expression of valid domainname for the phone-context parameter, following the syntax
         // defined in RFC3966.
@@ -3325,7 +3240,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         private val RFC3966_DOMAINLABEL = "[" + ALPHANUM + "]+((\\-)*[" + ALPHANUM + "])*"
         private val RFC3966_TOPLABEL = "[" + VALID_ALPHA + "]+((\\-)*[" + ALPHANUM + "])*"
         private val RFC3966_DOMAINNAME = "^(" + RFC3966_DOMAINLABEL + "\\.)*" + RFC3966_TOPLABEL + "\\.?$"
-        val RFC3966_DOMAINNAME_PATTERN = Pattern.compile(RFC3966_DOMAINNAME)
+        val RFC3966_DOMAINNAME_PATTERN = Regex(RFC3966_DOMAINNAME)
 
         /**
          * Helper method for constructing regular expressions for parsing. Creates an expression that
@@ -3366,11 +3281,14 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
             // When extension is not separated clearly.
             val ambiguousSeparator = "[- ]+"
             val rfcExtn = RFC3966_EXTN_PREFIX + extnDigits(extLimitAfterExplicitLabel)
-            val explicitExtn = (possibleSeparatorsBetweenNumberAndExtLabel + explicitExtLabels
-                    + possibleCharsAfterExtLabel + extnDigits(extLimitAfterExplicitLabel)
-                    + optionalExtnSuffix)
-            val ambiguousExtn = (possibleSeparatorsBetweenNumberAndExtLabel + ambiguousExtLabels
-                    + possibleCharsAfterExtLabel + extnDigits(extLimitAfterAmbiguousChar) + optionalExtnSuffix)
+            val explicitExtn =
+                (possibleSeparatorsBetweenNumberAndExtLabel + explicitExtLabels + possibleCharsAfterExtLabel + extnDigits(
+                    extLimitAfterExplicitLabel
+                ) + optionalExtnSuffix)
+            val ambiguousExtn =
+                (possibleSeparatorsBetweenNumberAndExtLabel + ambiguousExtLabels + possibleCharsAfterExtLabel + extnDigits(
+                    extLimitAfterAmbiguousChar
+                ) + optionalExtnSuffix)
             val americanStyleExtnWithSuffix = ambiguousSeparator + extnDigits(extLimitWhenNotSure) + "#"
 
             // The first regular expression covers RFC 3966 format, where the extension is added using
@@ -3381,10 +3299,8 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
             // chance of falsely interpreting two numbers beside each other as a number + extension. The
             // fourth one covers the special case of American numbers where the extension is written with a
             // hash at the end, such as "- 503#".
-            val extensionPattern = (rfcExtn + "|"
-                    + explicitExtn + "|"
-                    + ambiguousExtn + "|"
-                    + americanStyleExtnWithSuffix)
+            val extensionPattern =
+                (rfcExtn + "|" + explicitExtn + "|" + ambiguousExtn + "|" + americanStyleExtnWithSuffix)
             // Additional pattern that is supported when parsing extensions, not when matching.
             if (forParsing) {
                 // This is same as possibleSeparatorsBetweenNumberAndExtLabel, but not matching comma as
@@ -3394,40 +3310,40 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
                 // through possibleSeparatorsBetweenNumberAndExtLabel, so we do not repeat it here. Semi-colon
                 // works in Iphone and Android also to pop up a button with the extension number following.
                 val autoDiallingAndExtLabelsFound = "(?:,{2}|;)"
-                val autoDiallingExtn = (possibleSeparatorsNumberExtLabelNoComma
-                        + autoDiallingAndExtLabelsFound + possibleCharsAfterExtLabel
-                        + extnDigits(extLimitAfterLikelyLabel) + optionalExtnSuffix)
-                val onlyCommasExtn = (possibleSeparatorsNumberExtLabelNoComma
-                        + "(?:,)+" + possibleCharsAfterExtLabel + extnDigits(extLimitAfterAmbiguousChar)
-                        + optionalExtnSuffix)
+                val autoDiallingExtn =
+                    (possibleSeparatorsNumberExtLabelNoComma + autoDiallingAndExtLabelsFound + possibleCharsAfterExtLabel + extnDigits(
+                        extLimitAfterLikelyLabel
+                    ) + optionalExtnSuffix)
+                val onlyCommasExtn =
+                    (possibleSeparatorsNumberExtLabelNoComma + "(?:,)+" + possibleCharsAfterExtLabel + extnDigits(
+                        extLimitAfterAmbiguousChar
+                    ) + optionalExtnSuffix)
                 // Here the first pattern is exclusively for extension autodialling formats which are used
                 // when dialling and in this case we accept longer extensions. However, the second pattern
                 // is more liberal on the number of commas that acts as extension labels, so we have a strict
                 // cap on the number of digits in such extensions.
-                return (extensionPattern + "|"
-                        + autoDiallingExtn + "|"
-                        + onlyCommasExtn)
+                return (extensionPattern + "|" + autoDiallingExtn + "|" + onlyCommasExtn)
             }
             return extensionPattern
         }
 
         // Regexp of all known extension prefixes used by different regions followed by 1 or more valid
         // digits, for use when parsing.
-        private val EXTN_PATTERN = Pattern.compile("(?:" + EXTN_PATTERNS_FOR_PARSING + ")$", REGEX_FLAGS)
+        private val EXTN_PATTERN = Regex("(?:" + EXTN_PATTERNS_FOR_PARSING + ")$", REGEX_FLAGS)
 
         // We append optionally the extension pattern to the end here, as a valid phone number may
         // have an extension prefix appended, followed by 1 or more digits.
         private val VALID_PHONE_NUMBER_PATTERN =
-            Pattern.compile(VALID_PHONE_NUMBER + "(?:" + EXTN_PATTERNS_FOR_PARSING + ")?", REGEX_FLAGS)
+            Regex(VALID_PHONE_NUMBER + "(?:" + EXTN_PATTERNS_FOR_PARSING + ")?", REGEX_FLAGS)
 
         @JvmField
-        val NON_DIGITS_PATTERN = Pattern.compile("(\\D+)")
+        val NON_DIGITS_PATTERN = Regex("(\\D+)")
 
         // The FIRST_GROUP_PATTERN was originally set to $1 but there are some countries for which the
         // first group is not used in the national pattern (e.g. Argentina) so the $1 group does not match
         // correctly.  Therefore, we use \d, so that the first group actually used in the pattern will be
         // matched.
-        private val FIRST_GROUP_PATTERN = Pattern.compile("(\\$\\d)")
+        private val FIRST_GROUP_PATTERN = Regex("(\\$\\d)")
 
         // Constants used in the formatting rules to represent the national prefix, first group and
         // carrier code respectively.
@@ -3438,7 +3354,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         // A pattern that is used to determine if the national prefix formatting rule has the first group
         // only, i.e., does not start with the national prefix. Note that the pattern explicitly allows
         // for unbalanced parentheses.
-        private val FIRST_GROUP_ONLY_PREFIX_PATTERN = Pattern.compile("\\(?\\$1\\)?")
+        private val FIRST_GROUP_ONLY_PREFIX_PATTERN = Regex("\\(?\\$1\\)?")
         const val REGION_CODE_FOR_NON_GEO_ENTITY = "001"
 
         /**
@@ -3458,18 +3374,18 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
          */
         fun extractPossibleNumber(number: CharSequence): CharSequence {
             var number = number
-            val m = VALID_START_CHAR_PATTERN.matcher(number)
-            return if (m.find()) {
-                number = number.subSequence(m.start(), number.length)
+            val m = VALID_START_CHAR_PATTERN.find(number)
+            return if (m != null) {
+                number = number.subSequence(m.range.first, number.length)
                 // Remove trailing non-alpha non-numerical characters.
-                val trailingCharsMatcher = UNWANTED_END_CHAR_PATTERN.matcher(number)
-                if (trailingCharsMatcher.find()) {
-                    number = number.subSequence(0, trailingCharsMatcher.start())
+                val trailingCharsMatchResult = UNWANTED_END_CHAR_PATTERN.find(number)
+                if (trailingCharsMatchResult != null) {
+                    number = number.subSequence(0, trailingCharsMatchResult.range.first)
                 }
                 // Check for extra numbers at the end.
-                val secondNumber = SECOND_NUMBER_START_PATTERN.matcher(number)
-                if (secondNumber.find()) {
-                    number = number.subSequence(0, secondNumber.start())
+                val secondNumberMatchResult = SECOND_NUMBER_START_PATTERN.find(number)
+                if (secondNumberMatchResult != null) {
+                    number = number.subSequence(0, secondNumberMatchResult.range.first)
                 }
                 number
             } else {
@@ -3492,8 +3408,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
             if (number.length < MIN_LENGTH_FOR_NSN) {
                 return false
             }
-            val m = VALID_PHONE_NUMBER_PATTERN.matcher(number)
-            return m.matches()
+            return VALID_PHONE_NUMBER_PATTERN.matches(number)
         }
 
         /**
@@ -3513,11 +3428,10 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
          * normalized in place
          */
         fun normalize(number: StringBuilder): StringBuilder {
-            val m = VALID_ALPHA_PHONE_PATTERN.matcher(number)
-            if (m.matches()) {
-                number.replace(0, number.length, normalizeHelper(number, ALPHA_PHONE_MAPPINGS, true))
+            if (VALID_ALPHA_PHONE_PATTERN.matches(number)) {
+                number.replaceRange(0, number.length, normalizeHelper(number, ALPHA_PHONE_MAPPINGS, true))
             } else {
-                number.replace(0, number.length, normalizeDigitsOnly(number))
+                number.replaceRange(0, number.length, normalizeDigitsOnly(number))
             }
             return number
         }
@@ -3579,7 +3493,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
          */
         fun getCountryMobileToken(countryCallingCode: Int): String? {
             return if (MOBILE_TOKEN_MAPPINGS!!.containsKey(countryCallingCode)) {
-                MOBILE_TOKEN_MAPPINGS[countryCallingCode]
+                MOBILE_TOKEN_MAPPINGS!![countryCallingCode]
             } else ""
         }
 
@@ -3596,9 +3510,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
          * @return  the normalized string version of the phone number
          */
         private fun normalizeHelper(
-            number: CharSequence,
-            normalizationReplacements: Map<Char, Char>?,
-            removeNonMatches: Boolean
+            number: CharSequence, normalizationReplacements: Map<Char, Char>?, removeNonMatches: Boolean
         ): String {
             val normalizedNumber = StringBuilder(number.length)
             for (i in 0..<number.length) {
@@ -3634,9 +3546,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
             // stripped just one of them (e.g. liteBuild strips exampleNumber). We don't bother checking the
             // possibleLengthsLocalOnly, since if this is the only thing that's present we don't really
             // support the type at all: no type-specific methods will work with only this data.
-            return (desc!!.hasExampleNumber()
-                    || descHasPossibleNumberData(desc)
-                    || desc.hasNationalNumberPattern())
+            return (desc!!.hasExampleNumber() || descHasPossibleNumberData(desc) || desc.hasNationalNumberPattern())
         }
 
         /**
@@ -3676,11 +3586,11 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
          * @param context  Android [Context] used to load metadata. This should not be null.
          * @return  a PhoneNumberUtil instance
          */
-        @JvmStatic
-        fun createInstance(context: Context?): PhoneNumberUtil {
-            requireNotNull(context) { "context could not be null." }
-            return createInstance(AssetsMetadataLoader(context.assets))
-        }
+//        @JvmStatic
+//        fun createInstance(context: Context?): PhoneNumberUtil {
+//            requireNotNull(context) { "context could not be null." }
+//            return createInstance(AssetsMetadataLoader(context.assets))
+//        }
 
         /**
          * Create a new [PhoneNumberUtil] instance to carry out international phone number
@@ -3698,14 +3608,12 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
          * @return  a PhoneNumberUtil instance
          */
         private fun createInstance(
-            metadataSource: MetadataSource?,
-            metadataDependenciesProvider: DefaultMetadataDependenciesProvider?
+            metadataSource: MetadataSource?, metadataDependenciesProvider: DefaultMetadataDependenciesProvider?
         ): PhoneNumberUtil {
             requireNotNull(metadataSource) { "metadataSource could not be null." }
             requireNotNull(metadataDependenciesProvider) { "metadataDependenciesProvider could not be null." }
             return PhoneNumberUtil(
-                metadataSource, metadataDependenciesProvider,
-                countryCodeToRegionCodeMap
+                metadataSource, metadataDependenciesProvider, countryCodeToRegionCodeMap
             )
         }
 
@@ -3715,8 +3623,9 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
          */
         @JvmStatic
         fun formattingRuleHasFirstGroupOnly(nationalPrefixFormattingRule: String): Boolean {
-            return (nationalPrefixFormattingRule.length == 0
-                    || FIRST_GROUP_ONLY_PREFIX_PATTERN.matcher(nationalPrefixFormattingRule).matches())
+            return (nationalPrefixFormattingRule.length == 0 || FIRST_GROUP_ONLY_PREFIX_PATTERN.matches(
+                nationalPrefixFormattingRule
+            ))
         }
 
         private fun ensureMetadataIsNonNull(phoneMetadata: PhoneMetadata?, message: String) {
@@ -3729,17 +3638,14 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
          * A helper function to set the values related to leading zeros in a PhoneNumber.
          */
         fun setItalianLeadingZerosForPhoneNumber(
-            nationalNumber: CharSequence,
-            phoneNumber: PhoneNumber
+            nationalNumber: CharSequence, phoneNumber: PhoneNumber
         ) {
             if (nationalNumber.length > 1 && nationalNumber[0] == '0') {
                 phoneNumber.setItalianLeadingZero(true)
                 var numberOfLeadingZeros = 1
                 // Note that if the national number is all "0"s, the last "0" is not counted as a leading
                 // zero.
-                while (numberOfLeadingZeros < nationalNumber.length - 1
-                    && nationalNumber[numberOfLeadingZeros] == '0'
-                ) {
+                while (numberOfLeadingZeros < nationalNumber.length - 1 && nationalNumber[numberOfLeadingZeros] == '0') {
                     numberOfLeadingZeros++
                 }
                 if (numberOfLeadingZeros != 1) {

@@ -26,7 +26,7 @@
 //import java.util.logging.Level;
 //import java.util.logging.Logger;
 //
-//import io.michaelrocks.libphonenumber.android.PhoneNumberUtil.PhoneNumberType;
+//import io.michaelrocks.libphonenumber.kotlin.PhoneNumberUtil.PhoneNumberType;
 //import io.michaelrocks.libphonenumber.kotlin.Phonemetadata.PhoneNumberDesc;
 //import io.michaelrocks.libphonenumber.kotlin.Phonenumber.PhoneNumber;
 //import io.michaelrocks.libphonenumber.android.metadata.DefaultMetadataDependenciesProvider;

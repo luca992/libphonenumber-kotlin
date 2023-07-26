@@ -14,21 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.michaelrocks.libphonenumber.android
+package io.michaelrocks.libphonenumber.kotlin
 
-import io.michaelrocks.libphonenumber.android.PhoneNumberUtil
-import io.michaelrocks.libphonenumber.android.PhoneNumberUtil.Companion.formattingRuleHasFirstGroupOnly
-import io.michaelrocks.libphonenumber.android.PhoneNumberUtil.Companion.normalizeDigits
-import io.michaelrocks.libphonenumber.android.PhoneNumberUtil.Companion.normalizeDigitsOnly
-import io.michaelrocks.libphonenumber.android.PhoneNumberUtil.Leniency
-import io.michaelrocks.libphonenumber.android.PhoneNumberUtil.PhoneNumberFormat
-import io.michaelrocks.libphonenumber.kotlin.NumberParseException
-import io.michaelrocks.libphonenumber.kotlin.PhoneNumberMatch
-import io.michaelrocks.libphonenumber.kotlin.Phonemetadata
+import io.michaelrocks.libphonenumber.kotlin.PhoneNumberUtil
+import io.michaelrocks.libphonenumber.kotlin.PhoneNumberUtil.Companion.formattingRuleHasFirstGroupOnly
+import io.michaelrocks.libphonenumber.kotlin.PhoneNumberUtil.Companion.normalizeDigits
+import io.michaelrocks.libphonenumber.kotlin.PhoneNumberUtil.Companion.normalizeDigitsOnly
+import io.michaelrocks.libphonenumber.kotlin.PhoneNumberUtil.Leniency
+import io.michaelrocks.libphonenumber.kotlin.PhoneNumberUtil.PhoneNumberFormat
 import io.michaelrocks.libphonenumber.kotlin.Phonenumber.PhoneNumber
 import io.michaelrocks.libphonenumber.kotlin.Phonenumber.PhoneNumber.CountryCodeSource
 import io.michaelrocks.libphonenumber.kotlin.internal.RegexCache
-import java.util.regex.Pattern
 
 /**
  * A stateful class that finds and extracts telephone numbers from [text][CharSequence].
@@ -42,15 +38,12 @@ import java.util.regex.Pattern
  *
  * This class is not thread-safe.
  */
-internal class PhoneNumberMatcher(
-    util: PhoneNumberUtil?, text: CharSequence?, country: String, leniency: Leniency?,
-    maxTries: Long
+class PhoneNumberMatcher(
+    util: PhoneNumberUtil?, text: CharSequence?, country: String, leniency: Leniency?, maxTries: Long
 ) : MutableIterator<PhoneNumberMatch?> {
     /** The potential states of a PhoneNumberMatcher.  */
     private enum class State {
-        NOT_READY,
-        READY,
-        DONE
+        NOT_READY, READY, DONE
     }
 
     /** The phone number utility.  */
@@ -122,10 +115,11 @@ internal class PhoneNumberMatcher(
      */
     private fun find(index: Int): PhoneNumberMatch? {
         var index = index
-        val matcher = PATTERN!!.matcher(text)
-        while (maxTries > 0 && matcher.find(index)) {
-            val start = matcher.start()
-            var candidate = text.subSequence(start, matcher.end())
+
+        while (maxTries > 0) {
+            val matcherResult = REGEX!!.find(text, index) ?: break
+            val start = matcherResult.range.first
+            var candidate = text.subSequence(start, matcherResult.range.last)
 
             // Check for extra numbers at the end.
             // TODO: This is the place to start when trying to support extraction of multiple phone number
@@ -150,14 +144,14 @@ internal class PhoneNumberMatcher(
      */
     private fun extractMatch(candidate: CharSequence, offset: Int): PhoneNumberMatch? {
         // Skip a match that is more likely to be a date.
-        if (SLASH_SEPARATED_DATES.matcher(candidate).find()) {
+        if (SLASH_SEPARATED_DATES.find(candidate) == null) {
             return null
         }
 
         // Skip potential time-stamps.
-        if (TIME_STAMPS.matcher(candidate).find()) {
+        if (TIME_STAMPS.find(candidate) == null) {
             val followingText = text.toString().substring(offset + candidate.length)
-            if (TIME_STAMPS_SUFFIX.matcher(followingText).lookingAt()) {
+            if (TIME_STAMPS_SUFFIX.matchesAt(followingText, 0)) {
                 return null
             }
         }
@@ -180,14 +174,16 @@ internal class PhoneNumberMatcher(
      */
     private fun extractInnerMatch(candidate: CharSequence, offset: Int): PhoneNumberMatch? {
         for (possibleInnerMatch in INNER_MATCHES) {
-            val groupMatcher = possibleInnerMatch.matcher(candidate)
             var isFirstMatch = true
-            while (groupMatcher.find() && maxTries > 0) {
+            while (maxTries > 0) {
+                var groupMatcherResult: MatchResult? = null
+
                 if (isFirstMatch) {
+                    groupMatcherResult = possibleInnerMatch.find(candidate) ?: break
                     // We should handle any group before this one too.
                     val group = trimAfterFirstMatch(
                         PhoneNumberUtil.UNWANTED_END_CHAR_PATTERN,
-                        candidate.subSequence(0, groupMatcher.start())
+                        candidate.subSequence(0, groupMatcherResult.range.first)
                     )
                     val match = parseAndVerify(group, offset)
                     if (match != null) {
@@ -195,11 +191,13 @@ internal class PhoneNumberMatcher(
                     }
                     maxTries--
                     isFirstMatch = false
+                } else {
+                    groupMatcherResult = groupMatcherResult!!.next() ?: break
                 }
                 val group = trimAfterFirstMatch(
-                    PhoneNumberUtil.UNWANTED_END_CHAR_PATTERN, groupMatcher.group(1)
+                    PhoneNumberUtil.UNWANTED_END_CHAR_PATTERN, groupMatcherResult.groupValues[1]
                 )
-                val match = parseAndVerify(group, offset + groupMatcher.start(1))
+                val match = parseAndVerify(group, offset + groupMatcherResult.range.first)
                 if (match != null) {
                     return match
                 }
@@ -222,7 +220,7 @@ internal class PhoneNumberMatcher(
         try {
             // Check the candidate doesn't contain any formatting which would indicate that it really
             // isn't a phone number.
-            if (!MATCHING_BRACKETS!!.matcher(candidate).matches() || PUB_PAGES.matcher(candidate).find()) {
+            if (!MATCHING_BRACKETS!!.matches(candidate) || PUB_PAGES.find(candidate) == null) {
                 return null
             }
 
@@ -231,7 +229,7 @@ internal class PhoneNumberMatcher(
             if (leniency.compareTo(Leniency.VALID) >= 0) {
                 // If the candidate is not at the start of the text, and does not start with phone-number
                 // punctuation, check the previous character.
-                if (offset > 0 && !LEAD_CLASS!!.matcher(candidate).lookingAt()) {
+                if (offset > 0 && LEAD_CLASS!!.find(candidate, 0) == null) {
                     val previousChar = text[offset - 1]
                     // We return null if it is a latin letter or an invalid punctuation symbol.
                     if (isInvalidPunctuationSymbol(previousChar) || isLatinLetter(previousChar)) {
@@ -267,7 +265,7 @@ internal class PhoneNumberMatcher(
      * criteria, both for our default way of performing formatting and for any alternate formats we
      * may want to check.
      */
-    internal interface NumberGroupingChecker {
+    interface NumberGroupingChecker {
         /**
          * Returns true if the groups of digits found in our candidate phone number match our
          * expectations.
@@ -279,14 +277,15 @@ internal class PhoneNumberMatcher(
          * formatted this number
          */
         fun checkGroups(
-            util: PhoneNumberUtil?, number: PhoneNumber?,
-            normalizedCandidate: StringBuilder?, expectedNumberGroups: Array<String?>?
+            util: PhoneNumberUtil,
+            number: PhoneNumber,
+            normalizedCandidate: StringBuilder,
+            expectedNumberGroups: Array<String>
         ): Boolean
     }
 
     fun checkNumberGroupingIsValid(
-        number: PhoneNumber, candidate: CharSequence?, util: PhoneNumberUtil,
-        checker: NumberGroupingChecker
+        number: PhoneNumber, candidate: CharSequence?, util: PhoneNumberUtil, checker: NumberGroupingChecker
     ): Boolean {
         val normalizedCandidate = normalizeDigits(candidate!!, true /* keep non-digits */)
         var formattedNumberGroups = getNationalNumberGroups(util, number)
@@ -294,9 +293,10 @@ internal class PhoneNumberMatcher(
             return true
         }
         // If this didn't pass, see if there are any alternate formats that match, and try them instead.
-        val alternateFormats = phoneUtil.metadataDependenciesProvider
-            .alternateFormatsMetadataSource
-            .getFormattingMetadataForCountryCallingCode(number.countryCode)
+        val alternateFormats =
+            phoneUtil.metadataDependenciesProvider.alternateFormatsMetadataSource.getFormattingMetadataForCountryCallingCode(
+                number.countryCode
+            )
         val nationalSignificantNumber = util.getNationalSignificantNumber(number)
         if (alternateFormats != null) {
             for (alternateFormat in alternateFormats.numberFormatList) {
@@ -366,7 +366,7 @@ internal class PhoneNumberMatcher(
          *  * No alpha digits (vanity numbers such as 1-800-SIX-FLAGS) are currently supported.
          *
          */
-        private val PATTERN: Pattern? = null
+        private var REGEX: Regex? = null
 
         /**
          * Matches strings that look like publication pages. Example:
@@ -375,28 +375,28 @@ internal class PhoneNumberMatcher(
          *
          * The string "211-227 (2003)" is not a telephone number.
          */
-        private val PUB_PAGES = Pattern.compile("\\d{1,5}-+\\d{1,5}\\s{0,4}\\(\\d{1,4}")
+        private val PUB_PAGES = Regex("\\d{1,5}-+\\d{1,5}\\s{0,4}\\(\\d{1,4}")
 
         /**
          * Matches strings that look like dates using "/" as a separator. Examples: 3/10/2011, 31/10/96 or
          * 08/31/95.
          */
         private val SLASH_SEPARATED_DATES =
-            Pattern.compile("(?:(?:[0-3]?\\d/[01]?\\d)|(?:[01]?\\d/[0-3]?\\d))/(?:[12]\\d)?\\d{2}")
+            Regex("(?:(?:[0-3]?\\d/[01]?\\d)|(?:[01]?\\d/[0-3]?\\d))/(?:[12]\\d)?\\d{2}")
 
         /**
          * Matches timestamps. Examples: "2012-01-02 08:00". Note that the reg-ex does not include the
          * trailing ":\d\d" -- that is covered by TIME_STAMPS_SUFFIX.
          */
-        private val TIME_STAMPS = Pattern.compile("[12]\\d{3}[-/]?[01]\\d[-/]?[0-3]\\d +[0-2]\\d$")
-        private val TIME_STAMPS_SUFFIX = Pattern.compile(":[0-5]\\d")
+        private val TIME_STAMPS = Regex("[12]\\d{3}[-/]?[01]\\d[-/]?[0-3]\\d +[0-2]\\d$")
+        private val TIME_STAMPS_SUFFIX = Regex(":[0-5]\\d")
 
         /**
          * Pattern to check that brackets match. Opening brackets should be closed within a phone number.
          * This also checks that there is something inside the brackets. Having no brackets at all is also
          * fine.
          */
-        private val MATCHING_BRACKETS: Pattern? = null
+        private var MATCHING_BRACKETS: Regex? = null
 
         /**
          * Patterns used to extract phone numbers from a larger phone-number-like pattern. These are
@@ -409,67 +409,58 @@ internal class PhoneNumberMatcher(
          * well.
          */
         private val INNER_MATCHES = arrayOf( // Breaks on the slash - e.g. "651-234-2345/332-445-1234"
-            Pattern.compile("/+(.*)"),  // Note that the bracket here is inside the capturing group, since we consider it part of the
+            Regex("/+(.*)"),  // Note that the bracket here is inside the capturing group, since we consider it part of the
             // phone number. Will match a pattern like "(650) 223 3345 (754) 223 3321".
-            Pattern.compile("(\\([^(]*)"),  // Breaks on a hyphen - e.g. "12345 - 332-445-1234 is my number."
+            Regex("(\\([^(]*)"),  // Breaks on a hyphen - e.g. "12345 - 332-445-1234 is my number."
             // We require a space on either side of the hyphen for it to be considered a separator.
-            Pattern.compile("(?:\\p{Z}-|-\\p{Z})\\p{Z}*(.+)"),  // Various types of wide hyphens. Note we have decided not to enforce a space here, since it's
+            Regex("(?:\\p{Z}-|-\\p{Z})\\p{Z}*(.+)"),  // Various types of wide hyphens. Note we have decided not to enforce a space here, since it's
             // possible that it's supposed to be used to break two numbers without spaces, and we haven't
             // seen many instances of it used within a number.
-            Pattern.compile("[\u2012-\u2015\uFF0D]\\p{Z}*(.+)"),  // Breaks on a full stop - e.g. "12345. 332-445-1234 is my number."
-            Pattern.compile("\\.+\\p{Z}*([^.]+)"),  // Breaks on space - e.g. "3324451234 8002341234"
-            Pattern.compile("\\p{Z}+(\\P{Z}+)")
+            Regex("[\u2012-\u2015\uFF0D]\\p{Z}*(.+)"),  // Breaks on a full stop - e.g. "12345. 332-445-1234 is my number."
+            Regex("\\.+\\p{Z}*([^.]+)"),  // Breaks on space - e.g. "3324451234 8002341234"
+            Regex("\\p{Z}+(\\P{Z}+)")
         )
 
         /**
          * Punctuation that may be at the start of a phone number - brackets and plus signs.
          */
-        private val LEAD_CLASS: Pattern? = null
+        private var LEAD_CLASS: Regex? = null
 
-        init {
-            /* Builds the MATCHING_BRACKETS and PATTERN regular expressions. The building blocks below exist
+        init {/* Builds the MATCHING_BRACKETS and PATTERN regular expressions. The building blocks below exist
      * to make the pattern more easily understood. */
             val openingParens = "(\\[\uFF08\uFF3B"
             val closingParens = ")\\]\uFF09\uFF3D"
             val nonParens = "[^$openingParens$closingParens]"
 
             /* Limit on the number of pairs of brackets in a phone number. */
-            val bracketPairLimit = limit(0, 3)
-            /*
+            val bracketPairLimit = limit(0, 3)/*
      * An opening bracket at the beginning may not be closed, but subsequent ones should be.  It's
      * also possible that the leading bracket was dropped, so we shouldn't be surprised if we see a
      * closing bracket first. We limit the sets of brackets in a phone number to four.
-     */MATCHING_BRACKETS = Pattern.compile(
-                "(?:[" + openingParens + "])?" + "(?:" + nonParens + "+" + "[" + closingParens + "])?"
-                        + nonParens + "+"
-                        + "(?:[" + openingParens + "]" + nonParens + "+[" + closingParens + "])" + bracketPairLimit
-                        + nonParens + "*"
+     */
+            MATCHING_BRACKETS = Regex(
+                "(?:[" + openingParens + "])?" + "(?:" + nonParens + "+" + "[" + closingParens + "])?" + nonParens + "+" + "(?:[" + openingParens + "]" + nonParens + "+[" + closingParens + "])" + bracketPairLimit + nonParens + "*"
             )
 
             /* Limit on the number of leading (plus) characters. */
-            val leadLimit = limit(0, 2)
-            /* Limit on the number of consecutive punctuation characters. */
-            val punctuationLimit = limit(0, 4)
-            /* The maximum number of digits allowed in a digit-separated block. As we allow all digits in a
+            val leadLimit = limit(0, 2)/* Limit on the number of consecutive punctuation characters. */
+            val punctuationLimit = limit(0, 4)/* The maximum number of digits allowed in a digit-separated block. As we allow all digits in a
      * single block, set high enough to accommodate the entire national number and the international
      * country code. */
-            val digitBlockLimit = PhoneNumberUtil.MAX_LENGTH_FOR_NSN + PhoneNumberUtil.MAX_LENGTH_COUNTRY_CODE
-            /* Limit on the number of blocks separated by punctuation. Uses digitBlockLimit since some
+            val digitBlockLimit = PhoneNumberUtil.MAX_LENGTH_FOR_NSN + PhoneNumberUtil.MAX_LENGTH_COUNTRY_CODE/* Limit on the number of blocks separated by punctuation. Uses digitBlockLimit since some
      * formats use spaces to separate each digit. */
             val blockLimit = limit(0, digitBlockLimit)
 
             /* A punctuation sequence allowing white space. */
-            val punctuation = "[" + PhoneNumberUtil.VALID_PUNCTUATION + "]" + punctuationLimit
-            /* A digits block without punctuation. */
+            val punctuation =
+                "[" + PhoneNumberUtil.VALID_PUNCTUATION + "]" + punctuationLimit/* A digits block without punctuation. */
             val digitSequence = "\\p{Nd}" + limit(1, digitBlockLimit)
             val leadClassChars = openingParens + PhoneNumberUtil.PLUS_CHARS
             val leadClass = "[$leadClassChars]"
-            LEAD_CLASS = Pattern.compile(leadClass)
+            LEAD_CLASS = Regex(leadClass)
 
-            /* Phone number pattern allowing optional punctuation. */PATTERN = Pattern.compile(
-                "(?:" + leadClass + punctuation + ")" + leadLimit
-                        + digitSequence + "(?:" + punctuation + digitSequence + ")" + blockLimit
-                        + "(?:" + PhoneNumberUtil.EXTN_PATTERNS_FOR_MATCHING + ")?",
+            /* Phone number pattern allowing optional punctuation. */REGEX = Regex(
+                "(?:" + leadClass + punctuation + ")" + leadLimit + digitSequence + "(?:" + punctuation + digitSequence + ")" + blockLimit + "(?:" + PhoneNumberUtil.EXTN_PATTERNS_FOR_MATCHING + ")?",
                 PhoneNumberUtil.REGEX_FLAGS
             )
         }
@@ -484,13 +475,11 @@ internal class PhoneNumberMatcher(
          * Trims away any characters after the first match of `pattern` in `candidate`,
          * returning the trimmed version.
          */
-        private fun trimAfterFirstMatch(pattern: Pattern, candidate: CharSequence): CharSequence {
-            var candidate = candidate
-            val trailingCharsMatcher = pattern.matcher(candidate)
-            if (trailingCharsMatcher.find()) {
-                candidate = candidate.subSequence(0, trailingCharsMatcher.start())
-            }
-            return candidate
+        private fun trimAfterFirstMatch(regex: Regex, candidate: CharSequence): CharSequence {
+            val trailingCharsMatcher = regex.find(candidate)
+            return if (trailingCharsMatcher != null) {
+                candidate.subSequence(0, trailingCharsMatcher.range.first)
+            } else candidate
         }
 
         /**
@@ -500,16 +489,16 @@ internal class PhoneNumberMatcher(
          */
         // @VisibleForTesting
         fun isLatinLetter(letter: Char): Boolean {
-            // Combining marks are a subset of non-spacing-mark.
-            if (!Character.isLetter(letter) && Character.getType(letter) != Character.NON_SPACING_MARK.toInt()) {
-                return false
-            }
-            val block = Character.UnicodeBlock.of(letter)
-            return block == Character.UnicodeBlock.BASIC_LATIN || block == Character.UnicodeBlock.LATIN_1_SUPPLEMENT || block == Character.UnicodeBlock.LATIN_EXTENDED_A || block == Character.UnicodeBlock.LATIN_EXTENDED_ADDITIONAL || block == Character.UnicodeBlock.LATIN_EXTENDED_B || block == Character.UnicodeBlock.COMBINING_DIACRITICAL_MARKS
+            val charValue = letter.code
+            return ('A'.code <= charValue && charValue <= 'Z'.code) || ('a'.code <= charValue && charValue <= 'z'.code)
         }
 
         private fun isInvalidPunctuationSymbol(character: Char): Boolean {
-            return character == '%' || Character.getType(character) == Character.CURRENCY_SYMBOL.toInt()
+            return character == '%' || isCurrencySymbol(character)
+        }
+
+        private fun isCurrencySymbol(character: Char): Boolean {
+            return (character.code in 36..63) || (character.code in 1536..1541) || (character.code in 8352..8361) || (character.code in 65020..65023)
         }
 
         fun allNumberGroupsRemainGrouped(
@@ -541,9 +530,7 @@ internal class PhoneNumberMatcher(
                     // as we do not need to distinguish between different countries with the same country
                     // calling code and this is faster.
                     val region = util.getRegionCodeForCountryCode(number.countryCode)
-                    if (util.getNddPrefixForRegion(region, true) != null
-                        && Character.isDigit(normalizedCandidate[fromIndex])
-                    ) {
+                    if (util.getNddPrefixForRegion(region, true) != null && normalizedCandidate[fromIndex].isDigit()) {
                         // This means there is no formatting symbol after the NDC. In this case, we only
                         // accept the number if there is no formatting symbol at all in the number, except
                         // for extensions. This is only important for countries with national prefixes.
@@ -572,8 +559,7 @@ internal class PhoneNumberMatcher(
             // First we check if the national significant number is formatted as a block.
             // We use contains and not equals, since the national significant number may be present with
             // a prefix such as a national number prefix, or the country code itself.
-            if (candidateGroups.size == 1
-                || candidateGroups[candidateNumberGroupIndex].contains(
+            if (candidateGroups.size == 1 || candidateGroups[candidateNumberGroupIndex].contains(
                     util.getNationalSignificantNumber(number)
                 )
             ) {
@@ -591,8 +577,9 @@ internal class PhoneNumberMatcher(
             }
             // Now check the first group. There may be a national prefix at the start, so we only check
             // that the candidate group ends with the formatted number group.
-            return (candidateNumberGroupIndex >= 0
-                    && candidateGroups[candidateNumberGroupIndex].endsWith(formattedNumberGroups[0]))
+            return (candidateNumberGroupIndex >= 0 && candidateGroups[candidateNumberGroupIndex].endsWith(
+                formattedNumberGroups[0]
+            ))
         }
 
         /**
@@ -600,7 +587,7 @@ internal class PhoneNumberMatcher(
          * prefix, and return it as a set of digit blocks that would be formatted together following
          * standard formatting rules.
          */
-        private fun getNationalNumberGroups(util: PhoneNumberUtil, number: PhoneNumber): Array<String?> {
+        private fun getNationalNumberGroups(util: PhoneNumberUtil, number: PhoneNumber): Array<String> {
             // This will be in the format +CC-DG1-DG2-DGX;ext=EXT where DG1..DGX represents groups of
             // digits.
             val rfc3966Format = util.format(number, PhoneNumberFormat.RFC3966)
@@ -622,14 +609,12 @@ internal class PhoneNumberMatcher(
          * the formatting pattern passed in.
          */
         private fun getNationalNumberGroups(
-            util: PhoneNumberUtil, number: PhoneNumber,
-            formattingPattern: Phonemetadata.NumberFormat
-        ): Array<String?> {
+            util: PhoneNumberUtil, number: PhoneNumber, formattingPattern: Phonemetadata.NumberFormat
+        ): Array<String> {
             // If a format is provided, we format the NSN only, and split that according to the separator.
             val nationalSignificantNumber = util.getNationalSignificantNumber(number)
             return util.formatNsnUsingPattern(
-                nationalSignificantNumber,
-                formattingPattern, PhoneNumberFormat.RFC3966
+                nationalSignificantNumber, formattingPattern, PhoneNumberFormat.RFC3966
             ).split("-".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         }
 
@@ -647,11 +632,13 @@ internal class PhoneNumberMatcher(
             }
 
             // If the first slash is after the country calling code, this is permitted.
-            val candidateHasCountryCode = (number.countryCodeSource === CountryCodeSource.FROM_NUMBER_WITH_PLUS_SIGN
-                    || number.countryCodeSource === CountryCodeSource.FROM_NUMBER_WITHOUT_PLUS_SIGN)
-            return if (candidateHasCountryCode
-                && (normalizeDigitsOnly(candidate.substring(0, firstSlashInBodyIndex))
-                        == number.countryCode.toString())
+            val candidateHasCountryCode =
+                (number.countryCodeSource === CountryCodeSource.FROM_NUMBER_WITH_PLUS_SIGN || number.countryCodeSource === CountryCodeSource.FROM_NUMBER_WITHOUT_PLUS_SIGN)
+            return if (candidateHasCountryCode && (normalizeDigitsOnly(
+                    candidate.substring(
+                        0, firstSlashInBodyIndex
+                    )
+                ) == number.countryCode.toString())
             ) {
                 // Any more slashes and this is illegal.
                 candidate.substring(secondSlashInBodyIndex + 1).contains("/")
@@ -676,8 +663,7 @@ internal class PhoneNumberMatcher(
                         // significant number.
                         index++
                         if (util.isNumberMatch(
-                                number,
-                                candidate.substring(index)
+                                number, candidate.substring(index)
                             ) !== PhoneNumberUtil.MatchType.NSN_MATCH
                         ) {
                             return false

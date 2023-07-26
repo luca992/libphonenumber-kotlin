@@ -23,7 +23,7 @@
 //import java.util.List;
 //import java.util.NoSuchElementException;
 //
-//import io.michaelrocks.libphonenumber.android.PhoneNumberUtil.Leniency;
+//import io.michaelrocks.libphonenumber.kotlin.PhoneNumberUtil.Leniency;
 //import io.michaelrocks.libphonenumber.kotlin.Phonenumber.PhoneNumber;
 //import io.michaelrocks.libphonenumber.kotlin.Phonenumber.PhoneNumber.CountryCodeSource;
 //

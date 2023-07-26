@@ -6,7 +6,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import io.michaelrocks.libphonenumber.kotlin.NumberParseException;
-import io.michaelrocks.libphonenumber.android.PhoneNumberUtil;
+import io.michaelrocks.libphonenumber.kotlin.PhoneNumberUtil;
 import io.michaelrocks.libphonenumber.kotlin.Phonenumber;
 
 public class MainActivity extends Activity {

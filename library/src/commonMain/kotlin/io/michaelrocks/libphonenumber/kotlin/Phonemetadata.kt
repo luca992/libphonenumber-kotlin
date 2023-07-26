@@ -403,7 +403,7 @@ class Phonemetadata private constructor() {
                 return this
             }
 
-            override fun setInternationalPrefix(value: String?): Builder {
+            override fun setInternationalPrefix(value: String): Builder {
                 super.setInternationalPrefix(value)
                 return this
             }
@@ -755,14 +755,14 @@ class Phonemetadata private constructor() {
 
         // optional string international_prefix = 11;
         private var hasInternationalPrefix = false
-        var internationalPrefix: String? = ""
+        var internationalPrefix: String = ""
             private set
 
         fun hasInternationalPrefix(): Boolean {
             return hasInternationalPrefix
         }
 
-        open fun setInternationalPrefix(value: String?): PhoneMetadata {
+        open fun setInternationalPrefix(value: String): PhoneMetadata {
             hasInternationalPrefix = true
             internationalPrefix = value
             return this
