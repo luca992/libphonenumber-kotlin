@@ -623,15 +623,13 @@ class AsYouTypeFormatter internal constructor(
     }
 
     private fun inputDigitHelper(nextChar: Char): String {
-        TODO()
         // Note that formattingTemplate is not guaranteed to have a value, it could be empty, e.g.
         // when the next digit is entered after extracting an IDD or NDD.
-        /*
-        val digitMatcher = DIGIT_PATTERN.matcher(formattingTemplate)
-        return if (digitMatcher.find(lastMatchPosition)) {
-            val tempTemplate = digitMatcher.replaceFirst(nextChar.toString())
-            formattingTemplate.replace(0, tempTemplate.length, tempTemplate)
-            lastMatchPosition = digitMatcher.start()
+        val digitMatchResult = DIGIT_PATTERN.find(formattingTemplate, lastMatchPosition)
+        return if (digitMatchResult != null) {
+            val tempTemplate = formattingTemplate.replaceFirst(DIGIT_PATTERN, nextChar.toString())
+            formattingTemplate.replaceRange(0, tempTemplate.length, tempTemplate)
+            lastMatchPosition = digitMatchResult.range.first
             formattingTemplate.substring(0, lastMatchPosition + 1)
         } else {
             if (possibleFormats.size == 1) {
@@ -642,7 +640,6 @@ class AsYouTypeFormatter internal constructor(
             currentFormattingPattern = ""
             accruedInput.toString()
         }
-        */
     }
 
     companion object {
