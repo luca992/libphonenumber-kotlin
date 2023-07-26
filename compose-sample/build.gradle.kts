@@ -81,6 +81,10 @@ kotlin {
 
         val androidMain by getting {
             dependsOn(commonMain)
+            dependencies {
+                implementation(libs.androidx.appcompat)
+                implementation(libs.androidx.activity.compose)
+            }
         }
 
         val desktopMain by getting {
@@ -168,6 +172,7 @@ compose.desktop.nativeApplication {
 
 
 android {
+    namespace = "io.luca992.libphonenumber.sample"
     compileSdk = 33
 
     defaultConfig {
@@ -186,5 +191,9 @@ android {
             res.srcDirs("src/androidMain/res", "src/commonMain/resources")
         }
     }
-    namespace = "io.luca992.libphonenumber.sample"
+    // https://kotlinlang.org/docs/gradle-configure-project.html#gradle-java-toolchains-support
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
 }

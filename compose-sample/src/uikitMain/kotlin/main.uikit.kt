@@ -1,11 +1,10 @@
 import androidx.compose.ui.window.ComposeUIViewController
-import kotlinx.cinterop.autoreleasepool
-import kotlinx.cinterop.cstr
-import kotlinx.cinterop.memScoped
-import kotlinx.cinterop.toCValues
+import io.luca992.libphonenumber.sample.App
+import kotlinx.cinterop.*
 import platform.Foundation.NSStringFromClass
 import platform.UIKit.*
 
+@OptIn(ExperimentalForeignApi::class)
 fun main() {
     val args = emptyArray<String>()
     memScoped {
@@ -29,6 +28,7 @@ class SkikoAppDelegate : UIResponder, UIApplicationDelegateProtocol {
         _window = window
     }
 
+    @OptIn(ExperimentalForeignApi::class)
     override fun application(application: UIApplication, didFinishLaunchingWithOptions: Map<Any?, *>?): Boolean {
         window = UIWindow(frame = UIScreen.mainScreen.bounds)
         window!!.rootViewController = ComposeUIViewController {
