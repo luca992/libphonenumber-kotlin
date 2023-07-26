@@ -2291,7 +2291,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
                     return false
                 }
             }
-            number.removeRange(0, matchEnd)
+            number.removeRange(0, matchEnd + 1)
             return true
         }
         return false
@@ -2319,7 +2319,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         // Check to see if the number begins with one or more plus signs.
         val m = PLUS_CHARS_PATTERN.matchAt(number, 0)
         if (m != null) {
-            number.removeRange(0, m.range.last)
+            number.removeRange(0, m.range.last + 1)
             // Can now normalize the rest of the number since we've consumed the "+" sign at the start.
             normalize(number)
             return CountryCodeSource.FROM_NUMBER_WITH_PLUS_SIGN
