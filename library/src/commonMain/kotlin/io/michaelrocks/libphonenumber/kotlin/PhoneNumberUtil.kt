@@ -3189,7 +3189,9 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         // Regular expression of trailing characters that we want to remove. We remove all characters that
         // are not alpha or numerical characters. The hash character is retained here, as it may signify
         // the previous block was an extension.
-        private const val UNWANTED_END_CHARS = "[[\\P{N}&&\\P{L}]&&[^#]]+$"
+        // https://youtrack.jetbrains.com/issue/KT-58678/Native-Regex-inconsistency-with-JVM-Native-Regex
+//        private const val UNWANTED_END_CHARS = "[[\\P{N}&&\\P{L}]&&[^#]]+$"
+        private const val UNWANTED_END_CHARS = "^([^0-9a-zA-Z#]+)$"
 
         @JvmField
         val UNWANTED_END_CHAR_PATTERN = Regex(UNWANTED_END_CHARS)

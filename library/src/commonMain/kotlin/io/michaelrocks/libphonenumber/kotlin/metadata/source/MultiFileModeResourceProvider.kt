@@ -40,6 +40,8 @@ class MultiFileModeResourceProvider(phoneMetadataFileNameBase: String) : PhoneMe
     }
 
     companion object {
-        private val ALPHANUMERIC = Regex("^[\\p{L}\\p{N}]+$")
+        // https://youtrack.jetbrains.com/issue/KT-58678/Native-Regex-inconsistency-with-JVM-Native-Regex
+        private val ALPHANUMERIC = Regex("^([a-zA-Z0-9]+)$")
+//        private val ALPHANUMERIC = Regex("^[\\p{L}\\p{N}]+$")
     }
 }
