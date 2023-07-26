@@ -135,8 +135,8 @@ compose.desktop {
 compose.experimental {
     web.application {}
     uikit.application {
-        bundleIdPrefix = "io.eqoty.secretk"
-        projectName = "Eqoty Admin Console"
+        bundleIdPrefix = "io.luca992.libphonenumber.sample"
+        projectName = "libphonenumber-kotlin sample"
         deployConfigurations {
             simulator("IPhone8") {
                 //Usage: ./gradlew iosDeployIPhone8Debug
@@ -186,5 +186,5 @@ android {
             res.srcDirs("src/androidMain/res", "src/commonMain/resources")
         }
     }
-    namespace = "io.eqoty.secretk.sample"
+    namespace = "io.luca992.libphonenumber.sample"
 }
