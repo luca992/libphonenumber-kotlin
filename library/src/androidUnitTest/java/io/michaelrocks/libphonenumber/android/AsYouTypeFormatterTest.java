@@ -17,6 +17,8 @@
 //
 //package io.michaelrocks.libphonenumber.android;
 //
+//import static org.junit.Assert.assertEquals;
+//
 ///**
 // * Unit tests for AsYouTypeFormatter.java
 // *
