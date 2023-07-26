@@ -1,6 +1,5 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.experimental.dsl.IOSDevices
-import java.util.*
 
 plugins {
     alias(libs.plugins.org.jetbrains.kotlin.multiplatform)
@@ -11,7 +10,7 @@ plugins {
 version = "1.0-SNAPSHOT"
 
 kotlin {
-    android()
+    androidTarget()
     jvm("desktop")
     js(IR) {
         browser()

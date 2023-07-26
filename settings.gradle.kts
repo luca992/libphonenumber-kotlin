@@ -20,6 +20,10 @@ dependencyResolutionManagement {
     }
 }
 
+plugins {
+    id("de.fayard.refreshVersions")
+}
+
 include(":library")
 include(":sample")
 include(":compose-sample")

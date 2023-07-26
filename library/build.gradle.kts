@@ -10,7 +10,7 @@ group = rootProject.group
 version = rootProject.version
 
 kotlin {
-    android()
+    androidTarget()
     jvm()
     js(IR){
         browser()

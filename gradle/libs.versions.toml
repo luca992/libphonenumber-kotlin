@@ -12,11 +12,11 @@ org-jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose-j
 androidx-espressoCore = "3.5.1"
 junit = "1.1.5"
 junitVersion = "4.13.2"
-kotlin = "1.8.20"
+kotlin = "1.9.0"
 agp = "8.0.2"
-compose-jb = "1.4.1"
+compose-jb = "1.4.3"
 
-mockitoVersion = "5.1.1"
+mockitoVersion = "5.4.0"
 okio = "3.4.0"
 
 androidx-activity = "1.7.2"
@@ -25,12 +25,10 @@ androidx-lifecycle = "2.6.1"
 androidx-startup = "1.1.1"
 androidx-appcompat = "1.6.1"
 
-
 rules = "1.5.0"
 runner = "1.5.2"
 
-kermit = "2.0.0-RC4"
-
+kermit = "2.0.0-RC5"
 
 [libraries]
 
@@ -39,7 +37,6 @@ androidx-rules = { module = "androidx.test:rules", version.ref = "rules" }
 androidx-runner = { module = "androidx.test:runner", version.ref = "runner" }
 espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidx-espressoCore" }
 junit = { module = "junit:junit", version.ref = "junitVersion" }
-
 
 com-squareup-okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 
