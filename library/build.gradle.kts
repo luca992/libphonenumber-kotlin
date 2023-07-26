@@ -14,7 +14,8 @@ object Targets {
     // limited by moko resources https://github.com/icerockdev/moko-resources/issues/73
     val iosTargets = arrayOf("iosArm64", "iosX64", "iosSimulatorArm64")
     val tvosTargets = arrayOf("tvosArm64", "tvosX64", "tvosSimulatorArm64")
-    val watchosTargets = arrayOf("watchosArm32", "watchosArm64", "watchosX64", "watchosSimulatorArm64", "watchosDeviceArm64")
+    val watchosTargets =
+        arrayOf("watchosArm32", "watchosArm64", "watchosX64", "watchosSimulatorArm64", "watchosDeviceArm64")
     val macosTargets = arrayOf("macosX64", "macosArm64")
     val darwinTargets = iosTargets + tvosTargets + watchosTargets + macosTargets
 

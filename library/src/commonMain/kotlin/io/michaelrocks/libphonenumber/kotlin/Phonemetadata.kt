@@ -30,7 +30,6 @@ package io.michaelrocks.libphonenumber.kotlin
 import io.michaelrocks.libphonenumber.kotlin.io.Externalizable
 import io.michaelrocks.libphonenumber.kotlin.io.ObjectInput
 import io.michaelrocks.libphonenumber.kotlin.io.ObjectOutput
-import okio.IOException
 import kotlin.jvm.JvmStatic
 
 
@@ -1129,151 +1128,151 @@ class Phonemetadata private constructor() {
             objectOutput.writeBoolean(mobileNumberPortableRegion_)
         }
 
-        override fun readExternal(objectInput: ObjectInput) {
-            var hasDesc = objectInput.readBoolean()
+        override fun readExternal(input: ObjectInput) {
+            var hasDesc = input.readBoolean()
             if (hasDesc) {
                 val desc = PhoneNumberDesc()
-                desc.readExternal(objectInput)
+                desc.readExternal(input)
                 setGeneralDesc(desc)
             }
-            hasDesc = objectInput.readBoolean()
+            hasDesc = input.readBoolean()
             if (hasDesc) {
                 val desc = PhoneNumberDesc()
-                desc.readExternal(objectInput)
+                desc.readExternal(input)
                 setFixedLine(desc)
             }
-            hasDesc = objectInput.readBoolean()
+            hasDesc = input.readBoolean()
             if (hasDesc) {
                 val desc = PhoneNumberDesc()
-                desc.readExternal(objectInput)
+                desc.readExternal(input)
                 setMobile(desc)
             }
-            hasDesc = objectInput.readBoolean()
+            hasDesc = input.readBoolean()
             if (hasDesc) {
                 val desc = PhoneNumberDesc()
-                desc.readExternal(objectInput)
+                desc.readExternal(input)
                 setTollFree(desc)
             }
-            hasDesc = objectInput.readBoolean()
+            hasDesc = input.readBoolean()
             if (hasDesc) {
                 val desc = PhoneNumberDesc()
-                desc.readExternal(objectInput)
+                desc.readExternal(input)
                 setPremiumRate(desc)
             }
-            hasDesc = objectInput.readBoolean()
+            hasDesc = input.readBoolean()
             if (hasDesc) {
                 val desc = PhoneNumberDesc()
-                desc.readExternal(objectInput)
+                desc.readExternal(input)
                 setSharedCost(desc)
             }
-            hasDesc = objectInput.readBoolean()
+            hasDesc = input.readBoolean()
             if (hasDesc) {
                 val desc = PhoneNumberDesc()
-                desc.readExternal(objectInput)
+                desc.readExternal(input)
                 setPersonalNumber(desc)
             }
-            hasDesc = objectInput.readBoolean()
+            hasDesc = input.readBoolean()
             if (hasDesc) {
                 val desc = PhoneNumberDesc()
-                desc.readExternal(objectInput)
+                desc.readExternal(input)
                 setVoip(desc)
             }
-            hasDesc = objectInput.readBoolean()
+            hasDesc = input.readBoolean()
             if (hasDesc) {
                 val desc = PhoneNumberDesc()
-                desc.readExternal(objectInput)
+                desc.readExternal(input)
                 setPager(desc)
             }
-            hasDesc = objectInput.readBoolean()
+            hasDesc = input.readBoolean()
             if (hasDesc) {
                 val desc = PhoneNumberDesc()
-                desc.readExternal(objectInput)
+                desc.readExternal(input)
                 setUan(desc)
             }
-            hasDesc = objectInput.readBoolean()
+            hasDesc = input.readBoolean()
             if (hasDesc) {
                 val desc = PhoneNumberDesc()
-                desc.readExternal(objectInput)
+                desc.readExternal(input)
                 setEmergency(desc)
             }
-            hasDesc = objectInput.readBoolean()
+            hasDesc = input.readBoolean()
             if (hasDesc) {
                 val desc = PhoneNumberDesc()
-                desc.readExternal(objectInput)
+                desc.readExternal(input)
                 setVoicemail(desc)
             }
-            hasDesc = objectInput.readBoolean()
+            hasDesc = input.readBoolean()
             if (hasDesc) {
                 val desc = PhoneNumberDesc()
-                desc.readExternal(objectInput)
+                desc.readExternal(input)
                 setShortCode(desc)
             }
-            hasDesc = objectInput.readBoolean()
+            hasDesc = input.readBoolean()
             if (hasDesc) {
                 val desc = PhoneNumberDesc()
-                desc.readExternal(objectInput)
+                desc.readExternal(input)
                 setStandardRate(desc)
             }
-            hasDesc = objectInput.readBoolean()
+            hasDesc = input.readBoolean()
             if (hasDesc) {
                 val desc = PhoneNumberDesc()
-                desc.readExternal(objectInput)
+                desc.readExternal(input)
                 setCarrierSpecific(desc)
             }
-            hasDesc = objectInput.readBoolean()
+            hasDesc = input.readBoolean()
             if (hasDesc) {
                 val desc = PhoneNumberDesc()
-                desc.readExternal(objectInput)
+                desc.readExternal(input)
                 setSmsServices(desc)
             }
-            hasDesc = objectInput.readBoolean()
+            hasDesc = input.readBoolean()
             if (hasDesc) {
                 val desc = PhoneNumberDesc()
-                desc.readExternal(objectInput)
+                desc.readExternal(input)
                 setNoInternationalDialling(desc)
             }
-            setId(objectInput.readUTF())
-            setCountryCode(objectInput.readInt())
-            setInternationalPrefix(objectInput.readUTF())
-            var hasString = objectInput.readBoolean()
+            setId(input.readUTF())
+            setCountryCode(input.readInt())
+            setInternationalPrefix(input.readUTF())
+            var hasString = input.readBoolean()
             if (hasString) {
-                setPreferredInternationalPrefix(objectInput.readUTF())
+                setPreferredInternationalPrefix(input.readUTF())
             }
-            hasString = objectInput.readBoolean()
+            hasString = input.readBoolean()
             if (hasString) {
-                setNationalPrefix(objectInput.readUTF())
+                setNationalPrefix(input.readUTF())
             }
-            hasString = objectInput.readBoolean()
+            hasString = input.readBoolean()
             if (hasString) {
-                setPreferredExtnPrefix(objectInput.readUTF())
+                setPreferredExtnPrefix(input.readUTF())
             }
-            hasString = objectInput.readBoolean()
+            hasString = input.readBoolean()
             if (hasString) {
-                setNationalPrefixForParsing(objectInput.readUTF())
+                setNationalPrefixForParsing(input.readUTF())
             }
-            hasString = objectInput.readBoolean()
+            hasString = input.readBoolean()
             if (hasString) {
-                setNationalPrefixTransformRule(objectInput.readUTF())
+                setNationalPrefixTransformRule(input.readUTF())
             }
-            setSameMobileAndFixedLinePattern(objectInput.readBoolean())
-            val nationalFormatSize = objectInput.readInt()
+            setSameMobileAndFixedLinePattern(input.readBoolean())
+            val nationalFormatSize = input.readInt()
             for (i in 0 until nationalFormatSize) {
                 val numFormat = NumberFormat()
-                numFormat.readExternal(objectInput)
+                numFormat.readExternal(input)
                 numberFormat_.add(numFormat)
             }
-            val intlNumberFormatSize = objectInput.readInt()
+            val intlNumberFormatSize = input.readInt()
             for (i in 0 until intlNumberFormatSize) {
                 val numFormat = NumberFormat()
-                numFormat.readExternal(objectInput)
+                numFormat.readExternal(input)
                 intlNumberFormat_.add(numFormat)
             }
-            setMainCountryForCode(objectInput.readBoolean())
-            hasString = objectInput.readBoolean()
+            setMainCountryForCode(input.readBoolean())
+            hasString = input.readBoolean()
             if (hasString) {
-                setLeadingDigits(objectInput.readUTF())
+                setLeadingDigits(input.readUTF())
             }
-            setMobileNumberPortableRegion(objectInput.readBoolean())
+            setMobileNumberPortableRegion(input.readBoolean())
         }
 
         companion object {
@@ -1320,11 +1319,11 @@ class Phonemetadata private constructor() {
             }
         }
 
-        override fun readExternal(objectInput: ObjectInput) {
-            val size = objectInput.readInt()
+        override fun readExternal(input: ObjectInput) {
+            val size = input.readInt()
             for (i in 0 until size) {
                 val metadata = PhoneMetadata()
-                metadata.readExternal(objectInput)
+                metadata.readExternal(input)
                 metadata_.add(metadata)
             }
         }
