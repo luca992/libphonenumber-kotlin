@@ -17,8 +17,10 @@
 package io.michaelrocks.libphonenumber.kotlin.metadata.init
 
 import co.touchlab.kermit.Logger
+import io.michaelrocks.libphonenumber.kotlin.Phonemetadata
 import io.michaelrocks.libphonenumber.kotlin.Phonemetadata.PhoneMetadata
 import io.michaelrocks.libphonenumber.kotlin.io.InputStream
+import io.michaelrocks.libphonenumber.kotlin.io.ObjectInputStream
 import okio.IOException
 import kotlin.jvm.JvmStatic
 
@@ -33,29 +35,28 @@ class MetadataParser private constructor(private val strictMode: Boolean) {
      * @return parsed [PhoneMetadata], or empty [Collection] if `source` is `null` and lenient mode is on
      */
     fun parse(source: InputStream?): Collection<PhoneMetadata> {
-        TODO()
-//        if (source == null) {
-//            return handleNullSource()
-//        }
-//        var ois: ObjectInputStream? = null
-//        return try {
-//            ois = ObjectInputStream(source)
-//            val phoneMetadataCollection = PhoneMetadataCollection()
-//            phoneMetadataCollection.readExternal(ois)
-//            val phoneMetadata = phoneMetadataCollection.metadataList
-//            // Sanity check; this should not happen if provided InputStream is valid
-//            check(!phoneMetadata.isEmpty()) { "Empty metadata" }
-//            phoneMetadataCollection.metadataList
-//        } catch (e: IOException) {
-//            throw IllegalStateException("Unable to parse metadata file", e)
-//        } finally {
-//            if (ois != null) {
-//                // This will close all underlying streams as well, including source.
-//                close(ois)
-//            } else {
-//                close(source)
-//            }
-//        }
+        if (source == null) {
+            return handleNullSource()
+        }
+        var ois: ObjectInputStream? = null
+        return try {
+            ois = ObjectInputStream(source)
+            val phoneMetadataCollection = Phonemetadata.PhoneMetadataCollection()
+            phoneMetadataCollection.readExternal(ois)
+            val phoneMetadata = phoneMetadataCollection.metadataList
+            // Sanity check; this should not happen if provided InputStream is valid
+            check(!phoneMetadata.isEmpty()) { "Empty metadata" }
+            phoneMetadataCollection.metadataList
+        } catch (e: IOException) {
+            throw IllegalStateException("Unable to parse metadata file", e)
+        } finally {
+            if (ois != null) {
+                // This will close all underlying streams as well, including source.
+                close(ois)
+            } else {
+                close(source)
+            }
+        }
     }
 
     private fun handleNullSource(): List<PhoneMetadata> {
