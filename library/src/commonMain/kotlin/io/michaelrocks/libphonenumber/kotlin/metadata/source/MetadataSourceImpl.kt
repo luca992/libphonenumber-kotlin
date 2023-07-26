@@ -20,7 +20,6 @@ import io.michaelrocks.libphonenumber.kotlin.MetadataLoader
 import io.michaelrocks.libphonenumber.kotlin.Phonemetadata.PhoneMetadata
 import io.michaelrocks.libphonenumber.kotlin.internal.GeoEntityUtility.isGeoEntity
 import io.michaelrocks.libphonenumber.kotlin.metadata.init.MetadataParser
-import io.michaelrocks.libphonenumber.kotlin.metadata.source.*
 
 /**
  * Implementation of [MetadataSource] guarded by [MetadataBootstrappingGuard].
@@ -47,14 +46,14 @@ class MetadataSourceImpl(
     override fun getMetadataForNonGeographicalRegion(countryCallingCode: Int): PhoneMetadata? {
         require(!isGeoEntity(countryCallingCode)) { "$countryCallingCode calling code belongs to a geo entity" }
         return bootstrappingGuard
-            .getOrBootstrap(phoneMetadataFileNameProvider.getFor(countryCallingCode)!!)
+            .getOrBootstrap(phoneMetadataFileNameProvider.getFor(countryCallingCode))
             .getMetadataBy(countryCallingCode)
     }
 
     override fun getMetadataForRegion(regionCode: String?): PhoneMetadata? {
         require(isGeoEntity(regionCode!!)) { "$regionCode region code is a non-geo entity" }
         return bootstrappingGuard
-            .getOrBootstrap(phoneMetadataFileNameProvider.getFor(regionCode)!!)
+            .getOrBootstrap(phoneMetadataFileNameProvider.getFor(regionCode))
             .getMetadataBy(regionCode)
     }
 }
