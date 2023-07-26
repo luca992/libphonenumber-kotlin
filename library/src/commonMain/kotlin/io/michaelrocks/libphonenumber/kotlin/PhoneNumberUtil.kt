@@ -3573,24 +3573,6 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
             return createInstance(metadataSource, metadataDependenciesProvider)
         }
 
-        /**
-         * Create a new [PhoneNumberUtil] instance to carry out international phone number
-         * formatting, parsing, or validation. The instance is loaded with all metadata by
-         * using the context specified.
-         *
-         *
-         * This method should only be used in the rare case in which you want to manage your own
-         * metadata loading. Calling this method multiple times is very expensive, as each time
-         * a new instance is created from scratch.
-         *
-         * @param context  Android [Context] used to load metadata. This should not be null.
-         * @return  a PhoneNumberUtil instance
-         */
-//        @JvmStatic
-//        fun createInstance(context: Context?): PhoneNumberUtil {
-//            requireNotNull(context) { "context could not be null." }
-//            return createInstance(AssetsMetadataLoader(context.assets))
-//        }
 
         /**
          * Create a new [PhoneNumberUtil] instance to carry out international phone number
