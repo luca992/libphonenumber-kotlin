@@ -4,6 +4,8 @@
 
 org-jetbrains-kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 com-android-library = { id = "com.android.library", version.ref = "agp" }
+com-android-application = { id = "com.android.application", version.ref = "agp" }
+org-jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose-jb" }
 
 [versions]
 
@@ -12,6 +14,7 @@ junit = "1.1.5"
 junitVersion = "4.13.2"
 kotlin = "1.8.20"
 agp = "8.0.2"
+compose-jb = "1.4.1"
 
 mockitoVersion = "5.1.1"
 okio = "3.4.0"
