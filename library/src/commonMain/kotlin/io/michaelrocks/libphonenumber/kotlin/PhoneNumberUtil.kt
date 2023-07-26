@@ -3562,8 +3562,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
          * @param metadataLoader  customized metadata loader. This should not be null
          * @return  a PhoneNumberUtil instance
          */
-        fun createInstance(metadataLoader: MetadataLoader?): PhoneNumberUtil {
-            requireNotNull(metadataLoader) { "metadataLoader could not be null." }
+        fun createInstance(metadataLoader: MetadataLoader): PhoneNumberUtil {
             val metadataDependenciesProvider = DefaultMetadataDependenciesProvider(metadataLoader)
             val metadataSource: MetadataSource = MetadataSourceImpl(
                 metadataDependenciesProvider.phoneNumberMetadataFileNameProvider,
@@ -3590,10 +3589,8 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
          * @return  a PhoneNumberUtil instance
          */
         private fun createInstance(
-            metadataSource: MetadataSource?, metadataDependenciesProvider: DefaultMetadataDependenciesProvider?
+            metadataSource: MetadataSource, metadataDependenciesProvider: DefaultMetadataDependenciesProvider
         ): PhoneNumberUtil {
-            requireNotNull(metadataSource) { "metadataSource could not be null." }
-            requireNotNull(metadataDependenciesProvider) { "metadataDependenciesProvider could not be null." }
             return PhoneNumberUtil(
                 metadataSource, metadataDependenciesProvider, countryCodeToRegionCodeMap
             )
