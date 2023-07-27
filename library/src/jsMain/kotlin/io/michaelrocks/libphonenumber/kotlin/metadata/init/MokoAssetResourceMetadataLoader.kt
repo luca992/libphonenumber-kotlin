@@ -21,24 +21,31 @@ import dev.icerock.moko.resources.AssetResource
 import io.michaelrocks.libphonenumber.kotlin.MetadataLoader
 import io.michaelrocks.libphonenumber.kotlin.io.InputStream
 import io.michaelrocks.libphonenumber.kotlin.io.OkioInputStream
-import okio.FileSystem
-import okio.Path.Companion.toPath
-import okio.buffer
+import kotlinx.browser.window
+import okio.Buffer
+import org.khronos.webgl.ArrayBuffer
+import org.khronos.webgl.Int8Array
 
 /**
  * A [MetadataLoader] implementation that reads phone number metadata files as classpath
  * resources.
  */
-class ClassPathResourceMetadataLoader : MetadataLoader {
-    override fun loadMetadata(phoneMetadataResource: AssetResource): InputStream {
-        val path = phoneMetadataResource.path.toPath()
-        return OkioInputStream(FileSystem.SYSTEM.source(path).buffer())
+private fun ArrayBuffer.asByteArray(): ByteArray = Int8Array(this).unsafeCast<ByteArray>()
 
+class MokoAssetResourceMetadataLoader : MetadataLoader {
+    override fun loadMetadata(phoneMetadataResource: AssetResource): InputStream {
+        val buffer = Buffer()
+        window.fetch(phoneMetadataResource.originalPath).then {
+            it.arrayBuffer()
+        }.then {
+            buffer.write(it.asByteArray())
+        }
+        return OkioInputStream(buffer)
     }
 
     companion object {
         private val logger = Logger.withTag(
-            ClassPathResourceMetadataLoader::class.simpleName.toString()
+            MokoAssetResourceMetadataLoader::class.simpleName.toString()
         )
     }
 }

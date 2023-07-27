@@ -156,3 +156,6 @@ lint/tmp/
 *.hprof
 
 .DS_Store
+
+# moko-resources-generated
+moko-resources-generated.js
