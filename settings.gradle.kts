@@ -26,4 +26,3 @@ plugins {
 
 include(":library")
 include(":sample")
-include(":compose-sample")

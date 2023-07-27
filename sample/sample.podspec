@@ -1,5 +1,5 @@
 Pod::Spec.new do |spec|
-    spec.name                     = 'compose_sample'
+    spec.name                     = 'sample'
     spec.version                  = '1.0-SNAPSHOT'
     spec.homepage                 = 'https://github.com/JetBrains/compose-jb'
     spec.source                   = { :http=> ''}
@@ -12,13 +12,13 @@ Pod::Spec.new do |spec|
                 
                 
     spec.pod_target_xcconfig = {
-        'KOTLIN_PROJECT_PATH' => ':compose-sample',
+        'KOTLIN_PROJECT_PATH' => ':sample',
         'PRODUCT_MODULE_NAME' => 'shared',
     }
                 
     spec.script_phases = [
         {
-            :name => 'Build compose_sample',
+            :name => 'Build sample',
             :execution_position => :before_compile,
             :shell_path => '/bin/sh',
             :script => <<-SCRIPT

@@ -1,16 +1,16 @@
 PODS:
-  - compose_sample (1.0-SNAPSHOT)
+  - sample (1.0-SNAPSHOT)
 
 DEPENDENCIES:
-  - compose_sample (from `../compose-sample`)
+  - sample (from `../sample`)
 
 EXTERNAL SOURCES:
-  compose_sample:
-    :path: "../compose-sample"
+  sample:
+    :path: "../sample"
 
 SPEC CHECKSUMS:
-  compose_sample: 765ea60058bd3dc230aa566f057624532027e23f
+  sample: 8899be0e4370cd5ab3bfc8bf81090ba46c6ca71f
 
-PODFILE CHECKSUM: 91f5e050a7d57ace1c1a17cb33e42def977c58fd
+PODFILE CHECKSUM: 4522186d270471310130db42abc1984c8fbbfc8f
 
 COCOAPODS: 1.12.1

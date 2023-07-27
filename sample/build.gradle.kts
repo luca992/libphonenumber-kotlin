@@ -185,7 +185,7 @@ compose.desktop.nativeApplication {
     targets(kotlin.targets.getByName("macosArm64"))
     distributions {
         targetFormats(TargetFormat.Dmg)
-        packageName = "Eqoty Admin Console"
+        packageName = "libphonenumber sample"
         packageVersion = "1.0.0"
     }
 }
