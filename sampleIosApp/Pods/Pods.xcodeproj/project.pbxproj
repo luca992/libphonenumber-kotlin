@@ -37,20 +37,20 @@
 
 /* Begin PBXFileReference section */
 		0011AEE22E8296B3D9E0B0B2CDCAB2EE /* Pods-iosApp-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-iosApp-acknowledgements.plist"; sourceTree = "<group>"; };
-		0E68BC9D1DEDF00EC32C9CAD8A8265E3 /* sample.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; path = sample.podspec; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		0BA62979C096906E2D84877CBC2740C0 /* sample.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; path = sample.podspec; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		0D720B95DCD8FC7C8BF86E89331C6711 /* shared.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = shared.framework; path = build/cocoapods/framework/shared.framework; sourceTree = "<group>"; };
+		17AFA007ED9F1E8D23BC9A384716C467 /* sample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = sample.release.xcconfig; sourceTree = "<group>"; };
 		1A2FB55B5C37861BC78ECD1420D818C3 /* Pods-iosApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-iosApp.release.xcconfig"; sourceTree = "<group>"; };
-		26F60BF50609C019349921EDA61B84AA /* shared.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = shared.framework; path = build/cocoapods/framework/shared.framework; sourceTree = "<group>"; };
 		3A2475209BEE7612101900020629C625 /* Pods-iosApp-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-iosApp-dummy.m"; sourceTree = "<group>"; };
 		42DE4C0106600A5B6D599285368F3270 /* Pods-iosApp-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-iosApp-umbrella.h"; sourceTree = "<group>"; };
 		482384ADFE4EF692B16FACB8C2021970 /* Pods-iosApp.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-iosApp.modulemap"; sourceTree = "<group>"; };
 		73010CC983E3809BECEE5348DA1BB8C6 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
-		96827D9625204BB8B2B622470FA81F37 /* sample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = sample.release.xcconfig; sourceTree = "<group>"; };
 		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
-		9DAE5A6B0F22771A97BE9001AA0D7CBF /* sample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = sample.debug.xcconfig; sourceTree = "<group>"; };
 		A43877303056397968EC90C7AAFE17E8 /* Pods-iosApp-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-iosApp-acknowledgements.markdown"; sourceTree = "<group>"; };
 		A79C2AA5C063914B2D1BD80187FDF6DE /* Pods-iosApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-iosApp.debug.xcconfig"; sourceTree = "<group>"; };
 		B097DD7534E741D5C41838011D755842 /* Pods-iosApp */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "Pods-iosApp"; path = Pods_iosApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BCAED803D074E2E9C3B1327F049C8C2A /* Pods-iosApp-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-iosApp-Info.plist"; sourceTree = "<group>"; };
+		CE430FD49C89DD244B092F56763D9481 /* sample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = sample.debug.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,6 +65,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0633EA0F4A169D376D4BB050386A4AC4 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				CE430FD49C89DD244B092F56763D9481 /* sample.debug.xcconfig */,
+				17AFA007ED9F1E8D23BC9A384716C467 /* sample.release.xcconfig */,
+			);
+			name = "Support Files";
+			path = "../sampleIosApp/Pods/Target Support Files/sample";
+			sourceTree = "<group>";
+		};
+		160E9F3B0350016AA5B1E644B623B38C /* Pod */ = {
+			isa = PBXGroup;
+			children = (
+				0BA62979C096906E2D84877CBC2740C0 /* sample.podspec */,
+			);
+			name = Pod;
+			sourceTree = "<group>";
+		};
 		1F86AA6785DF34AFD5A71790761717DE /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -97,29 +115,10 @@
 			name = iOS;
 			sourceTree = "<group>";
 		};
-		A01E13B252A1F9BE07F5CD05052FE117 /* Pod */ = {
+		677C114889702D7D933CB33ADEC97742 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				0E68BC9D1DEDF00EC32C9CAD8A8265E3 /* sample.podspec */,
-			);
-			name = Pod;
-			sourceTree = "<group>";
-		};
-		A37C90E76F99CCB0CEBD347C1C790E65 /* sample */ = {
-			isa = PBXGroup;
-			children = (
-				BE768DBB770751BDBAAF2E7D6271750B /* Frameworks */,
-				A01E13B252A1F9BE07F5CD05052FE117 /* Pod */,
-				E45B58659D2A7FD9AF4471FC87AA2E10 /* Support Files */,
-			);
-			name = sample;
-			path = ../../sample;
-			sourceTree = "<group>";
-		};
-		BE768DBB770751BDBAAF2E7D6271750B /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				26F60BF50609C019349921EDA61B84AA /* shared.framework */,
+				0D720B95DCD8FC7C8BF86E89331C6711 /* shared.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -130,6 +129,17 @@
 				310087C345B86EEF25A054485E0BB5CB /* Pods-iosApp */,
 			);
 			name = "Targets Support Files";
+			sourceTree = "<group>";
+		};
+		CF0FD809A8462DFA9FF40B8950E7C15A /* sample */ = {
+			isa = PBXGroup;
+			children = (
+				677C114889702D7D933CB33ADEC97742 /* Frameworks */,
+				160E9F3B0350016AA5B1E644B623B38C /* Pod */,
+				0633EA0F4A169D376D4BB050386A4AC4 /* Support Files */,
+			);
+			name = sample;
+			path = ../../sample;
 			sourceTree = "<group>";
 		};
 		CF1408CF629C7361332E53B88F7BD30C = {
@@ -151,20 +161,10 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		E45B58659D2A7FD9AF4471FC87AA2E10 /* Support Files */ = {
-			isa = PBXGroup;
-			children = (
-				9DAE5A6B0F22771A97BE9001AA0D7CBF /* sample.debug.xcconfig */,
-				96827D9625204BB8B2B622470FA81F37 /* sample.release.xcconfig */,
-			);
-			name = "Support Files";
-			path = "../iosApp/Pods/Target Support Files/sample";
-			sourceTree = "<group>";
-		};
 		FB23C4A46325692B6059077AF890F740 /* Development Pods */ = {
 			isa = PBXGroup;
 			children = (
-				A37C90E76F99CCB0CEBD347C1C790E65 /* sample */,
+				CF0FD809A8462DFA9FF40B8950E7C15A /* sample */,
 			);
 			name = "Development Pods";
 			sourceTree = "<group>";
@@ -276,7 +276,7 @@
 /* Begin XCBuildConfiguration section */
 		0587922CB866774B0B5889A0B03CA74D /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 96827D9625204BB8B2B622470FA81F37 /* sample.release.xcconfig */;
+			baseConfigurationReference = 17AFA007ED9F1E8D23BC9A384716C467 /* sample.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -332,7 +332,7 @@
 		};
 		3B520EFB1B3131BD5EBFFF12F58EBE68 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9DAE5A6B0F22771A97BE9001AA0D7CBF /* sample.debug.xcconfig */;
+			baseConfigurationReference = CE430FD49C89DD244B092F56763D9481 /* sample.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;

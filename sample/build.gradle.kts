@@ -85,9 +85,9 @@ kotlin {
 
     cocoapods {
         summary = "Shared code for the sample"
-        homepage = "https://github.com/JetBrains/compose-jb"
+        homepage = "https://github.com/luca992/libphonenumber-kotlin"
         ios.deploymentTarget = "14.1"
-        podfile = project.file("../iosApp/Podfile")
+        podfile = project.file("../sampleIosApp/Podfile")
         framework {
             baseName = "shared"
             isStatic = true
@@ -168,7 +168,7 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "compose-sample"
+            packageName = "libphonenumber sample"
             packageVersion = "1.0.0"
         }
     }

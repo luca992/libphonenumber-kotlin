@@ -1,7 +1,7 @@
 Pod::Spec.new do |spec|
     spec.name                     = 'sample'
     spec.version                  = '1.0-SNAPSHOT'
-    spec.homepage                 = 'https://github.com/JetBrains/compose-jb'
+    spec.homepage                 = 'https://github.com/luca992/libphonenumber-kotlin'
     spec.source                   = { :http=> ''}
     spec.authors                  = ''
     spec.license                  = ''
