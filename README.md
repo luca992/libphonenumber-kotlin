@@ -1,12 +1,23 @@
-[![Build](https://github.com/MichaelRocks/libphonenumber-android/actions/workflows/build.yml/badge.svg)](https://github.com/MichaelRocks/libphonenumber-android/actions/workflows/build.yml)
-[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-libphonenumber--android-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/3676)
+[![Build](https://github.com/luca992/libphonenumber-kotlin/actions/workflows/build.yml/badge.svg)](https://github.com/luca992/libphonenumber-kotlin/actions/workflows/build.yml)
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-libphonenumber--kotlin-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/3676)
 
-libphonenumber-android
+libphonenumber-kotlin
 ======================
-Android port of Google's [libphonenumber][1].
+Kotlin Multiplatform port of [MichaelRocks/libphonenumber-android](https://github.com/MichaelRocks/libphonenumber-android)
 
 Why?
 ----
+Ported to Kotlin Multiplatform to be used in common code for Android and iOS, macOS, and web!
+
+Check out the Compose Multiplatform [sample](sample) 
+
+Note: the web sample is still a WIP, loading moko-resources assets is not working yet
+
+
+TODO: Update the rest of the readme.
+
+___
+
 Google's libphonenumber is a great library but it has to major flaws when used on Android:
  1. ~~It adds about [7k methods][2] to a final dex.~~ Not anymore, since 7.7.0.
  2. Internally the library uses `Class.getResourceAsStream()` method,
@@ -23,7 +34,7 @@ repositories {
 }
 
 dependencies {
-  implementation 'io.michaelrocks:libphonenumber-android:8.13.17'
+ // todo: publish to mavenCentral
 }
 ```
 
