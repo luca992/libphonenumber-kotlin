@@ -20,14 +20,20 @@ import co.touchlab.kermit.Logger
 import dev.icerock.moko.resources.AssetResource
 import io.michaelrocks.libphonenumber.kotlin.MetadataLoader
 import io.michaelrocks.libphonenumber.kotlin.io.InputStream
+import io.michaelrocks.libphonenumber.kotlin.io.OkioInputStream
+import okio.FileSystem
+import okio.Path.Companion.toPath
+import okio.buffer
 
 /**
  * A [MetadataLoader] implementation that reads phone number metadata files as classpath
  * resources.
  */
 class ClassPathResourceMetadataLoader : MetadataLoader {
-    override fun loadMetadata(phoneMetadataResource: AssetResource): InputStream? {
-        return phoneMetadataResource.resourcesClassLoader.getResourceAsStream(phoneMetadataResource.filePath)
+    override fun loadMetadata(phoneMetadataResource: AssetResource): InputStream {
+        val path = phoneMetadataResource.path.toPath()
+        return OkioInputStream(FileSystem.SYSTEM.source(path).buffer())
+
     }
 
     companion object {
