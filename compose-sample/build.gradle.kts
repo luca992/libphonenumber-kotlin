@@ -16,6 +16,7 @@ plugins {
     alias(libs.plugins.org.jetbrains.compose)
     alias(libs.plugins.com.android.application)
     alias(libs.plugins.dev.icerock.mobile.multiplatform.resources)
+    kotlin("native.cocoapods")
 }
 
 version = "1.0-SNAPSHOT"
@@ -47,7 +48,7 @@ kotlin {
             }
         }
     }
-    iosX64("uikitX64") {
+    iosX64() {
         binaries {
             executable {
                 entryPoint = "main"
@@ -59,7 +60,7 @@ kotlin {
             }
         }
     }
-    iosArm64("uikitArm64") {
+    iosArm64() {
         binaries {
             executable {
                 entryPoint = "main"
@@ -71,6 +72,29 @@ kotlin {
             }
         }
     }
+    iosSimulatorArm64() {
+        // TODO: remove after 1.5 release
+        binaries.forEach {
+            it.freeCompilerArgs += listOf(
+                "-linker-option", "-framework", "-linker-option", "Metal",
+                "-linker-option", "-framework", "-linker-option", "CoreText",
+                "-linker-option", "-framework", "-linker-option", "CoreGraphics",
+            )
+        }
+    }
+
+    cocoapods {
+        summary = "Shared code for the sample"
+        homepage = "https://github.com/JetBrains/compose-jb"
+        ios.deploymentTarget = "14.1"
+        podfile = project.file("../iosApp/Podfile")
+        framework {
+            baseName = "shared"
+            isStatic = true
+        }
+        extraSpecAttributes["resources"] = "['src/commonMain/resources/**', 'src/iosMain/resources/**']"
+    }
+
 
     sourceSets {
         val commonMain by getting {
@@ -123,14 +147,17 @@ kotlin {
         val macosArm64Main by getting {
             dependsOn(macosMain)
         }
-        val uikitMain by creating {
+        val iosMain by creating {
             dependsOn(nativeMain)
         }
-        val uikitX64Main by getting {
-            dependsOn(uikitMain)
+        val iosSimulatorArm64Main by getting {
+            dependsOn(iosMain)
         }
-        val uikitArm64Main by getting {
-            dependsOn(uikitMain)
+        val iosX64Main by getting {
+            dependsOn(iosMain)
+        }
+        val iosArm64Main by getting {
+            dependsOn(iosMain)
         }
     }
 }
@@ -150,25 +177,6 @@ compose.desktop {
 
 compose.experimental {
     web.application {}
-    uikit.application {
-        bundleIdPrefix = "io.luca992.libphonenumber.sample"
-        projectName = "libphonenumber-kotlin sample"
-        deployConfigurations {
-            simulator("IPhone8") {
-                //Usage: ./gradlew iosDeployIPhone8Debug
-                device = IOSDevices.IPHONE_8
-            }
-            simulator("IPad") {
-                //Usage: ./gradlew iosDeployIPadDebug
-                device = IOSDevices.IPAD_MINI_6th_Gen
-            }
-            connectedDevice("Device") {
-                //First need specify your teamId here, or in local.properties (compose.ios.teamId=***)
-                //teamId="***"
-                //Usage: ./gradlew iosDeployDeviceRelease
-            }
-        }
-    }
 }
 
 
