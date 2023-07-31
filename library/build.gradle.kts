@@ -112,6 +112,11 @@ android {
         }
     }
 
+    sourceSets {
+        named("test") {
+            java.srcDirs("src/androidUnitTest/java")
+        }
+    }
 
 //    androidComponents.beforeVariants { variantBuilder ->
 //        if (variantBuilder.name != "release") {
