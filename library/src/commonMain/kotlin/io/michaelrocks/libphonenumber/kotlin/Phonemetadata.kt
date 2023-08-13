@@ -1311,11 +1311,11 @@ class Phonemetadata private constructor() {
             return this
         }
 
-        override fun writeExternal(objectOutput: ObjectOutput) {
+        override fun writeExternal(out: ObjectOutput) {
             val size = metadataCount
-            objectOutput.writeInt(size)
+            out.writeInt(size)
             for (i in 0 until size) {
-                metadata_[i].writeExternal(objectOutput)
+                metadata_[i].writeExternal(out)
             }
         }
 
