@@ -1,15 +1,12 @@
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.tasks.AbstractNativeMacApplicationPackageAppDirTask
-import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
 import org.jetbrains.kotlin.gradle.plugin.mpp.AbstractExecutable
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBinary
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 import org.jetbrains.kotlin.library.impl.KotlinLibraryLayoutImpl
 import java.io.File
 import java.io.FileFilter
-import org.jetbrains.compose.experimental.dsl.IOSDevices as IOSDevices1
 import org.jetbrains.kotlin.konan.file.File as KonanFile
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.compose.experimental.dsl.IOSDevices
 
 plugins {
     alias(libs.plugins.org.jetbrains.kotlin.multiplatform)

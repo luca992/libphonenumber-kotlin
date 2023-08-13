@@ -3379,6 +3379,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
          * string if no character used to start phone numbers (such as + or any digit) is found in the
          * number
          */
+        @JvmStatic
         fun extractPossibleNumber(number: CharSequence): CharSequence {
             var number = number
             val m = VALID_START_CHAR_PATTERN.find(number)
@@ -3498,6 +3499,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
          * @param countryCallingCode  the country calling code for which we want the mobile token
          * @return  the mobile token, as a string, for the given country calling code
          */
+        @JvmStatic
         fun getCountryMobileToken(countryCallingCode: Int): String? {
             return if (MOBILE_TOKEN_MAPPINGS!!.containsKey(countryCallingCode)) {
                 MOBILE_TOKEN_MAPPINGS!![countryCallingCode]
@@ -3569,6 +3571,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
          * @param metadataLoader  customized metadata loader. This should not be null
          * @return  a PhoneNumberUtil instance
          */
+        @JvmStatic
         fun createInstance(metadataLoader: MetadataLoader): PhoneNumberUtil {
             val metadataDependenciesProvider = DefaultMetadataDependenciesProvider(metadataLoader)
             val metadataSource: MetadataSource = MetadataSourceImpl(
