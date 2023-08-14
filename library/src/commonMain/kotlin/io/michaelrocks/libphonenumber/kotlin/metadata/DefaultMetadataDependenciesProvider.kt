@@ -29,15 +29,15 @@ class DefaultMetadataDependenciesProvider @JvmOverloads constructor(metadataLoad
     val metadataParser = newLenientParser()
     val metadataLoader: MetadataLoader
     val phoneNumberMetadataFileNameProvider: PhoneMetadataResourceProvider = MultiFileModeResourceProvider(
-        "files/io/michaelrocks/libphonenumber/android/data/PhoneNumberMetadataProto"
+        "io/michaelrocks/libphonenumber/android/data/PhoneNumberMetadataProto"
     )
     val phoneNumberMetadataSource: MetadataSource
     val shortNumberMetadataFileNameProvider: PhoneMetadataResourceProvider = MultiFileModeResourceProvider(
-        "files/io/michaelrocks/libphonenumber/android/data/ShortNumberMetadataProto"
+        "io/michaelrocks/libphonenumber/android/data/ShortNumberMetadataProto"
     )
     val shortNumberMetadataSource: RegionMetadataSource
     val alternateFormatsMetadataFileNameProvider: PhoneMetadataResourceProvider = MultiFileModeResourceProvider(
-        "files/io/michaelrocks/libphonenumber/android/data/PhoneNumberAlternateFormatsProto"
+        "io/michaelrocks/libphonenumber/android/data/PhoneNumberAlternateFormatsProto"
     )
     val alternateFormatsMetadataSource: FormattingMetadataSource
 
@@ -62,7 +62,7 @@ class DefaultMetadataDependenciesProvider @JvmOverloads constructor(metadataLoad
     }
 
     val carrierDataDirectory: String
-        get() = "files/io/michaelrocks/libphonenumber/android/carrier/data/"
+        get() = "io/michaelrocks/libphonenumber/android/carrier/data/"
     val geocodingDataDirectory: String
-        get() = "files/io/michaelrocks/libphonenumber/android/geocoding/data/"
+        get() = "io/michaelrocks/libphonenumber/android/geocoding/data/"
 }

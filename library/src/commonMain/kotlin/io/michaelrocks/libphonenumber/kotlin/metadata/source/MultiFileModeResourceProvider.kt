@@ -17,7 +17,11 @@
 package io.michaelrocks.libphonenumber.kotlin.metadata.source
 
 import dev.icerock.moko.resources.AssetResource
+import dev.icerock.moko.resources.ResourceContainer
 import io.michaelrocks.libphonenumber.MR
+
+// TODO: Remove after https://github.com/icerockdev/moko-resources/pull/550 is merged
+expect fun ResourceContainer<AssetResource>.getAssetByFilePath(filePath: String): AssetResource?
 
 /**
  * [PhoneMetadataResourceProvider] implementation which appends key as a suffix to the
@@ -33,10 +37,9 @@ class MultiFileModeResourceProvider(phoneMetadataFileNameBase: String) : PhoneMe
     override fun getFor(key: Any): AssetResource {
         val keyAsString = key.toString()
         require(ALPHANUMERIC.matches(keyAsString)) { "Invalid key: $keyAsString" }
-        return when (keyAsString) {
-            "US" -> MR.assets.io.michaelrocks.libphonenumber.android.data.PhoneNumberMetadataProto_US
-            else -> throw NotImplementedError("Couldn't get asset resource for key: $keyAsString")
-        }
+        val path = phoneMetadataFileNamePrefix + keyAsString
+        return MR.assets.getAssetByFilePath(path)
+            ?: throw NotImplementedError("Couldn't get asset resource for key: $keyAsString")
     }
 
     companion object {
