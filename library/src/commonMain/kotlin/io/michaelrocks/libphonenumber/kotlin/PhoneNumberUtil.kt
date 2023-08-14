@@ -3217,7 +3217,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         //
         // Note VALID_PUNCTUATION starts with a -, so must be the first in the range.
         private val VALID_PHONE_NUMBER =
-            (DIGITS + "{" + MIN_LENGTH_FOR_NSN + "}" + "|" + "[" + PLUS_CHARS + "]*+(?:[" + VALID_PUNCTUATION + STAR_SIGN + "]*" + DIGITS + "){3,}[" + VALID_PUNCTUATION + STAR_SIGN + VALID_ALPHA + DIGITS + "]*")
+            (DIGITS + "{" + MIN_LENGTH_FOR_NSN + "}" + "|" + "[" + PLUS_CHARS + "]*" + "(?:[" + VALID_PUNCTUATION + STAR_SIGN + "]*" + DIGITS + "){3,}[" + VALID_PUNCTUATION + STAR_SIGN + VALID_ALPHA + DIGITS + "]*")
 
         // Default extension prefix to use when formatting. This will be put in front of any extension
         // component of the number, after the main national number is formatted. For example, if you wish
@@ -3244,9 +3244,9 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         // Regular expression of valid domainname for the phone-context parameter, following the syntax
         // defined in RFC3966.
         private val ALPHANUM = VALID_ALPHA + DIGITS
-        private val RFC3966_DOMAINLABEL = "[" + ALPHANUM + "]+((\\-)*[" + ALPHANUM + "])*"
-        private val RFC3966_TOPLABEL = "[" + VALID_ALPHA + "]+((\\-)*[" + ALPHANUM + "])*"
-        private val RFC3966_DOMAINNAME = "^(" + RFC3966_DOMAINLABEL + "\\.)*" + RFC3966_TOPLABEL + "\\.?$"
+        private val RFC3966_DOMAINLABEL = "[$ALPHANUM]+((-)*[$ALPHANUM])*"
+        private val RFC3966_TOPLABEL = "[$VALID_ALPHA]+((-)*[$ALPHANUM])*"
+        private val RFC3966_DOMAINNAME = "^($RFC3966_DOMAINLABEL\\.)*$RFC3966_TOPLABEL\\.?$"
         val RFC3966_DOMAINNAME_PATTERN = Regex(RFC3966_DOMAINNAME)
 
         /**
