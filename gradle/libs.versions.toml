@@ -18,7 +18,7 @@ agp = "8.0.2"
 compose-jb = "1.4.3"
 
 mockitoVersion = "5.4.0"
-okio = "3.4.0"
+okio = "3.5.0"
 multiplatform-resources = "0.23.0"
 
 androidx-activity = "1.7.2"
