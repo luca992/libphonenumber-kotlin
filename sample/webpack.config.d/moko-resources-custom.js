@@ -8,6 +8,12 @@
         include: [
             path.resolve(mokoResourcePath, "files"),
         ],
-        type: 'asset/resource'
+        type: 'asset/inline',
+        generator: {
+            dataUrl: content => {
+                // Convert buffer content to base64 and prepend it with mimetype
+                return `${content.toString('base64')}`
+            }
+        }
     });
 })(config);

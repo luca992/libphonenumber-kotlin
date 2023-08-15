@@ -21,8 +21,8 @@ import dev.icerock.moko.resources.AssetResource
 import io.michaelrocks.libphonenumber.kotlin.MetadataLoader
 import io.michaelrocks.libphonenumber.kotlin.io.InputStream
 import io.michaelrocks.libphonenumber.kotlin.io.OkioInputStream
-import kotlinx.browser.window
 import okio.Buffer
+import okio.ByteString.Companion.decodeBase64
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Int8Array
 
@@ -30,16 +30,15 @@ import org.khronos.webgl.Int8Array
  * A [MetadataLoader] implementation that reads phone number metadata files as classpath
  * resources.
  */
-private fun ArrayBuffer.asByteArray(): ByteArray = Int8Array(this).unsafeCast<ByteArray>()
 
 class MokoAssetResourceMetadataLoader : MetadataLoader {
     override fun loadMetadata(phoneMetadataResource: AssetResource): InputStream {
         val buffer = Buffer()
-        window.fetch(phoneMetadataResource.originalPath).then {
-            it.arrayBuffer()
-        }.then {
-            buffer.write(it.asByteArray())
-        }
+        // webpack is configured to bundle the metadata files as base64 strings by using asset/inline
+        // So phoneMetadataResource.originalPath will actually be a base64 string of the file contents
+        // in this mode vs asset/resource which would be the path to the file
+        val base64Data = phoneMetadataResource.originalPath.decodeBase64()!!
+        buffer.write(base64Data.toByteArray())
         return OkioInputStream(buffer)
     }
 
