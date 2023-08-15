@@ -120,7 +120,7 @@ class PhoneNumberMatcher(
         while (maxTries > 0) {
             val matcherResult = REGEX!!.find(text, index) ?: break
             val start = matcherResult.range.first
-            var candidate = text.subSequence(start, matcherResult.range.last)
+            var candidate = text.subSequence(start, matcherResult.range.last + 1)
 
             // Check for extra numbers at the end.
             // TODO: This is the place to start when trying to support extraction of multiple phone number
