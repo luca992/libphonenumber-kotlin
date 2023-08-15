@@ -2554,14 +2554,11 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         leniency: Leniency? = Leniency.VALID,
         maxTries: Long = Long.MAX_VALUE
     ): Iterable<PhoneNumberMatch> {
-        TODO()
-//        return object : Iterable<PhoneNumberMatch> {
-//            override fun iterator(): Iterator<PhoneNumberMatch> {
-//                return PhoneNumberMatcher(
-//                    this@PhoneNumberUtil, text, defaultRegion, leniency, maxTries
-//                )
-//            }
-//        }
+        return object : Iterable<PhoneNumberMatch> {
+            override fun iterator(): Iterator<PhoneNumberMatch> {
+                return PhoneNumberMatcher(this@PhoneNumberUtil, text, defaultRegion, leniency, maxTries)
+            }
+        }
     }
 
     /**

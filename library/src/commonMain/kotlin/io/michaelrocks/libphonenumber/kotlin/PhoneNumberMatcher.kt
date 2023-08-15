@@ -40,8 +40,8 @@ import io.michaelrocks.libphonenumber.kotlin.util.InplaceStringBuilder
  * This class is not thread-safe.
  */
 class PhoneNumberMatcher(
-    util: PhoneNumberUtil?, text: CharSequence?, country: String, leniency: Leniency?, maxTries: Long
-) : MutableIterator<PhoneNumberMatch?> {
+    util: PhoneNumberUtil?, text: CharSequence?, country: String?, leniency: Leniency?, maxTries: Long
+) : Iterator<PhoneNumberMatch> {
     /** The potential states of a PhoneNumberMatcher.  */
     private enum class State {
         NOT_READY, READY, DONE
@@ -57,7 +57,7 @@ class PhoneNumberMatcher(
      * The region (country) to assume for phone numbers without an international prefix, possibly
      * null.
      */
-    private val preferredRegion: String
+    private val preferredRegion: String?
 
     /** The degree of validation requested.  */
     private val leniency: Leniency
@@ -331,7 +331,7 @@ class PhoneNumberMatcher(
         return state == State.READY
     }
 
-    override fun next(): PhoneNumberMatch? {
+    override fun next(): PhoneNumberMatch {
         // Check the state and find the next match as a side-effect if necessary.
         if (!hasNext()) {
             throw NoSuchElementException()
@@ -341,14 +341,7 @@ class PhoneNumberMatcher(
         val result = lastMatch
         lastMatch = null
         state = State.NOT_READY
-        return result
-    }
-
-    /**
-     * Always throws [UnsupportedOperationException] as removal is not supported.
-     */
-    override fun remove() {
-        throw UnsupportedOperationException()
+        return result!!
     }
 
     companion object {
