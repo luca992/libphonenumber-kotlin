@@ -2373,7 +2373,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
                     return false
                 }
                 if (carrierCode != null && numOfGroups > 0 && prefixMatchResult.groups[numOfGroups - 1] != null) {
-                    carrierCode.append(prefixMatchResult.groups[1])
+                    carrierCode.append(prefixMatchResult.groups[0])
                 }
                 number.removeRange(0, prefixMatchResult.range.last + 1)
                 true
