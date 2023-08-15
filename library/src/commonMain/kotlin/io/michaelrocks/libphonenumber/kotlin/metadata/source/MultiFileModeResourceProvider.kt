@@ -27,7 +27,10 @@ expect fun ResourceContainer<AssetResource>.getAssetByFilePath(filePath: String)
  * [PhoneMetadataResourceProvider] implementation which appends key as a suffix to the
  * predefined metadata file name base.
  */
-class MultiFileModeResourceProvider(phoneMetadataFileNameBase: String) : PhoneMetadataResourceProvider {
+class MultiFileModeResourceProvider(
+    phoneMetadataFileNameBase: String,
+    val assets: ResourceContainer<AssetResource> = MR.assets
+) : PhoneMetadataResourceProvider {
     private val phoneMetadataFileNamePrefix: String
 
     init {
@@ -38,7 +41,7 @@ class MultiFileModeResourceProvider(phoneMetadataFileNameBase: String) : PhoneMe
         val keyAsString = key.toString()
         require(ALPHANUMERIC.matches(keyAsString)) { "Invalid key: $keyAsString" }
         val path = phoneMetadataFileNamePrefix + keyAsString
-        return MR.assets.getAssetByFilePath(path)
+        return assets.getAssetByFilePath(path)
             ?: throw NotImplementedError("Couldn't get asset resource for key: $keyAsString")
     }
 

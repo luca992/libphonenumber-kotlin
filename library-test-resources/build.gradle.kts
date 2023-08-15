@@ -46,6 +46,9 @@ kotlin {
         val jvmMain by getting {
             dependsOn(commonMain)
         }
+        val jsMain by getting {
+            dependsOn(commonMain)
+        }
     }
 }
 

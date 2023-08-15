@@ -20,6 +20,7 @@ import io.michaelrocks.libphonenumber.kotlin.metadata.DefaultMetadataDependencie
 import io.michaelrocks.libphonenumber.kotlin.metadata.source.MetadataSourceImpl
 import io.michaelrocks.libphonenumber.kotlin.metadata.source.MultiFileModeResourceProvider
 import junit.framework.TestCase
+import io.michaelrocks.libphonenumber.test.MR
 
 /**
  * Root class for PhoneNumberUtil tests that depend on the test metadata file.
@@ -49,7 +50,7 @@ abstract class TestMetadataTestCase : TestCase() {
     @JvmField
     protected val phoneUtil: PhoneNumberUtil = PhoneNumberUtil(
         MetadataSourceImpl(
-            MultiFileModeResourceProvider(TEST_METADATA_FILE_PREFIX),
+            MultiFileModeResourceProvider(TEST_METADATA_FILE_PREFIX, MR.assets),
             metadataDependenciesProvider.metadataLoader,
             metadataDependenciesProvider.metadataParser
         ),
