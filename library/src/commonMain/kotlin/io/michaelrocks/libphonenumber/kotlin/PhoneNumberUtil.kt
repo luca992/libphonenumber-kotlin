@@ -215,15 +215,21 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
                 ) {
                     false
                 } else {
-                    TODO()
-//                    matcher.checkNumberGroupingIsValid(number,
-//                        candidate,
-//                        util,
-//                        NumberGroupingChecker { util, number, normalizedCandidate, expectedNumberGroups ->
-//                            PhoneNumberMatcher.allNumberGroupsRemainGrouped(
-//                                util, number, normalizedCandidate, expectedNumberGroups
-//                            )
-//                        })
+                    matcher.checkNumberGroupingIsValid(number,
+                        candidate,
+                        util,
+                        object : NumberGroupingChecker {
+                            override fun checkGroups(
+                                util: PhoneNumberUtil,
+                                number: PhoneNumber,
+                                normalizedCandidate: InplaceStringBuilder,
+                                expectedNumberGroups: Array<String>
+                            ): Boolean {
+                                return PhoneNumberMatcher.allNumberGroupsRemainGrouped(
+                                    util, number, normalizedCandidate, expectedNumberGroups
+                                )
+                            }
+                        })
                 }
             }
         },

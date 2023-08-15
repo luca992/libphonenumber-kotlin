@@ -520,7 +520,7 @@ class PhoneNumberMatcher(
         fun allNumberGroupsRemainGrouped(
             util: PhoneNumberUtil,
             number: PhoneNumber,
-            normalizedCandidate: StringBuilder,
+            normalizedCandidate: InplaceStringBuilder,
             formattedNumberGroups: Array<String>
         ): Boolean {
             var fromIndex = 0
