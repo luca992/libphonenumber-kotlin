@@ -25,4 +25,5 @@ plugins {
 }
 
 include(":library")
+include(":library-test-resources")
 include(":sample")
