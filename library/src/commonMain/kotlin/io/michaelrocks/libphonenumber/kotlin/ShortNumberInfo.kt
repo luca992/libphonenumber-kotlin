@@ -514,7 +514,7 @@ class ShortNumberInfo internal constructor(// MatcherApi supports the basic matc
             val leadingZeros =
                 if (number.isItalianLeadingZero) {
                     val zeros = CharArray(number.numberOfLeadingZeros) { '0' }
-                    zeros.joinToString { "" }
+                    zeros.joinToString("")
                 } else {
                     ""
                 }
