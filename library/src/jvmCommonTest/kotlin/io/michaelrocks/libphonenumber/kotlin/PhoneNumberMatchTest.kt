@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.michaelrocks.libphonenumber.android
+package io.michaelrocks.libphonenumber.kotlin
 
 import io.michaelrocks.libphonenumber.kotlin.PhoneNumberMatch
 import io.michaelrocks.libphonenumber.kotlin.Phonenumber.PhoneNumber

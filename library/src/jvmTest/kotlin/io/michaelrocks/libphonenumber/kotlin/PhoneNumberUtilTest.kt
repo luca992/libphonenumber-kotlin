@@ -16,9 +16,9 @@
  */
 package io.michaelrocks.libphonenumber.kotlin
 
-import io.michaelrocks.libphonenumber.android.CountryCodeToRegionCodeMapForTesting.countryCodeToRegionCodeMap
-import io.michaelrocks.libphonenumber.android.RegionCode
-import io.michaelrocks.libphonenumber.android.TestMetadataTestCase
+import io.michaelrocks.libphonenumber.kotlin.CountryCodeToRegionCodeMapForTesting.countryCodeToRegionCodeMap
+import io.michaelrocks.libphonenumber.kotlin.RegionCode
+import io.michaelrocks.libphonenumber.kotlin.TestMetadataTestCase
 import io.michaelrocks.libphonenumber.kotlin.PhoneNumberUtil.*
 import io.michaelrocks.libphonenumber.kotlin.PhoneNumberUtil.Companion.extractPossibleNumber
 import io.michaelrocks.libphonenumber.kotlin.PhoneNumberUtil.Companion.getCountryMobileToken

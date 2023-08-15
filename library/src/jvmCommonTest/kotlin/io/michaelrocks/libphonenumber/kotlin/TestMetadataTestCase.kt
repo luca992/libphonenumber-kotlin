@@ -14,10 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.michaelrocks.libphonenumber.android
+package io.michaelrocks.libphonenumber.kotlin
 
-import io.michaelrocks.libphonenumber.kotlin.MetadataLoader
-import io.michaelrocks.libphonenumber.kotlin.PhoneNumberUtil
 import io.michaelrocks.libphonenumber.kotlin.metadata.DefaultMetadataDependenciesProvider
 import io.michaelrocks.libphonenumber.kotlin.metadata.source.MetadataSourceImpl
 import io.michaelrocks.libphonenumber.kotlin.metadata.source.MultiFileModeResourceProvider
@@ -61,6 +59,6 @@ abstract class TestMetadataTestCase : TestCase() {
 
     companion object {
         private const val TEST_METADATA_FILE_PREFIX =
-            "/io/michaelrocks/libphonenumber/android/data/PhoneNumberMetadataProtoForTesting"
+            "/io/michaelrocks/libphonenumber/kotlin/data/PhoneNumberMetadataProtoForTesting"
     }
 }

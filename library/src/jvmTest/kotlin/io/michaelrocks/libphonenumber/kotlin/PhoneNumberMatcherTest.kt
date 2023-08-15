@@ -16,8 +16,8 @@
  */
 package io.michaelrocks.libphonenumber.kotlin
 
-import io.michaelrocks.libphonenumber.android.RegionCode
-import io.michaelrocks.libphonenumber.android.TestMetadataTestCase
+import io.michaelrocks.libphonenumber.kotlin.RegionCode
+import io.michaelrocks.libphonenumber.kotlin.TestMetadataTestCase
 import io.michaelrocks.libphonenumber.kotlin.PhoneNumberUtil.Leniency
 import io.michaelrocks.libphonenumber.kotlin.Phonenumber.PhoneNumber
 import io.michaelrocks.libphonenumber.kotlin.Phonenumber.PhoneNumber.CountryCodeSource

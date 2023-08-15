@@ -14,16 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.michaelrocks.libphonenumber.android.metadata.source
+package io.michaelrocks.libphonenumber.kotlin.metadata.source
 
+import io.michaelrocks.libphonenumber.kotlin.metadata.source.MultiFileModeResourceProvider
 import io.michaelrocks.libphonenumber.kotlin.metadata.source.PhoneMetadataResourceProvider
-import io.michaelrocks.libphonenumber.kotlin.metadata.source.SingleFileModeResourceProvider
 import junit.framework.TestCase
+import org.junit.Assert
 
-class SingleFileModeFileNameProviderTest : TestCase() {
-    private val metadataFileNameProvider: PhoneMetadataResourceProvider = SingleFileModeResourceProvider("some/file")
-    fun test_getFor_shouldReturnTheFileNameBase() {
+class MultiFileModeFileNameProviderTest : TestCase() {
+    private val metadataFileNameProvider: PhoneMetadataResourceProvider = MultiFileModeResourceProvider("some/file")
+    fun test_getFor_shouldAppendKeyToTheBase() {
         val metadataFileName = metadataFileNameProvider.getFor("key1")
-        assertEquals("some/file", metadataFileName)
+        assertEquals("some/file_key1", metadataFileName)
+    }
+
+    fun test_getFor_shouldThrowExceptionForNonAlphanumericKey() {
+        Assert.assertThrows(
+            IllegalArgumentException::class.java
+        ) { metadataFileNameProvider.getFor("\tkey1\n") }
     }
 }

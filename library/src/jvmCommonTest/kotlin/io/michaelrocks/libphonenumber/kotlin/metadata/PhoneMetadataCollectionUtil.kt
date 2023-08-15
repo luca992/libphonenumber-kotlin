@@ -1,4 +1,4 @@
-package io.michaelrocks.libphonenumber.android.metadata
+package io.michaelrocks.libphonenumber.kotlin.metadata
 
 import io.michaelrocks.libphonenumber.kotlin.Phonemetadata.PhoneMetadataCollection
 import java.io.*
