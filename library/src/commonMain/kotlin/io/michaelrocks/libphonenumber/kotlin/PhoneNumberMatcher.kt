@@ -145,12 +145,12 @@ class PhoneNumberMatcher(
      */
     private fun extractMatch(candidate: CharSequence, offset: Int): PhoneNumberMatch? {
         // Skip a match that is more likely to be a date.
-        if (SLASH_SEPARATED_DATES.find(candidate) == null) {
+        if (SLASH_SEPARATED_DATES.find(candidate) != null) {
             return null
         }
 
         // Skip potential time-stamps.
-        if (TIME_STAMPS.find(candidate) == null) {
+        if (TIME_STAMPS.find(candidate) != null) {
             val followingText = text.toString().substring(offset + candidate.length)
             if (TIME_STAMPS_SUFFIX.matchesAt(followingText, 0)) {
                 return null
@@ -193,7 +193,7 @@ class PhoneNumberMatcher(
                     maxTries--
                     isFirstMatch = false
                 } else {
-                    groupMatcherResult = groupMatcherResult!!.next() ?: break
+                    groupMatcherResult = groupMatcherResult?.next() ?: break
                 }
                 val group = trimAfterFirstMatch(
                     PhoneNumberUtil.UNWANTED_END_CHAR_PATTERN, groupMatcherResult.groupValues[1]
@@ -221,7 +221,7 @@ class PhoneNumberMatcher(
         try {
             // Check the candidate doesn't contain any formatting which would indicate that it really
             // isn't a phone number.
-            if (!MATCHING_BRACKETS!!.matches(candidate) || PUB_PAGES.find(candidate) == null) {
+            if (!MATCHING_BRACKETS!!.matches(candidate) || PUB_PAGES.find(candidate) != null) {
                 return null
             }
 
