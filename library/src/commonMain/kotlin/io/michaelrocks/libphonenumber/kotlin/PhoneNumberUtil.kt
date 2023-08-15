@@ -2281,7 +2281,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
     private fun parsePrefixAsIdd(iddPattern: Regex, number: InplaceStringBuilder): Boolean {
         val m = iddPattern.matchAt(number, 0)
         if (m != null) {
-            val matchEnd = m.range.last
+            val matchEnd = m.range.last + 1
             // Only strip this if the first digit after the match is not a 0, since country calling codes
             // cannot begin with 0.
             val digitMatcher = CAPTURING_DIGIT_PATTERN.find(number.substring(matchEnd))
@@ -2291,7 +2291,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
                     return false
                 }
             }
-            number.removeRange(0, matchEnd + 1)
+            number.removeRange(0, matchEnd)
             return true
         }
         return false
@@ -2629,7 +2629,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
             if (e.errorType === NumberParseException.ErrorType.INVALID_COUNTRY_CODE && matchResult != null) {
                 // Strip the plus-char, and try again.
                 countryCode = maybeExtractCountryCode(
-                    nationalNumber.substring(matchResult.range.last),
+                    nationalNumber.substring(matchResult.range.last + 1),
                     regionMetadata,
                     normalizedNationalNumber,
                     keepRawInput,

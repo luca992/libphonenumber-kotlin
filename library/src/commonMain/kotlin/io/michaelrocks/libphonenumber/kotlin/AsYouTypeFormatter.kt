@@ -525,12 +525,12 @@ class AsYouTypeFormatter internal constructor(
             val m = nationalPrefixForParsing.matchAt(nationalNumber, 0)
             // Since some national prefix patterns are entirely optional, check that a national prefix
             // could actually be extracted.
-            if (m != null && m.range.last > 0) {
+            if (m != null && m.range.last + 1 > 0) {
                 // When the national prefix is detected, we use international formatting rules instead of
                 // national ones, because national formatting rules could contain local formatting rules
                 // for numbers entered without area code.
                 isCompleteNumber = true
-                startOfNationalNumber = m.range.last
+                startOfNationalNumber = m.range.last + 1
                 prefixBeforeNationalNumber.append(nationalNumber.substring(0, startOfNationalNumber))
             }
         }
@@ -553,7 +553,7 @@ class AsYouTypeFormatter internal constructor(
         val iddMatchResult = internationalPrefix.matchAt(accruedInputWithoutFormatting, 0)
         if (iddMatchResult != null) {
             isCompleteNumber = true
-            val startOfCountryCallingCode = iddMatchResult.range.last
+            val startOfCountryCallingCode = iddMatchResult.range.last + 1
             nationalNumber.setLength(0)
             nationalNumber.append(accruedInputWithoutFormatting.substring(startOfCountryCallingCode))
             prefixBeforeNationalNumber.setLength(0)
