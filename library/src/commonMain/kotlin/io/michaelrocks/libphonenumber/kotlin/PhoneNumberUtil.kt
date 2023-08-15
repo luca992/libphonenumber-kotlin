@@ -3222,7 +3222,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         //
         // Note VALID_PUNCTUATION starts with a -, so must be the first in the range.
         private val VALID_PHONE_NUMBER =
-            (DIGITS + "{" + MIN_LENGTH_FOR_NSN + "}" + "|" + "[" + PLUS_CHARS + "]*" + "(?:[" + VALID_PUNCTUATION + STAR_SIGN + "]*" + DIGITS + "){3,}[" + VALID_PUNCTUATION + STAR_SIGN + VALID_ALPHA + DIGITS + "]*")
+            "[$PLUS_CHARS]*(?:[$VALID_PUNCTUATION$STAR_SIGN]*[$DIGITS]){3,}[$VALID_PUNCTUATION$STAR_SIGN$VALID_ALPHA$DIGITS]*|[$DIGITS]{$MIN_LENGTH_FOR_NSN}"
 
         // Default extension prefix to use when formatting. This will be put in front of any extension
         // component of the number, after the main national number is formatted. For example, if you wish
