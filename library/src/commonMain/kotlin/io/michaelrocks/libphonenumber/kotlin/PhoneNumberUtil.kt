@@ -2364,15 +2364,15 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
             // remove the national prefix.
             val numOfGroups = prefixMatchResult.groups.size
             val transformRule = metadata.nationalPrefixTransformRule
-            return if (transformRule.isEmpty() || prefixMatchResult.groups[numOfGroups] == null) {
+            return if (transformRule.isEmpty() || prefixMatchResult.groups[numOfGroups - 1] == null) {
                 // If the original number was viable, and the resultant number is not, we return.
                 if (isViableOriginalNumber && !matcherApi.matchNationalNumber(
-                        number.substring(prefixMatchResult.range.last), generalDesc, false
+                        number.substring(prefixMatchResult.range.last + 1), generalDesc, false
                     )
                 ) {
                     return false
                 }
-                if (carrierCode != null && numOfGroups > 0 && prefixMatchResult.groups[numOfGroups] != null) {
+                if (carrierCode != null && numOfGroups > 0 && prefixMatchResult.groups[numOfGroups - 1] != null) {
                     carrierCode.append(prefixMatchResult.groups[1])
                 }
                 number.removeRange(0, prefixMatchResult.range.last + 1)
