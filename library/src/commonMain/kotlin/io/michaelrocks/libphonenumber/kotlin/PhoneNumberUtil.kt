@@ -2362,9 +2362,10 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
             // prefixMatcher.group(numOfGroups) == null implies nothing was captured by the capturing
             // groups in possibleNationalPrefix; therefore, no transformation is necessary, and we just
             // remove the national prefix.
-            val numOfGroups = prefixMatchResult.groups.size
+            // prefixMatchResult.groups has size of groupCount + 1 where groupCount is the count of groups in the regular expression
+            val numOfGroups = prefixMatchResult.groups.size - 1
             val transformRule = metadata.nationalPrefixTransformRule
-            return if (transformRule.isEmpty() || prefixMatchResult.groups[numOfGroups - 1] == null) {
+            return if (transformRule.isEmpty() || prefixMatchResult.groups[numOfGroups] == null) {
                 // If the original number was viable, and the resultant number is not, we return.
                 if (isViableOriginalNumber && !matcherApi.matchNationalNumber(
                         number.substring(prefixMatchResult.range.last + 1), generalDesc, false
@@ -2372,8 +2373,8 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
                 ) {
                     return false
                 }
-                if (carrierCode != null && numOfGroups > 0 && prefixMatchResult.groups[numOfGroups - 1] != null) {
-                    carrierCode.append(prefixMatchResult.groups[0])
+                if (carrierCode != null && numOfGroups > 0 && prefixMatchResult.groups[numOfGroups] != null) {
+                    carrierCode.append(prefixMatchResult.groups[1]?.value)
                 }
                 number.removeRange(0, prefixMatchResult.range.last + 1)
                 true
@@ -2389,7 +2390,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
                     return false
                 }
                 if (carrierCode != null && numOfGroups > 1) {
-                    carrierCode.append(prefixMatchResult.groups[1])
+                    carrierCode.append(prefixMatchResult.groups[1]?.value)
                 }
                 number.replaceRange(0, number.length, transformedNumber.toString())
                 true
