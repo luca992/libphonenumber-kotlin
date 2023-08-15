@@ -481,10 +481,32 @@ class PhoneNumberMatcher(
          * combining marks should also return true since we assume they have been added to a preceding
          * Latin character.
          */
-        // @VisibleForTesting
         fun isLatinLetter(letter: Char): Boolean {
             val charValue = letter.code
-            return ('A'.code <= charValue && charValue <= 'Z'.code) || ('a'.code <= charValue && charValue <= 'z'.code)
+
+            // Basic Latin letters
+            if (('A'.code <= charValue && charValue <= 'Z'.code) || ('a'.code <= charValue && charValue <= 'z'.code)) {
+                return true
+            }
+
+            // Latin-1 Supplement letters
+            if (charValue in 0x00C0..0x00FF && charValue != 0x00D7 && charValue != 0x00F7) {
+                return true
+            }
+
+            // Latin Extended-A
+            if (charValue in 0x0100..0x017F) {
+                return true
+            }
+
+            // Latin Extended-B and further ranges can be added similarly if needed...
+
+            // If you want to include the combining diacritical marks range:
+            if (charValue in 0x0300..0x036F) {
+                return true
+            }
+
+            return false
         }
 
         private fun isInvalidPunctuationSymbol(character: Char): Boolean {
