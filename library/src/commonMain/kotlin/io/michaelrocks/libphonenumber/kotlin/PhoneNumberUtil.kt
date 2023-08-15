@@ -3161,7 +3161,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
 
         // taken from js due to issues with the regex statement not working on web
         // https://github.com/google/libphonenumber/blob/e3b0e10884bcb64b052508530bfaa72b53add3ff/javascript/i18n/phonenumbers/phonenumberutil.js#L547-L556
-        private const val DIGITS = "0-9\uFF10-\uFF19\u0660-\u0669\u06F0-\u06F9"
+        private const val DIGITS = "0-9\uFF10-\uFF19\u0660-\u0669\u06F0-\u06F9\u1810-\u1819"
         // the original regex statement from java
         //private const val DIGITS = "\\p{Nd}"
 
