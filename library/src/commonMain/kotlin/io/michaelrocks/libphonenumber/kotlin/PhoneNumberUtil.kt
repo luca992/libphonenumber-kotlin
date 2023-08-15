@@ -2989,7 +2989,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         private val logger = Logger.withTag(PhoneNumberUtil::class.simpleName.toString())
 
         /** Flags to use when compiling regular expressions for phone numbers.  */
-        val REGEX_FLAGS = setOf(RegexOption.IGNORE_CASE, RegexOption.IGNORE_CASE)
+        val REGEX_FLAGS = setOf(RegexOption.IGNORE_CASE)
 
         // The minimum and maximum length of the national significant number.
         private const val MIN_LENGTH_FOR_NSN = 2
@@ -3040,7 +3040,35 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         private var DIALLABLE_CHAR_MAPPINGS: Map<Char, Char>? = null
 
         // Only upper-case variants of alpha characters are stored.
-        private var ALPHA_MAPPINGS: Map<Char, Char>? = null
+        private val ALPHA_MAPPINGS: Map<Char, Char> = hashMapOf(
+            'A' to '2',
+            'B' to '2',
+            'C' to '2',
+            'D' to '3',
+            'E' to '3',
+            'F' to '3',
+            'G' to '4',
+            'H' to '4',
+            'I' to '4',
+            'J' to '5',
+            'K' to '5',
+            'L' to '5',
+            'M' to '6',
+            'N' to '6',
+            'O' to '6',
+            'P' to '7',
+            'Q' to '7',
+            'R' to '7',
+            'S' to '7',
+            'T' to '8',
+            'U' to '8',
+            'V' to '8',
+            'W' to '9',
+            'X' to '9',
+            'Y' to '9',
+            'Z' to '9'
+        )
+
 
         // For performance reasons, amalgamate both into one map.
         private var ALPHA_PHONE_MAPPINGS: Map<Char, Char>? = null
@@ -3077,34 +3105,6 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
             asciiDigitMappings['7'] = '7'
             asciiDigitMappings['8'] = '8'
             asciiDigitMappings['9'] = '9'
-            val alphaMap = HashMap<Char, Char>(40)
-            alphaMap['A'] = '2'
-            alphaMap['B'] = '2'
-            alphaMap['C'] = '2'
-            alphaMap['D'] = '3'
-            alphaMap['E'] = '3'
-            alphaMap['F'] = '3'
-            alphaMap['G'] = '4'
-            alphaMap['H'] = '4'
-            alphaMap['I'] = '4'
-            alphaMap['J'] = '5'
-            alphaMap['K'] = '5'
-            alphaMap['L'] = '5'
-            alphaMap['M'] = '6'
-            alphaMap['N'] = '6'
-            alphaMap['O'] = '6'
-            alphaMap['P'] = '7'
-            alphaMap['Q'] = '7'
-            alphaMap['R'] = '7'
-            alphaMap['S'] = '7'
-            alphaMap['T'] = '8'
-            alphaMap['U'] = '8'
-            alphaMap['V'] = '8'
-            alphaMap['W'] = '9'
-            alphaMap['X'] = '9'
-            alphaMap['Y'] = '9'
-            alphaMap['Z'] = '9'
-            ALPHA_MAPPINGS = alphaMap
             val combinedMap = HashMap<Char, Char>(100)
             combinedMap.putAll(ALPHA_MAPPINGS as HashMap<Char, Char>)
             combinedMap.putAll(asciiDigitMappings)
@@ -3350,7 +3350,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         // We append optionally the extension pattern to the end here, as a valid phone number may
         // have an extension prefix appended, followed by 1 or more digits.
         private val VALID_PHONE_NUMBER_PATTERN =
-            Regex(VALID_PHONE_NUMBER + "(?:" + EXTN_PATTERNS_FOR_PARSING + ")?", REGEX_FLAGS)
+            Regex("$VALID_PHONE_NUMBER(?:$EXTN_PATTERNS_FOR_PARSING)?", REGEX_FLAGS)
 
         @JvmField
         val NON_DIGITS_PATTERN = Regex("(\\D+)")
