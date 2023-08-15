@@ -42,6 +42,7 @@ junit = { module = "junit:junit", version.ref = "junitVersion" }
 
 com-squareup-okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 dev-icerock-moko-resources = { module = "dev.icerock.moko:resources", version.ref = "multiplatform-resources" }
+dev-icerock-moko-resources-test = { module = "dev.icerock.moko:resources-test", version.ref = "multiplatform-resources" }
 
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 androidx-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "androidx-lifecycle" }

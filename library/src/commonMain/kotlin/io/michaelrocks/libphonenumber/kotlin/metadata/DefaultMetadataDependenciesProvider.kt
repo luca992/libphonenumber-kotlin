@@ -25,7 +25,7 @@ import kotlin.jvm.JvmOverloads
  * Provides metadata init and source dependencies when metadata is stored in multi-file mode and
  * loaded as a classpath resource.
  */
-class DefaultMetadataDependenciesProvider @JvmOverloads constructor(metadataLoader: MetadataLoader?) {
+class DefaultMetadataDependenciesProvider @JvmOverloads constructor(metadataLoader: MetadataLoader) {
     val metadataParser = newLenientParser()
     val metadataLoader: MetadataLoader
     val phoneNumberMetadataFileNameProvider: PhoneMetadataResourceProvider = MultiFileModeResourceProvider(
@@ -42,7 +42,6 @@ class DefaultMetadataDependenciesProvider @JvmOverloads constructor(metadataLoad
     val alternateFormatsMetadataSource: FormattingMetadataSource
 
     init {
-        requireNotNull(metadataLoader) { "metadataLoader could not be null." }
         this.metadataLoader = metadataLoader
         phoneNumberMetadataSource = MetadataSourceImpl(
             phoneNumberMetadataFileNameProvider,

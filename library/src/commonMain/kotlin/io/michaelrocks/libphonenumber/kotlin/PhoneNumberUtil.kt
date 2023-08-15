@@ -1879,7 +1879,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
      *
      * @return  true if regionCode is one of the regions under NANPA
      */
-    fun isNANPACountry(regionCode: String): Boolean {
+    fun isNANPACountry(regionCode: String?): Boolean {
         return nanpaRegions.contains(regionCode)
     }
 

@@ -52,12 +52,26 @@ kotlin {
                 implementation(libs.dev.icerock.moko.resources)
             }
         }
-        val commonTest by getting
+        val commonTest by getting {
+            dependencies {
+                implementation(libs.dev.icerock.moko.resources.test)
+            }
+        }
         val jvmCommonMain by creating {
             dependsOn(commonMain)
         }
+        val jvmCommonTest by creating {
+            dependsOn(commonTest)
+            dependencies{
+                implementation(libs.junit)
+                implementation(libs.mockito.core)
+            }
+        }
         val jvmMain by getting {
             dependsOn(jvmCommonMain)
+        }
+        val jvmTest by getting {
+            dependsOn(jvmCommonTest)
         }
         val androidMain by getting {
             dependsOn(jvmCommonMain)
@@ -72,11 +86,7 @@ kotlin {
             dependsOn(nonJvmMain)
         }
         val androidUnitTest by getting {
-            dependsOn(commonTest)
-            dependencies {
-                implementation(libs.junit)
-                implementation(libs.mockito.core)
-            }
+            dependsOn(jvmCommonTest)
         }
         val nativeMain by creating {
             dependsOn(nonJvmMain)
