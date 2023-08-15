@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.intl.Locale
 import io.michaelrocks.libphonenumber.kotlin.PhoneNumberUtil
 
 @Composable
@@ -20,6 +21,14 @@ fun App(util: PhoneNumberUtil, platform: String) {
     var examplePhoneNumberToFormat by remember { mutableStateOf("8005551212") }
     var examplePhoneNumberFormatted by remember { mutableStateOf(false) }
     var asYouTypeFormatterText by remember { mutableStateOf("") }
+    val region = remember {
+        try {
+            Locale.current.region
+        } catch (e: Exception) {
+            // as of compose 1.4.3, js fails to get the region so default to US
+            "US"
+        }
+    }
     MaterialTheme {
         Column(Modifier.fillMaxWidth()) {
             Button(onClick = {
@@ -29,7 +38,7 @@ fun App(util: PhoneNumberUtil, platform: String) {
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Button(onClick = {
-                    val phoneNumber = util.parse(examplePhoneNumberToFormat, "US")
+                    val phoneNumber = util.parse(examplePhoneNumberToFormat, region)
                     examplePhoneNumberToFormat =
                         util.format(phoneNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL)
                     examplePhoneNumberFormatted = true
@@ -47,7 +56,7 @@ fun App(util: PhoneNumberUtil, platform: String) {
                     modifier = Modifier.fillMaxWidth(),
                     label = { Text("AsYouTypeFormatter Input") },
                     singleLine = true,
-                    visualTransformation = PhoneNumberVisualTransformation(util),
+                    visualTransformation = PhoneNumberVisualTransformation(util, region),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
                 )
             }

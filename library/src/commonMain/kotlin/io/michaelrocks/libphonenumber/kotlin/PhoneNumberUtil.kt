@@ -3154,7 +3154,12 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         // present.
         const val VALID_PUNCTUATION =
             ("-x\u2010-\u2015\u2212\u30FC\uFF0D-\uFF0F " + "\u00A0\u00AD\u200B\u2060\u3000()\uFF08\uFF09\uFF3B\uFF3D.\\[\\]/~\u2053\u223C\uFF5E")
-        private const val DIGITS = "\\p{Nd}"
+
+        // taken from js due to issues with the regex statement not working on web
+        // https://github.com/google/libphonenumber/blob/e3b0e10884bcb64b052508530bfaa72b53add3ff/javascript/i18n/phonenumbers/phonenumberutil.js#L547-L556
+        private const val DIGITS = "0-9\uFF10-\uFF19\u0660-\u0669\u06F0-\u06F9"
+        // the original regex statement from java
+        //private const val DIGITS = "\\p{Nd}"
 
         // We accept alpha characters in phone numbers, ASCII only, upper and lower case.
         private val VALID_ALPHA = (ALPHA_MAPPINGS!!.keys.toTypedArray().contentToString()
@@ -3217,7 +3222,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         //
         // Note VALID_PUNCTUATION starts with a -, so must be the first in the range.
         private val VALID_PHONE_NUMBER =
-            (DIGITS + "{" + MIN_LENGTH_FOR_NSN + "}" + "|" + "[" + PLUS_CHARS + "]*+(?:[" + VALID_PUNCTUATION + STAR_SIGN + "]*" + DIGITS + "){3,}[" + VALID_PUNCTUATION + STAR_SIGN + VALID_ALPHA + DIGITS + "]*")
+            "[$PLUS_CHARS]*(?:[$VALID_PUNCTUATION$STAR_SIGN]*[$DIGITS]){3,}[$VALID_PUNCTUATION$STAR_SIGN$VALID_ALPHA$DIGITS]*|[$DIGITS]{$MIN_LENGTH_FOR_NSN}"
 
         // Default extension prefix to use when formatting. This will be put in front of any extension
         // component of the number, after the main national number is formatted. For example, if you wish
@@ -3244,9 +3249,9 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         // Regular expression of valid domainname for the phone-context parameter, following the syntax
         // defined in RFC3966.
         private val ALPHANUM = VALID_ALPHA + DIGITS
-        private val RFC3966_DOMAINLABEL = "[" + ALPHANUM + "]+((\\-)*[" + ALPHANUM + "])*"
-        private val RFC3966_TOPLABEL = "[" + VALID_ALPHA + "]+((\\-)*[" + ALPHANUM + "])*"
-        private val RFC3966_DOMAINNAME = "^(" + RFC3966_DOMAINLABEL + "\\.)*" + RFC3966_TOPLABEL + "\\.?$"
+        private val RFC3966_DOMAINLABEL = "[$ALPHANUM]+((-)*[$ALPHANUM])*"
+        private val RFC3966_TOPLABEL = "[$VALID_ALPHA]+((-)*[$ALPHANUM])*"
+        private val RFC3966_DOMAINNAME = "^($RFC3966_DOMAINLABEL\\.)*$RFC3966_TOPLABEL\\.?$"
         val RFC3966_DOMAINNAME_PATTERN = Regex(RFC3966_DOMAINNAME)
 
         /**

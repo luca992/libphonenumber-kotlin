@@ -159,3 +159,4 @@ lint/tmp/
 
 # moko-resources-generated
 moko-resources-generated.js
+pack-library-resources-generated.js
