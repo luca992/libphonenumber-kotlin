@@ -280,3 +280,5 @@ tasks.withType<AbstractNativeMacApplicationPackageAppDirTask> {
             }
     }
 }
+
+apply(from = "$rootDir/gradle/pack-library-resources.gradle.kts")
