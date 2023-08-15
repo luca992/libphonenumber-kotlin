@@ -3200,7 +3200,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         // the previous block was an extension.
         // https://youtrack.jetbrains.com/issue/KT-58678/Native-Regex-inconsistency-with-JVM-Native-Regex
 //        private const val UNWANTED_END_CHARS = "[[\\P{N}&&\\P{L}]&&[^#]]+$"
-        private const val UNWANTED_END_CHARS = "^([^0-9a-zA-Z#]+)$"
+        private const val UNWANTED_END_CHARS = "[^$DIGITS#A-Za-z]+$"
 
         @JvmField
         val UNWANTED_END_CHAR_PATTERN = Regex(UNWANTED_END_CHARS)
