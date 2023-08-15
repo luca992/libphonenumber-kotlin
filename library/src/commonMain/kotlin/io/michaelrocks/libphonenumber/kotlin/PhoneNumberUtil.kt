@@ -3154,7 +3154,12 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         // present.
         const val VALID_PUNCTUATION =
             ("-x\u2010-\u2015\u2212\u30FC\uFF0D-\uFF0F " + "\u00A0\u00AD\u200B\u2060\u3000()\uFF08\uFF09\uFF3B\uFF3D.\\[\\]/~\u2053\u223C\uFF5E")
-        private const val DIGITS = "\\p{Nd}"
+
+        // taken from js due to issues with the regex statement not working on web
+        // https://github.com/google/libphonenumber/blob/e3b0e10884bcb64b052508530bfaa72b53add3ff/javascript/i18n/phonenumbers/phonenumberutil.js#L547-L556
+        private const val DIGITS = "0-9\uFF10-\uFF19\u0660-\u0669\u06F0-\u06F9"
+        // the original regex statement from java
+        //private const val DIGITS = "\\p{Nd}"
 
         // We accept alpha characters in phone numbers, ASCII only, upper and lower case.
         private val VALID_ALPHA = (ALPHA_MAPPINGS!!.keys.toTypedArray().contentToString()
