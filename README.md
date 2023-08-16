@@ -15,8 +15,9 @@ Check out the Compose Multiplatform [sample](sample)
 https://github.com/luca992/libphonenumber-kotlin/assets/4157455/e3fc61a3-e2bb-4993-a6c5-c04f713dcd54
 
 
-Note: the web sample is still a WIP, loading moko-resources assets is not working yet
+Note: While the sample apps run on all targets, this project is experimental and is a work in progress. Only the JVM target has all tests passing, native and js have failing tests that need to be addressed.
 
+Any help/PRs are appreciated!
 
 TODO: Update the rest of the readme.
 
