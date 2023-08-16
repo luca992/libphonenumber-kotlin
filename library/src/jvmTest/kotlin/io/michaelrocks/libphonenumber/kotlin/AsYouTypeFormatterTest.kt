@@ -16,9 +16,10 @@
  */
 package io.michaelrocks.libphonenumber.kotlin
 
-import io.michaelrocks.libphonenumber.kotlin.RegionCode
-import io.michaelrocks.libphonenumber.kotlin.TestMetadataTestCase
 import io.michaelrocks.libphonenumber.kotlin.metadata.init.ClassPathResourceMetadataLoader
+import io.michaelrocks.libphonenumber.kotlin.utils.RegionCode
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 /**
  * Unit tests for AsYouTypeFormatter.java
@@ -33,6 +34,7 @@ class AsYouTypeFormatterTest : TestMetadataTestCase() {
     override val metadataLoader: MetadataLoader
         get() = ClassPathResourceMetadataLoader()
 
+    @Test
     fun testInvalidRegion() {
         val formatter = phoneUtil.getAsYouTypeFormatter(RegionCode.ZZ)
         assertEquals("+", formatter.inputDigit('+'))
@@ -54,6 +56,7 @@ class AsYouTypeFormatterTest : TestMetadataTestCase() {
         assertEquals("650253", formatter.inputDigit('3'))
     }
 
+    @Test
     fun testInvalidPlusSign() {
         val formatter = phoneUtil.getAsYouTypeFormatter(RegionCode.ZZ)
         assertEquals("+", formatter.inputDigit('+'))
@@ -71,6 +74,7 @@ class AsYouTypeFormatterTest : TestMetadataTestCase() {
         assertEquals("+48881231+2", formatter.inputDigit('2'))
     }
 
+    @Test
     fun testTooLongNumberMatchingMultipleLeadingDigits() {
         // See https://github.com/google/libphonenumber/issues/36
         // The bug occurred last time for countries which have two formatting rules with exactly the
@@ -94,6 +98,7 @@ class AsYouTypeFormatterTest : TestMetadataTestCase() {
         assertEquals("+819012345678901", formatter.inputDigit('1'))
     }
 
+    @Test
     fun testCountryWithSpaceInNationalPrefixFormattingRule() {
         val formatter = phoneUtil.getAsYouTypeFormatter(RegionCode.BY)
         assertEquals("8", formatter.inputDigit('8'))
@@ -109,6 +114,7 @@ class AsYouTypeFormatterTest : TestMetadataTestCase() {
         assertEquals("88190123", formatter.inputDigit('3'))
     }
 
+    @Test
     fun testCountryWithSpaceInNationalPrefixFormattingRuleAndLongNdd() {
         val formatter = phoneUtil.getAsYouTypeFormatter(RegionCode.BY)
         assertEquals("9", formatter.inputDigit('9'))
@@ -123,6 +129,7 @@ class AsYouTypeFormatterTest : TestMetadataTestCase() {
         assertEquals("99999 12 345", formatter.inputDigit('5'))
     }
 
+    @Test
     fun testAYTFUS() {
         val formatter = phoneUtil.getAsYouTypeFormatter(RegionCode.US)
         assertEquals("6", formatter.inputDigit('6'))
@@ -212,6 +219,7 @@ class AsYouTypeFormatterTest : TestMetadataTestCase() {
         assertEquals("+48 88 123 12 12", formatter.inputDigit('2'))
     }
 
+    @Test
     fun testAYTFUSFullWidthCharacters() {
         val formatter = phoneUtil.getAsYouTypeFormatter(RegionCode.US)
         assertEquals("\uFF16", formatter.inputDigit('\uFF16'))
@@ -226,6 +234,7 @@ class AsYouTypeFormatterTest : TestMetadataTestCase() {
         assertEquals("650 253 2222", formatter.inputDigit('\uFF12'))
     }
 
+    @Test
     fun testAYTFUSMobileShortCode() {
         val formatter = phoneUtil.getAsYouTypeFormatter(RegionCode.US)
         assertEquals("*", formatter.inputDigit('*'))
@@ -235,6 +244,7 @@ class AsYouTypeFormatterTest : TestMetadataTestCase() {
         assertEquals("*121#", formatter.inputDigit('#'))
     }
 
+    @Test
     fun testAYTFUSVanityNumber() {
         val formatter = phoneUtil.getAsYouTypeFormatter(RegionCode.US)
         assertEquals("8", formatter.inputDigit('8'))
@@ -251,6 +261,7 @@ class AsYouTypeFormatterTest : TestMetadataTestCase() {
         assertEquals("800 MY APPLE", formatter.inputDigit('E'))
     }
 
+    @Test
     fun testAYTFAndRememberPositionUS() {
         val formatter = phoneUtil.getAsYouTypeFormatter(RegionCode.US)
         assertEquals("1", formatter.inputDigitAndRememberPosition('1'))
@@ -381,6 +392,7 @@ class AsYouTypeFormatterTest : TestMetadataTestCase() {
         assertEquals(3, formatter.rememberedPosition)
     }
 
+    @Test
     fun testAYTFGBFixedLine() {
         val formatter = phoneUtil.getAsYouTypeFormatter(RegionCode.GB)
         assertEquals("0", formatter.inputDigit('0'))
@@ -398,6 +410,7 @@ class AsYouTypeFormatterTest : TestMetadataTestCase() {
         assertEquals("020 7031 3000", formatter.inputDigit('0'))
     }
 
+    @Test
     fun testAYTFGBTollFree() {
         val formatter = phoneUtil.getAsYouTypeFormatter(RegionCode.GB)
         assertEquals("0", formatter.inputDigit('0'))
@@ -413,6 +426,7 @@ class AsYouTypeFormatterTest : TestMetadataTestCase() {
         assertEquals("080 7031 3000", formatter.inputDigit('0'))
     }
 
+    @Test
     fun testAYTFGBPremiumRate() {
         val formatter = phoneUtil.getAsYouTypeFormatter(RegionCode.GB)
         assertEquals("0", formatter.inputDigit('0'))
@@ -428,6 +442,7 @@ class AsYouTypeFormatterTest : TestMetadataTestCase() {
         assertEquals("090 7031 3000", formatter.inputDigit('0'))
     }
 
+    @Test
     fun testAYTFNZMobile() {
         val formatter = phoneUtil.getAsYouTypeFormatter(RegionCode.NZ)
         assertEquals("0", formatter.inputDigit('0'))
@@ -442,6 +457,7 @@ class AsYouTypeFormatterTest : TestMetadataTestCase() {
         assertEquals("02-112 3456", formatter.inputDigit('6'))
     }
 
+    @Test
     fun testAYTFDE() {
         val formatter = phoneUtil.getAsYouTypeFormatter(RegionCode.DE)
         assertEquals("0", formatter.inputDigit('0'))
@@ -493,6 +509,7 @@ class AsYouTypeFormatterTest : TestMetadataTestCase() {
         assertEquals("00 1 650 253 2222", formatter.inputDigit('2'))
     }
 
+    @Test
     fun testAYTFAR() {
         val formatter = phoneUtil.getAsYouTypeFormatter(RegionCode.AR)
         assertEquals("0", formatter.inputDigit('0'))
@@ -508,6 +525,7 @@ class AsYouTypeFormatterTest : TestMetadataTestCase() {
         assertEquals("011 7031-3000", formatter.inputDigit('0'))
     }
 
+    @Test
     fun testAYTFARMobile() {
         val formatter = phoneUtil.getAsYouTypeFormatter(RegionCode.AR)
         assertEquals("+", formatter.inputDigit('+'))
@@ -526,6 +544,7 @@ class AsYouTypeFormatterTest : TestMetadataTestCase() {
         assertEquals("+54 9 11 2312 1234", formatter.inputDigit('4'))
     }
 
+    @Test
     fun testAYTFKR() {
         // +82 51 234 5678
         val formatter = phoneUtil.getAsYouTypeFormatter(RegionCode.KR)
@@ -616,6 +635,7 @@ class AsYouTypeFormatterTest : TestMetadataTestCase() {
         assertEquals("011-9876-7890", formatter.inputDigit('0'))
     }
 
+    @Test
     fun testAYTF_MX() {
         val formatter = phoneUtil.getAsYouTypeFormatter(RegionCode.MX)
 
@@ -715,6 +735,7 @@ class AsYouTypeFormatterTest : TestMetadataTestCase() {
         assertEquals("+52 1 541 234 5678", formatter.inputDigit('8'))
     }
 
+    @Test
     fun testAYTF_International_Toll_Free() {
         val formatter = phoneUtil.getAsYouTypeFormatter(RegionCode.US)
         // +800 1234 5678
@@ -733,6 +754,7 @@ class AsYouTypeFormatterTest : TestMetadataTestCase() {
         assertEquals("+800123456789", formatter.inputDigit('9'))
     }
 
+    @Test
     fun testAYTFMultipleLeadingDigitPatterns() {
         // +81 50 2345 6789
         val formatter = phoneUtil.getAsYouTypeFormatter(RegionCode.JP)
@@ -790,6 +812,7 @@ class AsYouTypeFormatterTest : TestMetadataTestCase() {
         assertEquals("+81 3332 2 5678", formatter.inputDigit('8'))
     }
 
+    @Test
     fun testAYTFLongIDD_AU() {
         val formatter = phoneUtil.getAsYouTypeFormatter(RegionCode.AU)
         // 0011 1 650 253 2250
@@ -847,6 +870,7 @@ class AsYouTypeFormatterTest : TestMetadataTestCase() {
         assertEquals("0011 244 250 253 222", formatter.inputDigit('2'))
     }
 
+    @Test
     fun testAYTFLongIDD_KR() {
         val formatter = phoneUtil.getAsYouTypeFormatter(RegionCode.KR)
         // 00300 1 650 253 2222
@@ -868,6 +892,7 @@ class AsYouTypeFormatterTest : TestMetadataTestCase() {
         assertEquals("00300 1 650 253 2222", formatter.inputDigit('2'))
     }
 
+    @Test
     fun testAYTFLongNDD_KR() {
         val formatter = phoneUtil.getAsYouTypeFormatter(RegionCode.KR)
         // 08811-9876-7890
@@ -904,6 +929,7 @@ class AsYouTypeFormatterTest : TestMetadataTestCase() {
         assertEquals("08500 11-9876-7890", formatter.inputDigit('0'))
     }
 
+    @Test
     fun testAYTFLongNDD_SG() {
         val formatter = phoneUtil.getAsYouTypeFormatter(RegionCode.SG)
         // 777777 9876 7890
@@ -923,6 +949,7 @@ class AsYouTypeFormatterTest : TestMetadataTestCase() {
         assertEquals("777777 9876 7890", formatter.inputDigit('0'))
     }
 
+    @Test
     fun testAYTFShortNumberFormattingFix_AU() {
         // For Australia, the national prefix is not optional when formatting.
         val formatter = phoneUtil.getAsYouTypeFormatter(RegionCode.AU)
@@ -997,6 +1024,7 @@ class AsYouTypeFormatterTest : TestMetadataTestCase() {
         assertEquals("+61 2 1234 5678", formatter.inputDigit('8'))
     }
 
+    @Test
     fun testAYTFShortNumberFormattingFix_KR() {
         // For Korea, the national prefix is not optional when formatting, and the national prefix
         // formatting rule doesn't consist of only the first group.
@@ -1040,6 +1068,7 @@ class AsYouTypeFormatterTest : TestMetadataTestCase() {
         assertEquals("+82 131-2-1234", formatter.inputDigit('4'))
     }
 
+    @Test
     fun testAYTFShortNumberFormattingFix_MX() {
         // For Mexico, the national prefix is optional when formatting.
         val formatter = phoneUtil.getAsYouTypeFormatter(RegionCode.MX)
@@ -1080,6 +1109,7 @@ class AsYouTypeFormatterTest : TestMetadataTestCase() {
         assertEquals("+52 800 123 4567", formatter.inputDigit('7'))
     }
 
+    @Test
     fun testAYTFNoNationalPrefix() {
         val formatter = phoneUtil.getAsYouTypeFormatter(RegionCode.IT)
         assertEquals("3", formatter.inputDigit('3'))
@@ -1090,6 +1120,7 @@ class AsYouTypeFormatterTest : TestMetadataTestCase() {
         assertEquals("333 333", formatter.inputDigit('3'))
     }
 
+    @Test
     fun testAYTFNoNationalPrefixFormattingRule() {
         val formatter = phoneUtil.getAsYouTypeFormatter(RegionCode.AO)
         assertEquals("3", formatter.inputDigit('3'))
@@ -1100,6 +1131,7 @@ class AsYouTypeFormatterTest : TestMetadataTestCase() {
         assertEquals("333 333", formatter.inputDigit('3'))
     }
 
+    @Test
     fun testAYTFShortNumberFormattingFix_US() {
         // For the US, an initial 1 is treated specially.
         val formatter = phoneUtil.getAsYouTypeFormatter(RegionCode.US)
@@ -1122,6 +1154,7 @@ class AsYouTypeFormatterTest : TestMetadataTestCase() {
         assertEquals("1 22", formatter.inputDigit('2'))
     }
 
+    @Test
     fun testAYTFClearNDDAfterIDDExtraction() {
         val formatter = phoneUtil.getAsYouTypeFormatter(RegionCode.KR)
 
@@ -1156,6 +1189,7 @@ class AsYouTypeFormatterTest : TestMetadataTestCase() {
         assertEquals("0070012345678901234567", formatter.inputDigit('7'))
     }
 
+    @Test
     fun testAYTFNumberPatternsBecomingInvalidShouldNotResultInDigitLoss() {
         val formatter = phoneUtil.getAsYouTypeFormatter(RegionCode.CN)
         assertEquals("+", formatter.inputDigit('+'))

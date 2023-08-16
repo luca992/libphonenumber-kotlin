@@ -14,36 +14,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.michaelrocks.libphonenumber.kotlin.metadata.source
+package io.michaelrocks.libphonenumber.kotlin.source
 
 import io.michaelrocks.libphonenumber.kotlin.Phonemetadata.PhoneMetadata.Companion.newBuilder
 import io.michaelrocks.libphonenumber.kotlin.metadata.source.MapBackedMetadataContainer.Companion.byCountryCallingCode
 import io.michaelrocks.libphonenumber.kotlin.metadata.source.MapBackedMetadataContainer.Companion.byRegionCode
-import junit.framework.TestCase
+import kotlin.test.Test
+import kotlin.test.assertNull
+import kotlin.test.assertSame
 
-class MapBackedMetadataContainerTest : TestCase() {
+class MapBackedMetadataContainerTest {
+    @Test
     fun test_getMetadataBy_shouldReturnNullForNullRegionCode() {
         assertNull(byRegionCode().getMetadataBy(null))
     }
 
+    @Test
     fun test_getMetadataBy_shouldReturnNullForNonExistingRegionCode() {
         assertNull(byRegionCode().getMetadataBy(REGION_CODE))
     }
 
+    @Test
     fun test_getMetadataBy_shouldReturnMetadataForExistingRegionCode() {
         val metadataContainer = byRegionCode()
         metadataContainer.accept(PHONE_METADATA)
         assertSame(PHONE_METADATA, metadataContainer.getMetadataBy(REGION_CODE))
     }
 
+    @Test
     fun test_getMetadataBy_shouldReturnNullForNullCountryCode() {
         assertNull(byCountryCallingCode().getMetadataBy(null))
     }
 
+    @Test
     fun test_getMetadataBy_shouldReturnNullForNonExistingCountryCode() {
         assertNull(byCountryCallingCode().getMetadataBy(COUNTRY_CODE))
     }
 
+    @Test
     fun test_getMetadataBy_shouldReturnMetadataForExistingCountryCode() {
         val metadataContainer = byCountryCallingCode()
         metadataContainer.accept(PHONE_METADATA)

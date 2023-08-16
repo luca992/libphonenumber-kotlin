@@ -29,8 +29,10 @@ import io.michaelrocks.libphonenumber.kotlin.metadata.DefaultMetadataDependencie
 import io.michaelrocks.libphonenumber.kotlin.metadata.init.ClassPathResourceMetadataLoader
 import io.michaelrocks.libphonenumber.kotlin.metadata.source.MetadataSource
 import io.michaelrocks.libphonenumber.kotlin.util.InplaceStringBuilder
+import io.michaelrocks.libphonenumber.kotlin.utils.RegionCode
 import org.junit.Assert
 import org.mockito.Mockito
+import kotlin.test.*
 
 /**
  * Unit tests for PhoneNumberUtil.java
@@ -49,15 +51,15 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         MetadataSource::class.java
     )
     private val phoneNumberUtilWithMissingMetadata = PhoneNumberUtil(
-        mockedMetadataSource,
-        DefaultMetadataDependenciesProvider(metadataLoader),
-        countryCodeToRegionCodeMap
+        mockedMetadataSource, DefaultMetadataDependenciesProvider(metadataLoader), countryCodeToRegionCodeMap
     )
 
+    @Test
     fun testGetSupportedRegions() {
         assertTrue(phoneUtil.getSupportedRegions().size > 0)
     }
 
+    @Test
     fun testGetSupportedGlobalNetworkCallingCodes() {
         val globalNetworkCallingCodes = phoneUtil.supportedGlobalNetworkCallingCodes
         assertTrue(globalNetworkCallingCodes.size > 0)
@@ -67,6 +69,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         }
     }
 
+    @Test
     fun testGetSupportedCallingCodes() {
         val callingCodes = phoneUtil.supportedCallingCodes
         assertTrue(callingCodes.size > 0)
@@ -80,45 +83,42 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertTrue(callingCodes.contains(979))
     }
 
+    @Test
     fun testGetInstanceLoadBadMetadata() {
         assertNull(phoneUtil.getMetadataForRegion("No Such Region"))
         assertNull(phoneUtil.getMetadataForNonGeographicalRegion(-1))
     }
 
+    @Test
     fun testGetSupportedTypesForRegion() {
         assertTrue(
-            phoneUtil.getSupportedTypesForRegion(RegionCode.BR)
-                .contains(PhoneNumberType.FIXED_LINE)
+            phoneUtil.getSupportedTypesForRegion(RegionCode.BR).contains(PhoneNumberType.FIXED_LINE)
         )
         // Our test data has no mobile numbers for Brazil.
         assertFalse(
-            phoneUtil.getSupportedTypesForRegion(RegionCode.BR)
-                .contains(PhoneNumberType.MOBILE)
+            phoneUtil.getSupportedTypesForRegion(RegionCode.BR).contains(PhoneNumberType.MOBILE)
         )
         // UNKNOWN should never be returned.
         assertFalse(
-            phoneUtil.getSupportedTypesForRegion(RegionCode.BR)
-                .contains(PhoneNumberType.UNKNOWN)
+            phoneUtil.getSupportedTypesForRegion(RegionCode.BR).contains(PhoneNumberType.UNKNOWN)
         )
         // In the US, many numbers are classified as FIXED_LINE_OR_MOBILE; but we don't want to expose
         // this as a supported type, instead we say FIXED_LINE and MOBILE are both present.
         assertTrue(
-            phoneUtil.getSupportedTypesForRegion(RegionCode.US)
-                .contains(PhoneNumberType.FIXED_LINE)
+            phoneUtil.getSupportedTypesForRegion(RegionCode.US).contains(PhoneNumberType.FIXED_LINE)
         )
         assertTrue(
-            phoneUtil.getSupportedTypesForRegion(RegionCode.US)
-                .contains(PhoneNumberType.MOBILE)
+            phoneUtil.getSupportedTypesForRegion(RegionCode.US).contains(PhoneNumberType.MOBILE)
         )
         assertFalse(
-            phoneUtil.getSupportedTypesForRegion(RegionCode.US)
-                .contains(PhoneNumberType.FIXED_LINE_OR_MOBILE)
+            phoneUtil.getSupportedTypesForRegion(RegionCode.US).contains(PhoneNumberType.FIXED_LINE_OR_MOBILE)
         )
 
         // Test the invalid region code.
         assertEquals(0, phoneUtil.getSupportedTypesForRegion(RegionCode.ZZ).size)
     }
 
+    @Test
     fun testGetSupportedTypesForNonGeoEntity() {
         // No data exists for 999 at all, no types should be returned.
         assertEquals(0, phoneUtil.getSupportedTypesForNonGeoEntity(999).size)
@@ -128,6 +128,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertFalse(typesFor979.contains(PhoneNumberType.UNKNOWN))
     }
 
+    @Test
     fun testGetInstanceLoadUSMetadata() {
         val metadata = phoneUtil.getMetadataForRegion(RegionCode.US)
         assertEquals("US", metadata!!.id)
@@ -136,17 +137,14 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertTrue(metadata.hasNationalPrefix())
         assertEquals(2, metadata.numberFormatCount)
         assertEquals(
-            "(\\d{3})(\\d{3})(\\d{4})",
-            metadata.getNumberFormat(1).pattern
+            "(\\d{3})(\\d{3})(\\d{4})", metadata.getNumberFormat(1).pattern
         )
         assertEquals("$1 $2 $3", metadata.getNumberFormat(1).format)
         assertEquals(
-            "[13-689]\\d{9}|2[0-35-9]\\d{8}",
-            metadata.generalDesc!!.nationalNumberPattern
+            "[13-689]\\d{9}|2[0-35-9]\\d{8}", metadata.generalDesc!!.nationalNumberPattern
         )
         assertEquals(
-            "[13-689]\\d{9}|2[0-35-9]\\d{8}",
-            metadata.fixedLine!!.nationalNumberPattern
+            "[13-689]\\d{9}|2[0-35-9]\\d{8}", metadata.fixedLine!!.nationalNumberPattern
         )
         assertEquals(1, metadata.generalDesc!!.possibleLengthCount)
         assertEquals(10, metadata.generalDesc!!.getPossibleLength(0))
@@ -158,6 +156,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertFalse(metadata.sharedCost!!.hasNationalNumberPattern())
     }
 
+    @Test
     fun testGetInstanceLoadDEMetadata() {
         val metadata = phoneUtil.getMetadataForRegion(RegionCode.DE)
         assertEquals("DE", metadata!!.id)
@@ -168,8 +167,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertEquals(1, metadata.getNumberFormat(5).leadingDigitsPatternCount)
         assertEquals("900", metadata.getNumberFormat(5).getLeadingDigitsPattern(0))
         assertEquals(
-            "(\\d{3})(\\d{3,4})(\\d{4})",
-            metadata.getNumberFormat(5).pattern
+            "(\\d{3})(\\d{3,4})(\\d{4})", metadata.getNumberFormat(5).pattern
         )
         assertEquals("$1 $2 $3", metadata.getNumberFormat(5).format)
         assertEquals(2, metadata.generalDesc!!.possibleLengthLocalOnlyCount)
@@ -179,14 +177,14 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertEquals(0, metadata.fixedLine!!.possibleLengthCount)
         assertEquals(2, metadata.mobile!!.possibleLengthCount)
         assertEquals(
-            "(?:[24-6]\\d{2}|3[03-9]\\d|[789](?:0[2-9]|[1-9]\\d))\\d{1,8}",
-            metadata.fixedLine!!.nationalNumberPattern
+            "(?:[24-6]\\d{2}|3[03-9]\\d|[789](?:0[2-9]|[1-9]\\d))\\d{1,8}", metadata.fixedLine!!.nationalNumberPattern
         )
         assertEquals("30123456", metadata.fixedLine!!.exampleNumber)
         assertEquals(10, metadata.tollFree!!.getPossibleLength(0))
         assertEquals("900([135]\\d{6}|9\\d{7})", metadata.premiumRate!!.nationalNumberPattern)
     }
 
+    @Test
     fun testGetInstanceLoadARMetadata() {
         val metadata = phoneUtil.getMetadataForRegion(RegionCode.AR)
         assertEquals("AR", metadata!!.id)
@@ -197,16 +195,15 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertEquals("9$1", metadata.nationalPrefixTransformRule)
         assertEquals("$2 15 $3-$4", metadata.getNumberFormat(2).format)
         assertEquals(
-            "(\\d)(\\d{4})(\\d{2})(\\d{4})",
-            metadata.getNumberFormat(3).pattern
+            "(\\d)(\\d{4})(\\d{2})(\\d{4})", metadata.getNumberFormat(3).pattern
         )
         assertEquals(
-            "(\\d)(\\d{4})(\\d{2})(\\d{4})",
-            metadata.getIntlNumberFormat(3).pattern
+            "(\\d)(\\d{4})(\\d{2})(\\d{4})", metadata.getIntlNumberFormat(3).pattern
         )
         assertEquals("$1 $2 $3 $4", metadata.getIntlNumberFormat(3).format)
     }
 
+    @Test
     fun testGetInstanceLoadInternationalTollFreeMetadata() {
         val metadata = phoneUtil.getMetadataForNonGeographicalRegion(800)
         assertEquals("001", metadata!!.id)
@@ -218,6 +215,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertEquals("12345678", metadata.tollFree!!.exampleNumber)
     }
 
+    @Test
     fun testIsNumberGeographical() {
         assertFalse(phoneUtil.isNumberGeographical(BS_MOBILE)) // Bahamas, mobile phone number.
         assertTrue(phoneUtil.isNumberGeographical(AU_NUMBER)) // Australian fixed line number.
@@ -229,6 +227,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertTrue(phoneUtil.isNumberGeographical(MX_MOBILE2)) // Mexico, another mobile phone number.
     }
 
+    @Test
     fun testGetLengthOfGeographicalAreaCode() {
         // Google MTV, which has area code "650".
         assertEquals(3, phoneUtil.getLengthOfGeographicalAreaCode(US_NUMBER))
@@ -269,6 +268,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertEquals(0, phoneUtil.getLengthOfGeographicalAreaCode(cnMobile))
     }
 
+    @Test
     fun testGetLengthOfNationalDestinationCode() {
         // Google MTV, which has national destination code (NDC) "650".
         assertEquals(3, phoneUtil.getLengthOfNationalDestinationCode(US_NUMBER))
@@ -310,6 +310,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertEquals(3, phoneUtil.getLengthOfNationalDestinationCode(cnMobile))
     }
 
+    @Test
     fun testGetCountryMobileToken() {
         assertEquals(
             "9", getCountryMobileToken(
@@ -329,6 +330,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         )
     }
 
+    @Test
     fun testGetNationalSignificantNumber() {
         assertEquals("6502530000", phoneUtil.getNationalSignificantNumber(US_NUMBER))
 
@@ -340,6 +342,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertEquals("12345678", phoneUtil.getNationalSignificantNumber(INTERNATIONAL_TOLL_FREE))
     }
 
+    @Test
     fun testGetNationalSignificantNumber_ManyLeadingZeros() {
         val number = PhoneNumber()
         number.setCountryCode(1)
@@ -353,6 +356,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertEquals("650", phoneUtil.getNationalSignificantNumber(number))
     }
 
+    @Test
     fun testGetExampleNumber() {
         assertEquals(DE_NUMBER, phoneUtil.getExampleNumber(RegionCode.DE))
         assertEquals(
@@ -360,8 +364,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         )
         // Should return the same response if asked for FIXED_LINE_OR_MOBILE too.
         assertEquals(
-            DE_NUMBER,
-            phoneUtil.getExampleNumberForType(RegionCode.DE, PhoneNumberType.FIXED_LINE_OR_MOBILE)
+            DE_NUMBER, phoneUtil.getExampleNumberForType(RegionCode.DE, PhoneNumberType.FIXED_LINE_OR_MOBILE)
         )
         assertNotNull(phoneUtil.getExampleNumberForType(RegionCode.US, PhoneNumberType.FIXED_LINE))
         assertNotNull(phoneUtil.getExampleNumberForType(RegionCode.US, PhoneNumberType.MOBILE))
@@ -375,6 +378,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertNull(phoneUtil.getExampleNumber(RegionCode.UN001))
     }
 
+    @Test
     fun testGetInvalidExampleNumber() {
         // RegionCode 001 is reserved for supporting non-geographical country calling codes. We don't
         // support getting an invalid example number for it with getInvalidExampleNumber.
@@ -385,11 +389,13 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertFalse(usInvalidNumber.nationalNumber == 0L)
     }
 
+    @Test
     fun testGetExampleNumberForNonGeoEntity() {
         assertEquals(INTERNATIONAL_TOLL_FREE, phoneUtil.getExampleNumberForNonGeoEntity(800))
         assertEquals(UNIVERSAL_PREMIUM_RATE, phoneUtil.getExampleNumberForNonGeoEntity(979))
     }
 
+    @Test
     fun testGetExampleNumberWithoutRegion() {
         // In our test metadata we don't cover all types: in our real metadata, we do.
         assertNotNull(phoneUtil.getExampleNumberForType(PhoneNumberType.FIXED_LINE))
@@ -397,6 +403,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertNotNull(phoneUtil.getExampleNumberForType(PhoneNumberType.PREMIUM_RATE))
     }
 
+    @Test
     fun testConvertAlphaCharactersInNumber() {
         val input = "1800-ABC-DEF"
         // Alpha chars are converted to digits; everything else is left untouched.
@@ -404,60 +411,68 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertEquals(expectedOutput, PhoneNumberUtil.convertAlphaCharactersInNumber(input))
     }
 
+    @Test
     fun testNormaliseRemovePunctuation() {
         val inputNumber = InplaceStringBuilder("034-56&+#2\u00AD34")
         val expectedOutput = "03456234"
         assertEquals(
+            expectedOutput,
+            PhoneNumberUtil.normalize(inputNumber).toString(),
             "Conversion did not correctly remove punctuation",
-            expectedOutput, PhoneNumberUtil.normalize(inputNumber).toString()
         )
     }
 
+    @Test
     fun testNormaliseReplaceAlphaCharacters() {
         val inputNumber = InplaceStringBuilder("034-I-am-HUNGRY")
         val expectedOutput = "034426486479"
         assertEquals(
+            expectedOutput,
+            PhoneNumberUtil.normalize(inputNumber).toString(),
             "Conversion did not correctly replace alpha characters",
-            expectedOutput, PhoneNumberUtil.normalize(inputNumber).toString()
         )
     }
 
+    @Test
     fun testNormaliseOtherDigits() {
         var inputNumber = InplaceStringBuilder("\uFF125\u0665")
         var expectedOutput = "255"
         assertEquals(
+            expectedOutput,
+            PhoneNumberUtil.normalize(inputNumber).toString(),
             "Conversion did not correctly replace non-latin digits",
-            expectedOutput, PhoneNumberUtil.normalize(inputNumber).toString()
         )
         // Eastern-Arabic digits.
         inputNumber = InplaceStringBuilder("\u06F52\u06F0")
         expectedOutput = "520"
         assertEquals(
+            expectedOutput,
+            PhoneNumberUtil.normalize(inputNumber).toString(),
             "Conversion did not correctly replace non-latin digits",
-            expectedOutput, PhoneNumberUtil.normalize(inputNumber).toString()
         )
     }
 
+    @Test
     fun testNormaliseStripAlphaCharacters() {
         val inputNumber = "034-56&+a#234"
         val expectedOutput = "03456234"
         assertEquals(
-            "Conversion did not correctly remove alpha character",
-            expectedOutput,
-            normalizeDigitsOnly(inputNumber)
+            expectedOutput, normalizeDigitsOnly(inputNumber), "Conversion did not correctly remove alpha character",
         )
     }
 
+    @Test
     fun testNormaliseStripNonDiallableCharacters() {
         val inputNumber = "03*4-56&+1a#234"
         val expectedOutput = "03*456+1#234"
         assertEquals(
-            "Conversion did not correctly remove non-diallable characters",
             expectedOutput,
-            normalizeDiallableCharsOnly(inputNumber)
+            normalizeDiallableCharsOnly(inputNumber),
+            "Conversion did not correctly remove non-diallable characters",
         )
     }
 
+    @Test
     fun testFormatUSNumber() {
         assertEquals("650 253 0000", phoneUtil.format(US_NUMBER, PhoneNumberFormat.NATIONAL))
         assertEquals("+1 650 253 0000", phoneUtil.format(US_NUMBER, PhoneNumberFormat.INTERNATIONAL))
@@ -469,17 +484,18 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         // Numbers with all zeros in the national number part will be formatted by using the raw_input
         // if that is available no matter which format is specified.
         assertEquals(
-            "000-000-0000",
-            phoneUtil.format(US_SPOOF_WITH_RAW_INPUT, PhoneNumberFormat.NATIONAL)
+            "000-000-0000", phoneUtil.format(US_SPOOF_WITH_RAW_INPUT, PhoneNumberFormat.NATIONAL)
         )
         assertEquals("0", phoneUtil.format(US_SPOOF, PhoneNumberFormat.NATIONAL))
     }
 
+    @Test
     fun testFormatBSNumber() {
         assertEquals("242 365 1234", phoneUtil.format(BS_NUMBER, PhoneNumberFormat.NATIONAL))
         assertEquals("+1 242 365 1234", phoneUtil.format(BS_NUMBER, PhoneNumberFormat.INTERNATIONAL))
     }
 
+    @Test
     fun testFormatGBNumber() {
         assertEquals("(020) 7031 3000", phoneUtil.format(GB_NUMBER, PhoneNumberFormat.NATIONAL))
         assertEquals("+44 20 7031 3000", phoneUtil.format(GB_NUMBER, PhoneNumberFormat.INTERNATIONAL))
@@ -487,6 +503,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertEquals("+44 7912 345 678", phoneUtil.format(GB_MOBILE, PhoneNumberFormat.INTERNATIONAL))
     }
 
+    @Test
     fun testFormatDENumber() {
         val deNumber = PhoneNumber()
         deNumber.setCountryCode(49).setNationalNumber(301234L)
@@ -519,6 +536,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertEquals("04134 1234", phoneUtil.format(deNumber, PhoneNumberFormat.NATIONAL))
     }
 
+    @Test
     fun testFormatITNumber() {
         assertEquals("02 3661 8300", phoneUtil.format(IT_NUMBER, PhoneNumberFormat.NATIONAL))
         assertEquals("+39 02 3661 8300", phoneUtil.format(IT_NUMBER, PhoneNumberFormat.INTERNATIONAL))
@@ -528,6 +546,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertEquals("+39345678901", phoneUtil.format(IT_MOBILE, PhoneNumberFormat.E164))
     }
 
+    @Test
     fun testFormatAUNumber() {
         assertEquals("02 3661 8300", phoneUtil.format(AU_NUMBER, PhoneNumberFormat.NATIONAL))
         assertEquals("+61 2 3661 8300", phoneUtil.format(AU_NUMBER, PhoneNumberFormat.INTERNATIONAL))
@@ -538,6 +557,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertEquals("+611800123456", phoneUtil.format(auNumber, PhoneNumberFormat.E164))
     }
 
+    @Test
     fun testFormatARNumber() {
         assertEquals("011 8765-4321", phoneUtil.format(AR_NUMBER, PhoneNumberFormat.NATIONAL))
         assertEquals("+54 11 8765-4321", phoneUtil.format(AR_NUMBER, PhoneNumberFormat.INTERNATIONAL))
@@ -545,13 +565,13 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertEquals("011 15 8765-4321", phoneUtil.format(AR_MOBILE, PhoneNumberFormat.NATIONAL))
         assertEquals(
             "+54 9 11 8765 4321", phoneUtil.format(
-                AR_MOBILE,
-                PhoneNumberFormat.INTERNATIONAL
+                AR_MOBILE, PhoneNumberFormat.INTERNATIONAL
             )
         )
         assertEquals("+5491187654321", phoneUtil.format(AR_MOBILE, PhoneNumberFormat.E164))
     }
 
+    @Test
     fun testFormatMXNumber() {
         assertEquals("045 234 567 8900", phoneUtil.format(MX_MOBILE1, PhoneNumberFormat.NATIONAL))
         assertEquals(
@@ -575,54 +595,44 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertEquals("+528211234567", phoneUtil.format(MX_NUMBER2, PhoneNumberFormat.E164))
     }
 
+    @Test
     fun testFormatOutOfCountryCallingNumber() {
         assertEquals(
-            "00 1 900 253 0000",
-            phoneUtil.formatOutOfCountryCallingNumber(US_PREMIUM, RegionCode.DE)
+            "00 1 900 253 0000", phoneUtil.formatOutOfCountryCallingNumber(US_PREMIUM, RegionCode.DE)
         )
         assertEquals(
-            "1 650 253 0000",
-            phoneUtil.formatOutOfCountryCallingNumber(US_NUMBER, RegionCode.BS)
+            "1 650 253 0000", phoneUtil.formatOutOfCountryCallingNumber(US_NUMBER, RegionCode.BS)
         )
         assertEquals(
-            "00 1 650 253 0000",
-            phoneUtil.formatOutOfCountryCallingNumber(US_NUMBER, RegionCode.PL)
+            "00 1 650 253 0000", phoneUtil.formatOutOfCountryCallingNumber(US_NUMBER, RegionCode.PL)
         )
         assertEquals(
-            "011 44 7912 345 678",
-            phoneUtil.formatOutOfCountryCallingNumber(GB_MOBILE, RegionCode.US)
+            "011 44 7912 345 678", phoneUtil.formatOutOfCountryCallingNumber(GB_MOBILE, RegionCode.US)
         )
         assertEquals(
-            "00 49 1234",
-            phoneUtil.formatOutOfCountryCallingNumber(DE_SHORT_NUMBER, RegionCode.GB)
+            "00 49 1234", phoneUtil.formatOutOfCountryCallingNumber(DE_SHORT_NUMBER, RegionCode.GB)
         )
         // Note this number is correctly formatted without national prefix. Most of the numbers that
         // are treated as invalid numbers by the library are short numbers, and they are usually not
         // dialed with national prefix.
         assertEquals("1234", phoneUtil.formatOutOfCountryCallingNumber(DE_SHORT_NUMBER, RegionCode.DE))
         assertEquals(
-            "011 39 02 3661 8300",
-            phoneUtil.formatOutOfCountryCallingNumber(IT_NUMBER, RegionCode.US)
+            "011 39 02 3661 8300", phoneUtil.formatOutOfCountryCallingNumber(IT_NUMBER, RegionCode.US)
         )
         assertEquals(
-            "02 3661 8300",
-            phoneUtil.formatOutOfCountryCallingNumber(IT_NUMBER, RegionCode.IT)
+            "02 3661 8300", phoneUtil.formatOutOfCountryCallingNumber(IT_NUMBER, RegionCode.IT)
         )
         assertEquals(
-            "+39 02 3661 8300",
-            phoneUtil.formatOutOfCountryCallingNumber(IT_NUMBER, RegionCode.SG)
+            "+39 02 3661 8300", phoneUtil.formatOutOfCountryCallingNumber(IT_NUMBER, RegionCode.SG)
         )
         assertEquals(
-            "6521 8000",
-            phoneUtil.formatOutOfCountryCallingNumber(SG_NUMBER, RegionCode.SG)
+            "6521 8000", phoneUtil.formatOutOfCountryCallingNumber(SG_NUMBER, RegionCode.SG)
         )
         assertEquals(
-            "011 54 9 11 8765 4321",
-            phoneUtil.formatOutOfCountryCallingNumber(AR_MOBILE, RegionCode.US)
+            "011 54 9 11 8765 4321", phoneUtil.formatOutOfCountryCallingNumber(AR_MOBILE, RegionCode.US)
         )
         assertEquals(
-            "011 800 1234 5678",
-            phoneUtil.formatOutOfCountryCallingNumber(INTERNATIONAL_TOLL_FREE, RegionCode.US)
+            "011 800 1234 5678", phoneUtil.formatOutOfCountryCallingNumber(INTERNATIONAL_TOLL_FREE, RegionCode.US)
         )
         val arNumberWithExtn = PhoneNumber().mergeFrom(AR_MOBILE).setExtension("1234")
         assertEquals(
@@ -634,148 +644,128 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
             phoneUtil.formatOutOfCountryCallingNumber(arNumberWithExtn, RegionCode.AU)
         )
         assertEquals(
-            "011 15 8765-4321 ext. 1234",
-            phoneUtil.formatOutOfCountryCallingNumber(arNumberWithExtn, RegionCode.AR)
+            "011 15 8765-4321 ext. 1234", phoneUtil.formatOutOfCountryCallingNumber(arNumberWithExtn, RegionCode.AR)
         )
     }
 
+    @Test
     fun testFormatOutOfCountryWithInvalidRegion() {
         // AQ/Antarctica isn't a valid region code for phone number formatting,
         // so this falls back to intl formatting.
         assertEquals(
-            "+1 650 253 0000",
-            phoneUtil.formatOutOfCountryCallingNumber(US_NUMBER, RegionCode.AQ)
+            "+1 650 253 0000", phoneUtil.formatOutOfCountryCallingNumber(US_NUMBER, RegionCode.AQ)
         )
         // For region code 001, the out-of-country format always turns into the international format.
         assertEquals(
-            "+1 650 253 0000",
-            phoneUtil.formatOutOfCountryCallingNumber(US_NUMBER, RegionCode.UN001)
+            "+1 650 253 0000", phoneUtil.formatOutOfCountryCallingNumber(US_NUMBER, RegionCode.UN001)
         )
     }
 
+    @Test
     fun testFormatOutOfCountryWithPreferredIntlPrefix() {
         // This should use 0011, since that is the preferred international prefix (both 0011 and 0012
         // are accepted as possible international prefixes in our test metadta.)
         assertEquals(
-            "0011 39 02 3661 8300",
-            phoneUtil.formatOutOfCountryCallingNumber(IT_NUMBER, RegionCode.AU)
+            "0011 39 02 3661 8300", phoneUtil.formatOutOfCountryCallingNumber(IT_NUMBER, RegionCode.AU)
         )
 
         // Testing preferred international prefixes with ~ are supported (designates waiting).
         assertEquals(
-            "8~10 39 02 3661 8300",
-            phoneUtil.formatOutOfCountryCallingNumber(IT_NUMBER, RegionCode.UZ)
+            "8~10 39 02 3661 8300", phoneUtil.formatOutOfCountryCallingNumber(IT_NUMBER, RegionCode.UZ)
         )
     }
 
+    @Test
     fun testFormatOutOfCountryKeepingAlphaChars() {
         val alphaNumericNumber = PhoneNumber()
-        alphaNumericNumber.setCountryCode(1).setNationalNumber(8007493524L)
-            .setRawInput("1800 six-flag")
+        alphaNumericNumber.setCountryCode(1).setNationalNumber(8007493524L).setRawInput("1800 six-flag")
         assertEquals(
-            "0011 1 800 SIX-FLAG",
-            phoneUtil.formatOutOfCountryKeepingAlphaChars(alphaNumericNumber, RegionCode.AU)
+            "0011 1 800 SIX-FLAG", phoneUtil.formatOutOfCountryKeepingAlphaChars(alphaNumericNumber, RegionCode.AU)
         )
         alphaNumericNumber.setRawInput("1-800-SIX-flag")
         assertEquals(
-            "0011 1 800-SIX-FLAG",
-            phoneUtil.formatOutOfCountryKeepingAlphaChars(alphaNumericNumber, RegionCode.AU)
+            "0011 1 800-SIX-FLAG", phoneUtil.formatOutOfCountryKeepingAlphaChars(alphaNumericNumber, RegionCode.AU)
         )
         alphaNumericNumber.setRawInput("Call us from UK: 00 1 800 SIX-flag")
         assertEquals(
-            "0011 1 800 SIX-FLAG",
-            phoneUtil.formatOutOfCountryKeepingAlphaChars(alphaNumericNumber, RegionCode.AU)
+            "0011 1 800 SIX-FLAG", phoneUtil.formatOutOfCountryKeepingAlphaChars(alphaNumericNumber, RegionCode.AU)
         )
         alphaNumericNumber.setRawInput("800 SIX-flag")
         assertEquals(
-            "0011 1 800 SIX-FLAG",
-            phoneUtil.formatOutOfCountryKeepingAlphaChars(alphaNumericNumber, RegionCode.AU)
+            "0011 1 800 SIX-FLAG", phoneUtil.formatOutOfCountryKeepingAlphaChars(alphaNumericNumber, RegionCode.AU)
         )
 
         // Formatting from within the NANPA region.
         assertEquals(
-            "1 800 SIX-FLAG",
-            phoneUtil.formatOutOfCountryKeepingAlphaChars(alphaNumericNumber, RegionCode.US)
+            "1 800 SIX-FLAG", phoneUtil.formatOutOfCountryKeepingAlphaChars(alphaNumericNumber, RegionCode.US)
         )
         assertEquals(
-            "1 800 SIX-FLAG",
-            phoneUtil.formatOutOfCountryKeepingAlphaChars(alphaNumericNumber, RegionCode.BS)
+            "1 800 SIX-FLAG", phoneUtil.formatOutOfCountryKeepingAlphaChars(alphaNumericNumber, RegionCode.BS)
         )
 
         // Testing that if the raw input doesn't exist, it is formatted using
         // formatOutOfCountryCallingNumber.
         alphaNumericNumber.clearRawInput()
         assertEquals(
-            "00 1 800 749 3524",
-            phoneUtil.formatOutOfCountryKeepingAlphaChars(alphaNumericNumber, RegionCode.DE)
+            "00 1 800 749 3524", phoneUtil.formatOutOfCountryKeepingAlphaChars(alphaNumericNumber, RegionCode.DE)
         )
 
         // Testing AU alpha number formatted from Australia.
-        alphaNumericNumber.setCountryCode(61).setNationalNumber(827493524L)
-            .setRawInput("+61 82749-FLAG")
+        alphaNumericNumber.setCountryCode(61).setNationalNumber(827493524L).setRawInput("+61 82749-FLAG")
         // This number should have the national prefix fixed.
         assertEquals(
-            "082749-FLAG",
-            phoneUtil.formatOutOfCountryKeepingAlphaChars(alphaNumericNumber, RegionCode.AU)
+            "082749-FLAG", phoneUtil.formatOutOfCountryKeepingAlphaChars(alphaNumericNumber, RegionCode.AU)
         )
         alphaNumericNumber.setRawInput("082749-FLAG")
         assertEquals(
-            "082749-FLAG",
-            phoneUtil.formatOutOfCountryKeepingAlphaChars(alphaNumericNumber, RegionCode.AU)
+            "082749-FLAG", phoneUtil.formatOutOfCountryKeepingAlphaChars(alphaNumericNumber, RegionCode.AU)
         )
         alphaNumericNumber.setNationalNumber(18007493524L).setRawInput("1-800-SIX-flag")
         // This number should not have the national prefix prefixed, in accordance with the override for
         // this specific formatting rule.
         assertEquals(
-            "1-800-SIX-FLAG",
-            phoneUtil.formatOutOfCountryKeepingAlphaChars(alphaNumericNumber, RegionCode.AU)
+            "1-800-SIX-FLAG", phoneUtil.formatOutOfCountryKeepingAlphaChars(alphaNumericNumber, RegionCode.AU)
         )
 
         // The metadata should not be permanently changed, since we copied it before modifying patterns.
         // Here we check this.
         alphaNumericNumber.setNationalNumber(1800749352L)
         assertEquals(
-            "1800 749 352",
-            phoneUtil.formatOutOfCountryCallingNumber(alphaNumericNumber, RegionCode.AU)
+            "1800 749 352", phoneUtil.formatOutOfCountryCallingNumber(alphaNumericNumber, RegionCode.AU)
         )
 
         // Testing a region with multiple international prefixes.
         assertEquals(
-            "+61 1-800-SIX-FLAG",
-            phoneUtil.formatOutOfCountryKeepingAlphaChars(alphaNumericNumber, RegionCode.SG)
+            "+61 1-800-SIX-FLAG", phoneUtil.formatOutOfCountryKeepingAlphaChars(alphaNumericNumber, RegionCode.SG)
         )
         // Testing the case of calling from a non-supported region.
         assertEquals(
-            "+61 1-800-SIX-FLAG",
-            phoneUtil.formatOutOfCountryKeepingAlphaChars(alphaNumericNumber, RegionCode.AQ)
+            "+61 1-800-SIX-FLAG", phoneUtil.formatOutOfCountryKeepingAlphaChars(alphaNumericNumber, RegionCode.AQ)
         )
 
         // Testing the case with an invalid country calling code.
-        alphaNumericNumber.setCountryCode(0).setNationalNumber(18007493524L)
-            .setRawInput("1-800-SIX-flag")
+        alphaNumericNumber.setCountryCode(0).setNationalNumber(18007493524L).setRawInput("1-800-SIX-flag")
         // Uses the raw input only.
         assertEquals(
-            "1-800-SIX-flag",
-            phoneUtil.formatOutOfCountryKeepingAlphaChars(alphaNumericNumber, RegionCode.DE)
+            "1-800-SIX-flag", phoneUtil.formatOutOfCountryKeepingAlphaChars(alphaNumericNumber, RegionCode.DE)
         )
 
         // Testing the case of an invalid alpha number.
         alphaNumericNumber.setCountryCode(1).setNationalNumber(80749L).setRawInput("180-SIX")
         // No country-code stripping can be done.
         assertEquals(
-            "00 1 180-SIX",
-            phoneUtil.formatOutOfCountryKeepingAlphaChars(alphaNumericNumber, RegionCode.DE)
+            "00 1 180-SIX", phoneUtil.formatOutOfCountryKeepingAlphaChars(alphaNumericNumber, RegionCode.DE)
         )
 
         // Testing the case of calling from a non-supported region.
         alphaNumericNumber.setCountryCode(1).setNationalNumber(80749L).setRawInput("180-SIX")
         // No country-code stripping can be done since the number is invalid.
         assertEquals(
-            "+1 180-SIX",
-            phoneUtil.formatOutOfCountryKeepingAlphaChars(alphaNumericNumber, RegionCode.AQ)
+            "+1 180-SIX", phoneUtil.formatOutOfCountryKeepingAlphaChars(alphaNumericNumber, RegionCode.AQ)
         )
     }
 
+    @Test
     fun testFormatWithCarrierCode() {
         // We only support this for AR in our test metadata, and only for mobile numbers starting with
         // certain values.
@@ -783,13 +773,11 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertEquals("02234 65-4321", phoneUtil.format(arMobile, PhoneNumberFormat.NATIONAL))
         // Here we force 14 as the carrier code.
         assertEquals(
-            "02234 14 65-4321",
-            phoneUtil.formatNationalNumberWithCarrierCode(arMobile, "14")
+            "02234 14 65-4321", phoneUtil.formatNationalNumberWithCarrierCode(arMobile, "14")
         )
         // Here we force the number to be shown with no carrier code.
         assertEquals(
-            "02234 65-4321",
-            phoneUtil.formatNationalNumberWithCarrierCode(arMobile, "")
+            "02234 65-4321", phoneUtil.formatNationalNumberWithCarrierCode(arMobile, "")
         )
         // Here the international rule is used, so no carrier code should be present.
         assertEquals("+5492234654321", phoneUtil.format(arMobile, PhoneNumberFormat.E164))
@@ -798,191 +786,157 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
 
         // Invalid country code should just get the NSN.
         assertEquals(
-            "12345",
-            phoneUtil.formatNationalNumberWithCarrierCode(UNKNOWN_COUNTRY_CODE_NO_RAW_INPUT, "89")
+            "12345", phoneUtil.formatNationalNumberWithCarrierCode(UNKNOWN_COUNTRY_CODE_NO_RAW_INPUT, "89")
         )
     }
 
+    @Test
     fun testFormatWithPreferredCarrierCode() {
         // We only support this for AR in our test metadata.
         val arNumber = PhoneNumber()
         arNumber.setCountryCode(54).setNationalNumber(91234125678L)
         // Test formatting with no preferred carrier code stored in the number itself.
         assertEquals(
-            "01234 15 12-5678",
-            phoneUtil.formatNationalNumberWithPreferredCarrierCode(arNumber, "15")
+            "01234 15 12-5678", phoneUtil.formatNationalNumberWithPreferredCarrierCode(arNumber, "15")
         )
         assertEquals(
-            "01234 12-5678",
-            phoneUtil.formatNationalNumberWithPreferredCarrierCode(arNumber, "")
+            "01234 12-5678", phoneUtil.formatNationalNumberWithPreferredCarrierCode(arNumber, "")
         )
         // Test formatting with preferred carrier code present.
         arNumber.setPreferredDomesticCarrierCode("19")
         assertEquals("01234 12-5678", phoneUtil.format(arNumber, PhoneNumberFormat.NATIONAL))
         assertEquals(
-            "01234 19 12-5678",
-            phoneUtil.formatNationalNumberWithPreferredCarrierCode(arNumber, "15")
+            "01234 19 12-5678", phoneUtil.formatNationalNumberWithPreferredCarrierCode(arNumber, "15")
         )
         assertEquals(
-            "01234 19 12-5678",
-            phoneUtil.formatNationalNumberWithPreferredCarrierCode(arNumber, "")
+            "01234 19 12-5678", phoneUtil.formatNationalNumberWithPreferredCarrierCode(arNumber, "")
         )
         // When the preferred_domestic_carrier_code is present (even when it is just a space), use it
         // instead of the default carrier code passed in.
         arNumber.setPreferredDomesticCarrierCode(" ")
         assertEquals(
-            "01234   12-5678",
-            phoneUtil.formatNationalNumberWithPreferredCarrierCode(arNumber, "15")
+            "01234   12-5678", phoneUtil.formatNationalNumberWithPreferredCarrierCode(arNumber, "15")
         )
         // When the preferred_domestic_carrier_code is present but empty, treat it as unset and use
         // instead the default carrier code passed in.
         arNumber.setPreferredDomesticCarrierCode("")
         assertEquals(
-            "01234 15 12-5678",
-            phoneUtil.formatNationalNumberWithPreferredCarrierCode(arNumber, "15")
+            "01234 15 12-5678", phoneUtil.formatNationalNumberWithPreferredCarrierCode(arNumber, "15")
         )
         // We don't support this for the US so there should be no change.
         val usNumber = PhoneNumber()
         usNumber.setCountryCode(1).setNationalNumber(4241231234L).setPreferredDomesticCarrierCode("99")
         assertEquals("424 123 1234", phoneUtil.format(usNumber, PhoneNumberFormat.NATIONAL))
         assertEquals(
-            "424 123 1234",
-            phoneUtil.formatNationalNumberWithPreferredCarrierCode(usNumber, "15")
+            "424 123 1234", phoneUtil.formatNationalNumberWithPreferredCarrierCode(usNumber, "15")
         )
     }
 
+    @Test
     fun testFormatNumberForMobileDialing() {
         // Numbers are normally dialed in national format in-country, and international format from
         // outside the country.
         assertEquals(
-            "6012345678",
-            phoneUtil.formatNumberForMobileDialing(CO_FIXED_LINE, RegionCode.CO, false)
+            "6012345678", phoneUtil.formatNumberForMobileDialing(CO_FIXED_LINE, RegionCode.CO, false)
         )
         assertEquals(
-            "030123456",
-            phoneUtil.formatNumberForMobileDialing(DE_NUMBER, RegionCode.DE, false)
+            "030123456", phoneUtil.formatNumberForMobileDialing(DE_NUMBER, RegionCode.DE, false)
         )
         assertEquals(
-            "+4930123456",
-            phoneUtil.formatNumberForMobileDialing(DE_NUMBER, RegionCode.CH, false)
+            "+4930123456", phoneUtil.formatNumberForMobileDialing(DE_NUMBER, RegionCode.CH, false)
         )
         val deNumberWithExtn = PhoneNumber().mergeFrom(DE_NUMBER).setExtension("1234")
         assertEquals(
-            "030123456",
-            phoneUtil.formatNumberForMobileDialing(deNumberWithExtn, RegionCode.DE, false)
+            "030123456", phoneUtil.formatNumberForMobileDialing(deNumberWithExtn, RegionCode.DE, false)
         )
         assertEquals(
-            "+4930123456",
-            phoneUtil.formatNumberForMobileDialing(deNumberWithExtn, RegionCode.CH, false)
+            "+4930123456", phoneUtil.formatNumberForMobileDialing(deNumberWithExtn, RegionCode.CH, false)
         )
 
         // US toll free numbers are marked as noInternationalDialling in the test metadata for testing
         // purposes. For such numbers, we expect nothing to be returned when the region code is not the
         // same one.
         assertEquals(
-            "800 253 0000",
-            phoneUtil.formatNumberForMobileDialing(
-                US_TOLLFREE, RegionCode.US,
-                true /*  keep formatting */
+            "800 253 0000", phoneUtil.formatNumberForMobileDialing(
+                US_TOLLFREE, RegionCode.US, true /*  keep formatting */
             )
         )
         assertEquals("", phoneUtil.formatNumberForMobileDialing(US_TOLLFREE, RegionCode.CN, true))
         assertEquals(
-            "+1 650 253 0000",
-            phoneUtil.formatNumberForMobileDialing(US_NUMBER, RegionCode.US, true)
+            "+1 650 253 0000", phoneUtil.formatNumberForMobileDialing(US_NUMBER, RegionCode.US, true)
         )
         val usNumberWithExtn = PhoneNumber().mergeFrom(US_NUMBER).setExtension("1234")
         assertEquals(
-            "+1 650 253 0000",
-            phoneUtil.formatNumberForMobileDialing(usNumberWithExtn, RegionCode.US, true)
+            "+1 650 253 0000", phoneUtil.formatNumberForMobileDialing(usNumberWithExtn, RegionCode.US, true)
         )
         assertEquals(
-            "8002530000",
-            phoneUtil.formatNumberForMobileDialing(
-                US_TOLLFREE, RegionCode.US,
-                false /* remove formatting */
+            "8002530000", phoneUtil.formatNumberForMobileDialing(
+                US_TOLLFREE, RegionCode.US, false /* remove formatting */
             )
         )
         assertEquals("", phoneUtil.formatNumberForMobileDialing(US_TOLLFREE, RegionCode.CN, false))
         assertEquals(
-            "+16502530000",
-            phoneUtil.formatNumberForMobileDialing(US_NUMBER, RegionCode.US, false)
+            "+16502530000", phoneUtil.formatNumberForMobileDialing(US_NUMBER, RegionCode.US, false)
         )
         assertEquals(
-            "+16502530000",
-            phoneUtil.formatNumberForMobileDialing(usNumberWithExtn, RegionCode.US, false)
+            "+16502530000", phoneUtil.formatNumberForMobileDialing(usNumberWithExtn, RegionCode.US, false)
         )
 
         // An invalid US number, which is one digit too long.
         assertEquals(
-            "+165025300001",
-            phoneUtil.formatNumberForMobileDialing(US_LONG_NUMBER, RegionCode.US, false)
+            "+165025300001", phoneUtil.formatNumberForMobileDialing(US_LONG_NUMBER, RegionCode.US, false)
         )
         assertEquals(
-            "+1 65025300001",
-            phoneUtil.formatNumberForMobileDialing(US_LONG_NUMBER, RegionCode.US, true)
+            "+1 65025300001", phoneUtil.formatNumberForMobileDialing(US_LONG_NUMBER, RegionCode.US, true)
         )
 
         // Star numbers. In real life they appear in Israel, but we have them in JP in our test
         // metadata.
         assertEquals(
-            "*2345",
-            phoneUtil.formatNumberForMobileDialing(JP_STAR_NUMBER, RegionCode.JP, false)
+            "*2345", phoneUtil.formatNumberForMobileDialing(JP_STAR_NUMBER, RegionCode.JP, false)
         )
         assertEquals(
-            "*2345",
-            phoneUtil.formatNumberForMobileDialing(JP_STAR_NUMBER, RegionCode.JP, true)
+            "*2345", phoneUtil.formatNumberForMobileDialing(JP_STAR_NUMBER, RegionCode.JP, true)
         )
         assertEquals(
-            "+80012345678",
-            phoneUtil.formatNumberForMobileDialing(INTERNATIONAL_TOLL_FREE, RegionCode.JP, false)
+            "+80012345678", phoneUtil.formatNumberForMobileDialing(INTERNATIONAL_TOLL_FREE, RegionCode.JP, false)
         )
         assertEquals(
-            "+800 1234 5678",
-            phoneUtil.formatNumberForMobileDialing(INTERNATIONAL_TOLL_FREE, RegionCode.JP, true)
+            "+800 1234 5678", phoneUtil.formatNumberForMobileDialing(INTERNATIONAL_TOLL_FREE, RegionCode.JP, true)
         )
 
         // UAE numbers beginning with 600 (classified as UAN) need to be dialled without +971 locally.
         assertEquals(
-            "+971600123456",
-            phoneUtil.formatNumberForMobileDialing(AE_UAN, RegionCode.JP, false)
+            "+971600123456", phoneUtil.formatNumberForMobileDialing(AE_UAN, RegionCode.JP, false)
         )
         assertEquals(
-            "600123456",
-            phoneUtil.formatNumberForMobileDialing(AE_UAN, RegionCode.AE, false)
+            "600123456", phoneUtil.formatNumberForMobileDialing(AE_UAN, RegionCode.AE, false)
         )
         assertEquals(
-            "+523312345678",
-            phoneUtil.formatNumberForMobileDialing(MX_NUMBER1, RegionCode.MX, false)
+            "+523312345678", phoneUtil.formatNumberForMobileDialing(MX_NUMBER1, RegionCode.MX, false)
         )
         assertEquals(
-            "+523312345678",
-            phoneUtil.formatNumberForMobileDialing(MX_NUMBER1, RegionCode.US, false)
+            "+523312345678", phoneUtil.formatNumberForMobileDialing(MX_NUMBER1, RegionCode.US, false)
         )
 
         // Test whether Uzbek phone numbers are returned in international format even when dialled from
         // same region or other regions.
         assertEquals(
-            "+998612201234",
-            phoneUtil.formatNumberForMobileDialing(UZ_FIXED_LINE, RegionCode.UZ, false)
+            "+998612201234", phoneUtil.formatNumberForMobileDialing(UZ_FIXED_LINE, RegionCode.UZ, false)
         )
         assertEquals(
-            "+998950123456",
-            phoneUtil.formatNumberForMobileDialing(UZ_MOBILE, RegionCode.UZ, false)
+            "+998950123456", phoneUtil.formatNumberForMobileDialing(UZ_MOBILE, RegionCode.UZ, false)
         )
         assertEquals(
-            "+998950123456",
-            phoneUtil.formatNumberForMobileDialing(UZ_MOBILE, RegionCode.US, false)
+            "+998950123456", phoneUtil.formatNumberForMobileDialing(UZ_MOBILE, RegionCode.US, false)
         )
 
         // Non-geographical numbers should always be dialed in international format.
         assertEquals(
-            "+80012345678",
-            phoneUtil.formatNumberForMobileDialing(INTERNATIONAL_TOLL_FREE, RegionCode.US, false)
+            "+80012345678", phoneUtil.formatNumberForMobileDialing(INTERNATIONAL_TOLL_FREE, RegionCode.US, false)
         )
         assertEquals(
-            "+80012345678",
-            phoneUtil.formatNumberForMobileDialing(INTERNATIONAL_TOLL_FREE, RegionCode.UN001, false)
+            "+80012345678", phoneUtil.formatNumberForMobileDialing(INTERNATIONAL_TOLL_FREE, RegionCode.UN001, false)
         )
 
         // Test that a short number is formatted correctly for mobile dialing within the region,
@@ -990,8 +944,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         val deShortNumber = PhoneNumber().setCountryCode(49).setNationalNumber(123L)
         assertEquals(
             "123", phoneUtil.formatNumberForMobileDialing(
-                deShortNumber, RegionCode.DE,
-                false
+                deShortNumber, RegionCode.DE, false
             )
         )
         assertEquals("", phoneUtil.formatNumberForMobileDialing(deShortNumber, RegionCode.IT, false))
@@ -1000,39 +953,36 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         // output in international format, but short numbers are in national format.
         assertEquals(
             "+16502530000", phoneUtil.formatNumberForMobileDialing(
-                US_NUMBER,
-                RegionCode.US, false
+                US_NUMBER, RegionCode.US, false
             )
         )
         assertEquals(
             "+16502530000", phoneUtil.formatNumberForMobileDialing(
-                US_NUMBER,
-                RegionCode.CA, false
+                US_NUMBER, RegionCode.CA, false
             )
         )
         assertEquals(
             "+16502530000", phoneUtil.formatNumberForMobileDialing(
-                US_NUMBER,
-                RegionCode.BR, false
+                US_NUMBER, RegionCode.BR, false
             )
         )
         val usShortNumber = PhoneNumber().setCountryCode(1).setNationalNumber(911L)
         assertEquals(
             "911", phoneUtil.formatNumberForMobileDialing(
-                usShortNumber, RegionCode.US,
-                false
+                usShortNumber, RegionCode.US, false
             )
         )
         assertEquals("", phoneUtil.formatNumberForMobileDialing(usShortNumber, RegionCode.CA, false))
         assertEquals("", phoneUtil.formatNumberForMobileDialing(usShortNumber, RegionCode.BR, false))
 
         // Test that the Australian emergency number 000 is formatted correctly.
-        val auNumber = PhoneNumber().setCountryCode(61).setNationalNumber(0L)
-            .setItalianLeadingZero(true).setNumberOfLeadingZeros(2)
+        val auNumber = PhoneNumber().setCountryCode(61).setNationalNumber(0L).setItalianLeadingZero(true)
+            .setNumberOfLeadingZeros(2)
         assertEquals("000", phoneUtil.formatNumberForMobileDialing(auNumber, RegionCode.AU, false))
         assertEquals("", phoneUtil.formatNumberForMobileDialing(auNumber, RegionCode.NZ, false))
     }
 
+    @Test
     fun testFormatByPattern() {
         val newNumFormat = Phonemetadata.NumberFormat.newBuilder()
         newNumFormat.setPattern("(\\d{3})(\\d{3})(\\d{4})")
@@ -1041,22 +991,17 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         newNumberFormats.add(newNumFormat.build())
         assertEquals(
             "(650) 253-0000", phoneUtil.formatByPattern(
-                US_NUMBER, PhoneNumberFormat.NATIONAL,
-                newNumberFormats
+                US_NUMBER, PhoneNumberFormat.NATIONAL, newNumberFormats
             )
         )
         assertEquals(
             "+1 (650) 253-0000", phoneUtil.formatByPattern(
-                US_NUMBER,
-                PhoneNumberFormat.INTERNATIONAL,
-                newNumberFormats
+                US_NUMBER, PhoneNumberFormat.INTERNATIONAL, newNumberFormats
             )
         )
         assertEquals(
             "tel:+1-650-253-0000", phoneUtil.formatByPattern(
-                US_NUMBER,
-                PhoneNumberFormat.RFC3966,
-                newNumberFormats
+                US_NUMBER, PhoneNumberFormat.RFC3966, newNumberFormats
             )
         )
 
@@ -1066,34 +1011,26 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         newNumFormat.setFormat("$1 $2-$3")
         newNumberFormats[0] = newNumFormat.build()
         assertEquals(
-            "1 (242) 365-1234",
-            phoneUtil.formatByPattern(
-                BS_NUMBER, PhoneNumberFormat.NATIONAL,
-                newNumberFormats
+            "1 (242) 365-1234", phoneUtil.formatByPattern(
+                BS_NUMBER, PhoneNumberFormat.NATIONAL, newNumberFormats
             )
         )
         assertEquals(
-            "+1 242 365-1234",
-            phoneUtil.formatByPattern(
-                BS_NUMBER, PhoneNumberFormat.INTERNATIONAL,
-                newNumberFormats
+            "+1 242 365-1234", phoneUtil.formatByPattern(
+                BS_NUMBER, PhoneNumberFormat.INTERNATIONAL, newNumberFormats
             )
         )
         newNumFormat.setPattern("(\\d{2})(\\d{5})(\\d{3})")
         newNumFormat.setFormat("$1-$2 $3")
         newNumberFormats[0] = newNumFormat.build()
         assertEquals(
-            "02-36618 300",
-            phoneUtil.formatByPattern(
-                IT_NUMBER, PhoneNumberFormat.NATIONAL,
-                newNumberFormats
+            "02-36618 300", phoneUtil.formatByPattern(
+                IT_NUMBER, PhoneNumberFormat.NATIONAL, newNumberFormats
             )
         )
         assertEquals(
-            "+39 02-36618 300",
-            phoneUtil.formatByPattern(
-                IT_NUMBER, PhoneNumberFormat.INTERNATIONAL,
-                newNumberFormats
+            "+39 02-36618 300", phoneUtil.formatByPattern(
+                IT_NUMBER, PhoneNumberFormat.INTERNATIONAL, newNumberFormats
             )
         )
         newNumFormat.setNationalPrefixFormattingRule("\$NP\$FG")
@@ -1101,65 +1038,58 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         newNumFormat.setFormat("$1 $2 $3")
         newNumberFormats[0] = newNumFormat.build()
         assertEquals(
-            "020 7031 3000",
-            phoneUtil.formatByPattern(
-                GB_NUMBER, PhoneNumberFormat.NATIONAL,
-                newNumberFormats
+            "020 7031 3000", phoneUtil.formatByPattern(
+                GB_NUMBER, PhoneNumberFormat.NATIONAL, newNumberFormats
             )
         )
         newNumFormat.setNationalPrefixFormattingRule("(\$NP\$FG)")
         newNumberFormats[0] = newNumFormat.build()
         assertEquals(
-            "(020) 7031 3000",
-            phoneUtil.formatByPattern(
-                GB_NUMBER, PhoneNumberFormat.NATIONAL,
-                newNumberFormats
+            "(020) 7031 3000", phoneUtil.formatByPattern(
+                GB_NUMBER, PhoneNumberFormat.NATIONAL, newNumberFormats
             )
         )
         newNumFormat.setNationalPrefixFormattingRule("")
         newNumberFormats[0] = newNumFormat.build()
         assertEquals(
-            "20 7031 3000",
-            phoneUtil.formatByPattern(
-                GB_NUMBER, PhoneNumberFormat.NATIONAL,
-                newNumberFormats
+            "20 7031 3000", phoneUtil.formatByPattern(
+                GB_NUMBER, PhoneNumberFormat.NATIONAL, newNumberFormats
             )
         )
         assertEquals(
-            "+44 20 7031 3000",
-            phoneUtil.formatByPattern(
-                GB_NUMBER, PhoneNumberFormat.INTERNATIONAL,
-                newNumberFormats
+            "+44 20 7031 3000", phoneUtil.formatByPattern(
+                GB_NUMBER, PhoneNumberFormat.INTERNATIONAL, newNumberFormats
             )
         )
     }
 
+    @Test
     fun testFormatE164Number() {
         assertEquals("+16502530000", phoneUtil.format(US_NUMBER, PhoneNumberFormat.E164))
         assertEquals("+4930123456", phoneUtil.format(DE_NUMBER, PhoneNumberFormat.E164))
         assertEquals("+80012345678", phoneUtil.format(INTERNATIONAL_TOLL_FREE, PhoneNumberFormat.E164))
     }
 
+    @Test
     fun testFormatNumberWithExtension() {
         val nzNumber = PhoneNumber().mergeFrom(NZ_NUMBER).setExtension("1234")
         // Uses default extension prefix:
         assertEquals("03-331 6005 ext. 1234", phoneUtil.format(nzNumber, PhoneNumberFormat.NATIONAL))
         // Uses RFC 3966 syntax.
         assertEquals(
-            "tel:+64-3-331-6005;ext=1234",
-            phoneUtil.format(nzNumber, PhoneNumberFormat.RFC3966)
+            "tel:+64-3-331-6005;ext=1234", phoneUtil.format(nzNumber, PhoneNumberFormat.RFC3966)
         )
         // Extension prefix overridden in the territory information for the US:
         val usNumberWithExtension = PhoneNumber().mergeFrom(US_NUMBER).setExtension("4567")
         assertEquals(
             "650 253 0000 extn. 4567", phoneUtil.format(
-                usNumberWithExtension,
-                PhoneNumberFormat.NATIONAL
+                usNumberWithExtension, PhoneNumberFormat.NATIONAL
             )
         )
     }
 
     @Throws(Exception::class)
+    @Test
     fun testFormatInOriginalFormat() {
         val number1 = phoneUtil.parseAndKeepRawInput("+442087654321", RegionCode.GB)
         assertEquals("+44 20 8765 4321", phoneUtil.formatInOriginalFormat(number1, RegionCode.GB))
@@ -1196,58 +1126,48 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertEquals("253 0000", phoneUtil.formatInOriginalFormat(localNumberUS, RegionCode.US))
         val numberWithNationalPrefixUS = phoneUtil.parseAndKeepRawInput("18003456789", RegionCode.US)
         assertEquals(
-            "1 800 345 6789",
-            phoneUtil.formatInOriginalFormat(numberWithNationalPrefixUS, RegionCode.US)
+            "1 800 345 6789", phoneUtil.formatInOriginalFormat(numberWithNationalPrefixUS, RegionCode.US)
         )
         val numberWithoutNationalPrefixGB = phoneUtil.parseAndKeepRawInput("2087654321", RegionCode.GB)
         assertEquals(
-            "20 8765 4321",
-            phoneUtil.formatInOriginalFormat(numberWithoutNationalPrefixGB, RegionCode.GB)
+            "20 8765 4321", phoneUtil.formatInOriginalFormat(numberWithoutNationalPrefixGB, RegionCode.GB)
         )
         // Make sure no metadata is modified as a result of the previous function call.
         assertEquals("(020) 8765 4321", phoneUtil.formatInOriginalFormat(number5, RegionCode.GB))
         val numberWithNationalPrefixMX = phoneUtil.parseAndKeepRawInput("013312345678", RegionCode.MX)
         assertEquals(
-            "01 33 1234 5678",
-            phoneUtil.formatInOriginalFormat(numberWithNationalPrefixMX, RegionCode.MX)
+            "01 33 1234 5678", phoneUtil.formatInOriginalFormat(numberWithNationalPrefixMX, RegionCode.MX)
         )
         val numberWithoutNationalPrefixMX = phoneUtil.parseAndKeepRawInput("3312345678", RegionCode.MX)
         assertEquals(
-            "33 1234 5678",
-            phoneUtil.formatInOriginalFormat(numberWithoutNationalPrefixMX, RegionCode.MX)
+            "33 1234 5678", phoneUtil.formatInOriginalFormat(numberWithoutNationalPrefixMX, RegionCode.MX)
         )
         val italianFixedLineNumber = phoneUtil.parseAndKeepRawInput("0212345678", RegionCode.IT)
         assertEquals(
-            "02 1234 5678",
-            phoneUtil.formatInOriginalFormat(italianFixedLineNumber, RegionCode.IT)
+            "02 1234 5678", phoneUtil.formatInOriginalFormat(italianFixedLineNumber, RegionCode.IT)
         )
         val numberWithNationalPrefixJP = phoneUtil.parseAndKeepRawInput("00777012", RegionCode.JP)
         assertEquals(
-            "0077-7012",
-            phoneUtil.formatInOriginalFormat(numberWithNationalPrefixJP, RegionCode.JP)
+            "0077-7012", phoneUtil.formatInOriginalFormat(numberWithNationalPrefixJP, RegionCode.JP)
         )
         val numberWithoutNationalPrefixJP = phoneUtil.parseAndKeepRawInput("0777012", RegionCode.JP)
         assertEquals(
-            "0777012",
-            phoneUtil.formatInOriginalFormat(numberWithoutNationalPrefixJP, RegionCode.JP)
+            "0777012", phoneUtil.formatInOriginalFormat(numberWithoutNationalPrefixJP, RegionCode.JP)
         )
         val numberWithCarrierCodeBR = phoneUtil.parseAndKeepRawInput("012 3121286979", RegionCode.BR)
         assertEquals(
-            "012 3121286979",
-            phoneUtil.formatInOriginalFormat(numberWithCarrierCodeBR, RegionCode.BR)
+            "012 3121286979", phoneUtil.formatInOriginalFormat(numberWithCarrierCodeBR, RegionCode.BR)
         )
 
         // The default national prefix used in this case is 045. When a number with national prefix 044
         // is entered, we return the raw input as we don't want to change the number entered.
         val numberWithNationalPrefixMX1 = phoneUtil.parseAndKeepRawInput("044(33)1234-5678", RegionCode.MX)
         assertEquals(
-            "044(33)1234-5678",
-            phoneUtil.formatInOriginalFormat(numberWithNationalPrefixMX1, RegionCode.MX)
+            "044(33)1234-5678", phoneUtil.formatInOriginalFormat(numberWithNationalPrefixMX1, RegionCode.MX)
         )
         val numberWithNationalPrefixMX2 = phoneUtil.parseAndKeepRawInput("045(33)1234-5678", RegionCode.MX)
         assertEquals(
-            "045 33 1234 5678",
-            phoneUtil.formatInOriginalFormat(numberWithNationalPrefixMX2, RegionCode.MX)
+            "045 33 1234 5678", phoneUtil.formatInOriginalFormat(numberWithNationalPrefixMX2, RegionCode.MX)
         )
 
         // The default international prefix used in this case is 0011. When a number with international
@@ -1255,13 +1175,11 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         // entered.
         val outOfCountryNumberFromAU1 = phoneUtil.parseAndKeepRawInput("0012 16502530000", RegionCode.AU)
         assertEquals(
-            "0012 16502530000",
-            phoneUtil.formatInOriginalFormat(outOfCountryNumberFromAU1, RegionCode.AU)
+            "0012 16502530000", phoneUtil.formatInOriginalFormat(outOfCountryNumberFromAU1, RegionCode.AU)
         )
         val outOfCountryNumberFromAU2 = phoneUtil.parseAndKeepRawInput("0011 16502530000", RegionCode.AU)
         assertEquals(
-            "0011 1 650 253 0000",
-            phoneUtil.formatInOriginalFormat(outOfCountryNumberFromAU2, RegionCode.AU)
+            "0011 1 650 253 0000", phoneUtil.formatInOriginalFormat(outOfCountryNumberFromAU2, RegionCode.AU)
         )
 
         // Test the star sign is not removed from or added to the original input by this method.
@@ -1272,11 +1190,11 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
 
         // Test an invalid national number without raw input is just formatted as the national number.
         assertEquals(
-            "650253000",
-            phoneUtil.formatInOriginalFormat(US_SHORT_BY_ONE_NUMBER, RegionCode.US)
+            "650253000", phoneUtil.formatInOriginalFormat(US_SHORT_BY_ONE_NUMBER, RegionCode.US)
         )
     }
 
+    @Test
     fun testIsPremiumRate() {
         assertEquals(PhoneNumberType.PREMIUM_RATE, phoneUtil.getNumberType(US_PREMIUM))
         val premiumRateNumber = PhoneNumber()
@@ -1294,6 +1212,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertEquals(PhoneNumberType.PREMIUM_RATE, phoneUtil.getNumberType(UNIVERSAL_PREMIUM_RATE))
     }
 
+    @Test
     fun testIsTollFree() {
         val tollFreeNumber = PhoneNumber()
         tollFreeNumber.setCountryCode(1).setNationalNumber(8881234567L)
@@ -1310,6 +1229,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertEquals(PhoneNumberType.TOLL_FREE, phoneUtil.getNumberType(INTERNATIONAL_TOLL_FREE))
     }
 
+    @Test
     fun testIsMobile() {
         assertEquals(PhoneNumberType.MOBILE, phoneUtil.getNumberType(BS_MOBILE))
         assertEquals(PhoneNumberType.MOBILE, phoneUtil.getNumberType(GB_MOBILE))
@@ -1320,6 +1240,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertEquals(PhoneNumberType.MOBILE, phoneUtil.getNumberType(mobileNumber))
     }
 
+    @Test
     fun testIsFixedLine() {
         assertEquals(PhoneNumberType.FIXED_LINE, phoneUtil.getNumberType(BS_NUMBER))
         assertEquals(PhoneNumberType.FIXED_LINE, phoneUtil.getNumberType(IT_NUMBER))
@@ -1327,6 +1248,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertEquals(PhoneNumberType.FIXED_LINE, phoneUtil.getNumberType(DE_NUMBER))
     }
 
+    @Test
     fun testIsFixedLineAndMobile() {
         assertEquals(PhoneNumberType.FIXED_LINE_OR_MOBILE, phoneUtil.getNumberType(US_NUMBER))
         val fixedLineAndMobileNumber = PhoneNumber().setCountryCode(54).setNationalNumber(1987654321L)
@@ -1335,29 +1257,34 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         )
     }
 
+    @Test
     fun testIsSharedCost() {
         val gbNumber = PhoneNumber()
         gbNumber.setCountryCode(44).setNationalNumber(8431231234L)
         assertEquals(PhoneNumberType.SHARED_COST, phoneUtil.getNumberType(gbNumber))
     }
 
+    @Test
     fun testIsVoip() {
         val gbNumber = PhoneNumber()
         gbNumber.setCountryCode(44).setNationalNumber(5631231234L)
         assertEquals(PhoneNumberType.VOIP, phoneUtil.getNumberType(gbNumber))
     }
 
+    @Test
     fun testIsPersonalNumber() {
         val gbNumber = PhoneNumber()
         gbNumber.setCountryCode(44).setNationalNumber(7031231234L)
         assertEquals(PhoneNumberType.PERSONAL_NUMBER, phoneUtil.getNumberType(gbNumber))
     }
 
+    @Test
     fun testIsUnknown() {
         // Invalid numbers should be of type UNKNOWN.
         assertEquals(PhoneNumberType.UNKNOWN, phoneUtil.getNumberType(US_LOCAL_NUMBER))
     }
 
+    @Test
     fun testIsValidNumber() {
         assertTrue(phoneUtil.isValidNumber(US_NUMBER))
         assertTrue(phoneUtil.isValidNumber(IT_NUMBER))
@@ -1368,6 +1295,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertTrue(phoneUtil.isValidNumber(nzNumber))
     }
 
+    @Test
     fun testIsValidForRegion() {
         // This number is valid for the Bahamas, but is not a valid US number.
         assertTrue(phoneUtil.isValidNumber(BS_NUMBER))
@@ -1411,6 +1339,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertFalse(phoneUtil.isValidNumberForRegion(invalidNumber, RegionCode.ZZ))
     }
 
+    @Test
     fun testIsNotValidNumber() {
         assertFalse(phoneUtil.isValidNumber(US_LOCAL_NUMBER))
         val invalidNumber = PhoneNumber()
@@ -1434,6 +1363,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertFalse(phoneUtil.isValidNumber(INTERNATIONAL_TOLL_FREE_TOO_LONG))
     }
 
+    @Test
     fun testGetRegionCodeForCountryCode() {
         assertEquals(RegionCode.US, phoneUtil.getRegionCodeForCountryCode(1))
         assertEquals(RegionCode.GB, phoneUtil.getRegionCodeForCountryCode(44))
@@ -1442,6 +1372,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertEquals(RegionCode.UN001, phoneUtil.getRegionCodeForCountryCode(979))
     }
 
+    @Test
     fun testGetRegionCodeForNumber() {
         assertEquals(RegionCode.BS, phoneUtil.getRegionCodeForNumber(BS_NUMBER))
         assertEquals(RegionCode.US, phoneUtil.getRegionCodeForNumber(US_NUMBER))
@@ -1450,6 +1381,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertEquals(RegionCode.UN001, phoneUtil.getRegionCodeForNumber(UNIVERSAL_PREMIUM_RATE))
     }
 
+    @Test
     fun testGetRegionCodesForCountryCode() {
         val regionCodesForNANPA = phoneUtil.getRegionCodesForCountryCode(1)
         assertTrue(regionCodesForNANPA.contains(RegionCode.US))
@@ -1461,6 +1393,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertTrue(phoneUtil.getRegionCodesForCountryCode(-1).isEmpty())
     }
 
+    @Test
     fun testGetCountryCodeForRegion() {
         assertEquals(1, phoneUtil.getCountryCodeForRegion(RegionCode.US))
         assertEquals(64, phoneUtil.getCountryCodeForRegion(RegionCode.NZ))
@@ -1471,6 +1404,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertEquals(0, phoneUtil.getCountryCodeForRegion(RegionCode.CS))
     }
 
+    @Test
     fun testGetNationalDiallingPrefixForRegion() {
         assertEquals("1", phoneUtil.getNddPrefixForRegion(RegionCode.US, false))
         // Test non-main country to see it gets the national dialling prefix for the main country with
@@ -1488,6 +1422,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertEquals(null, phoneUtil.getNddPrefixForRegion(RegionCode.CS, false))
     }
 
+    @Test
     fun testIsNANPACountry() {
         assertTrue(phoneUtil.isNANPACountry(RegionCode.US))
         assertTrue(phoneUtil.isNANPACountry(RegionCode.BS))
@@ -1497,6 +1432,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertFalse(phoneUtil.isNANPACountry(null))
     }
 
+    @Test
     fun testIsPossibleNumber() {
         assertTrue(phoneUtil.isPossibleNumber(US_NUMBER))
         assertTrue(phoneUtil.isPossibleNumber(US_LOCAL_NUMBER))
@@ -1514,6 +1450,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertTrue(phoneUtil.isPossibleNumber("+800 1234 5678", RegionCode.UN001))
     }
 
+    @Test
     fun testIsPossibleNumberForType_DifferentTypeLengths() {
         // We use Argentinian numbers since they have different possible lengths for different types.
         val number = PhoneNumber()
@@ -1554,6 +1491,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertFalse(phoneUtil.isPossibleNumberForType(number, PhoneNumberType.TOLL_FREE))
     }
 
+    @Test
     fun testIsPossibleNumberForType_LocalOnly() {
         val number = PhoneNumber()
         // Here we test a number length which matches a local-only length.
@@ -1564,6 +1502,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertFalse(phoneUtil.isPossibleNumberForType(number, PhoneNumberType.MOBILE))
     }
 
+    @Test
     fun testIsPossibleNumberForType_DataMissingForSizeReasons() {
         val number = PhoneNumber()
         // Here we test something where the possible lengths match the possible lengths of the country
@@ -1577,6 +1516,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertTrue(phoneUtil.isPossibleNumberForType(number, PhoneNumberType.FIXED_LINE))
     }
 
+    @Test
     fun testIsPossibleNumberForType_NumberTypeNotSupportedForRegion() {
         val number = PhoneNumber()
         // There are *no* mobile numbers for this region at all, so we return false.
@@ -1595,12 +1535,12 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertTrue(phoneUtil.isPossibleNumberForType(number, PhoneNumberType.PREMIUM_RATE))
     }
 
+    @Test
     fun testIsPossibleNumberWithReason() {
         // National numbers for country calling code +1 that are within 7 to 10 digits are possible.
         assertEquals(ValidationResult.IS_POSSIBLE, phoneUtil.isPossibleNumberWithReason(US_NUMBER))
         assertEquals(
-            ValidationResult.IS_POSSIBLE_LOCAL_ONLY,
-            phoneUtil.isPossibleNumberWithReason(US_LOCAL_NUMBER)
+            ValidationResult.IS_POSSIBLE_LOCAL_ONLY, phoneUtil.isPossibleNumberWithReason(US_LOCAL_NUMBER)
         )
         assertEquals(ValidationResult.TOO_LONG, phoneUtil.isPossibleNumberWithReason(US_LONG_NUMBER))
         val number = PhoneNumber()
@@ -1615,30 +1555,27 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         number.setCountryCode(65).setNationalNumber(1234567890L)
         assertEquals(ValidationResult.IS_POSSIBLE, phoneUtil.isPossibleNumberWithReason(number))
         assertEquals(
-            ValidationResult.TOO_LONG,
-            phoneUtil.isPossibleNumberWithReason(INTERNATIONAL_TOLL_FREE_TOO_LONG)
+            ValidationResult.TOO_LONG, phoneUtil.isPossibleNumberWithReason(INTERNATIONAL_TOLL_FREE_TOO_LONG)
         )
     }
 
+    @Test
     fun testIsPossibleNumberForTypeWithReason_DifferentTypeLengths() {
         // We use Argentinian numbers since they have different possible lengths for different types.
         val number = PhoneNumber()
         number.setCountryCode(54).setNationalNumber(12345L)
         // Too short for any Argentinian number.
         assertEquals(
-            ValidationResult.TOO_SHORT,
-            phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.UNKNOWN)
+            ValidationResult.TOO_SHORT, phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.UNKNOWN)
         )
         assertEquals(
-            ValidationResult.TOO_SHORT,
-            phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.FIXED_LINE)
+            ValidationResult.TOO_SHORT, phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.FIXED_LINE)
         )
 
         // 6-digit numbers are okay for fixed-line.
         number.setNationalNumber(123456L)
         assertEquals(
-            ValidationResult.IS_POSSIBLE,
-            phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.UNKNOWN)
+            ValidationResult.IS_POSSIBLE, phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.UNKNOWN)
         )
         assertEquals(
             ValidationResult.IS_POSSIBLE,
@@ -1646,74 +1583,63 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         )
         // But too short for mobile.
         assertEquals(
-            ValidationResult.TOO_SHORT,
-            phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.MOBILE)
+            ValidationResult.TOO_SHORT, phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.MOBILE)
         )
         // And too short for toll-free.
         assertEquals(
-            ValidationResult.TOO_SHORT,
-            phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.TOLL_FREE)
+            ValidationResult.TOO_SHORT, phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.TOLL_FREE)
         )
 
         // The same applies to 9-digit numbers.
         number.setNationalNumber(123456789L)
         assertEquals(
-            ValidationResult.IS_POSSIBLE,
-            phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.UNKNOWN)
+            ValidationResult.IS_POSSIBLE, phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.UNKNOWN)
         )
         assertEquals(
             ValidationResult.IS_POSSIBLE,
             phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.FIXED_LINE)
         )
         assertEquals(
-            ValidationResult.TOO_SHORT,
-            phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.MOBILE)
+            ValidationResult.TOO_SHORT, phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.MOBILE)
         )
         assertEquals(
-            ValidationResult.TOO_SHORT,
-            phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.TOLL_FREE)
+            ValidationResult.TOO_SHORT, phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.TOLL_FREE)
         )
 
         // 10-digit numbers are universally possible.
         number.setNationalNumber(1234567890L)
         assertEquals(
-            ValidationResult.IS_POSSIBLE,
-            phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.UNKNOWN)
+            ValidationResult.IS_POSSIBLE, phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.UNKNOWN)
         )
         assertEquals(
             ValidationResult.IS_POSSIBLE,
             phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.FIXED_LINE)
         )
         assertEquals(
-            ValidationResult.IS_POSSIBLE,
-            phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.MOBILE)
+            ValidationResult.IS_POSSIBLE, phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.MOBILE)
         )
         assertEquals(
-            ValidationResult.IS_POSSIBLE,
-            phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.TOLL_FREE)
+            ValidationResult.IS_POSSIBLE, phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.TOLL_FREE)
         )
 
         // 11-digit numbers are only possible for mobile numbers. Note we don't require the leading 9,
         // which all mobile numbers start with, and would be required for a valid mobile number.
         number.setNationalNumber(12345678901L)
         assertEquals(
-            ValidationResult.IS_POSSIBLE,
-            phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.UNKNOWN)
+            ValidationResult.IS_POSSIBLE, phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.UNKNOWN)
         )
         assertEquals(
-            ValidationResult.TOO_LONG,
-            phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.FIXED_LINE)
+            ValidationResult.TOO_LONG, phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.FIXED_LINE)
         )
         assertEquals(
-            ValidationResult.IS_POSSIBLE,
-            phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.MOBILE)
+            ValidationResult.IS_POSSIBLE, phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.MOBILE)
         )
         assertEquals(
-            ValidationResult.TOO_LONG,
-            phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.TOLL_FREE)
+            ValidationResult.TOO_LONG, phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.TOLL_FREE)
         )
     }
 
+    @Test
     fun testIsPossibleNumberForTypeWithReason_LocalOnly() {
         val number = PhoneNumber()
         // Here we test a number length which matches a local-only length.
@@ -1728,11 +1654,11 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         )
         // Mobile numbers must be 10 or 11 digits, and there are no local-only lengths.
         assertEquals(
-            ValidationResult.TOO_SHORT,
-            phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.MOBILE)
+            ValidationResult.TOO_SHORT, phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.MOBILE)
         )
     }
 
+    @Test
     fun testIsPossibleNumberForTypeWithReason_DataMissingForSizeReasons() {
         val number = PhoneNumber()
         // Here we test something where the possible lengths match the possible lengths of the country
@@ -1751,8 +1677,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         // Normal-length number.
         number.setNationalNumber(1234567890L)
         assertEquals(
-            ValidationResult.IS_POSSIBLE,
-            phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.UNKNOWN)
+            ValidationResult.IS_POSSIBLE, phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.UNKNOWN)
         )
         assertEquals(
             ValidationResult.IS_POSSIBLE,
@@ -1760,13 +1685,13 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         )
     }
 
+    @Test
     fun testIsPossibleNumberForTypeWithReason_NumberTypeNotSupportedForRegion() {
         val number = PhoneNumber()
         // There are *no* mobile numbers for this region at all, so we return INVALID_LENGTH.
         number.setCountryCode(55).setNationalNumber(12345678L)
         assertEquals(
-            ValidationResult.INVALID_LENGTH,
-            phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.MOBILE)
+            ValidationResult.INVALID_LENGTH, phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.MOBILE)
         )
         // This matches a fixed-line length though.
         assertEquals(
@@ -1776,23 +1701,20 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         // This is too short for fixed-line, and no mobile numbers exist.
         number.setCountryCode(55).setNationalNumber(1234567L)
         assertEquals(
-            ValidationResult.INVALID_LENGTH,
-            phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.MOBILE)
+            ValidationResult.INVALID_LENGTH, phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.MOBILE)
         )
         assertEquals(
             ValidationResult.TOO_SHORT,
             phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.FIXED_LINE_OR_MOBILE)
         )
         assertEquals(
-            ValidationResult.TOO_SHORT,
-            phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.FIXED_LINE)
+            ValidationResult.TOO_SHORT, phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.FIXED_LINE)
         )
 
         // This is too short for mobile, and no fixed-line numbers exist.
         number.setCountryCode(882).setNationalNumber(1234567L)
         assertEquals(
-            ValidationResult.TOO_SHORT,
-            phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.MOBILE)
+            ValidationResult.TOO_SHORT, phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.MOBILE)
         )
         assertEquals(
             ValidationResult.TOO_SHORT,
@@ -1807,8 +1729,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         // return INVALID_LENGTH.
         number.setCountryCode(979).setNationalNumber(123456789L)
         assertEquals(
-            ValidationResult.INVALID_LENGTH,
-            phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.MOBILE)
+            ValidationResult.INVALID_LENGTH, phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.MOBILE)
         )
         assertEquals(
             ValidationResult.INVALID_LENGTH,
@@ -1824,18 +1745,17 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         )
     }
 
+    @Test
     fun testIsPossibleNumberForTypeWithReason_FixedLineOrMobile() {
         val number = PhoneNumber()
         // For FIXED_LINE_OR_MOBILE, a number should be considered valid if it matches the possible
         // lengths for mobile *or* fixed-line numbers.
         number.setCountryCode(290).setNationalNumber(1234L)
         assertEquals(
-            ValidationResult.TOO_SHORT,
-            phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.FIXED_LINE)
+            ValidationResult.TOO_SHORT, phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.FIXED_LINE)
         )
         assertEquals(
-            ValidationResult.IS_POSSIBLE,
-            phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.MOBILE)
+            ValidationResult.IS_POSSIBLE, phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.MOBILE)
         )
         assertEquals(
             ValidationResult.IS_POSSIBLE,
@@ -1843,12 +1763,10 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         )
         number.setNationalNumber(12345L)
         assertEquals(
-            ValidationResult.TOO_SHORT,
-            phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.FIXED_LINE)
+            ValidationResult.TOO_SHORT, phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.FIXED_LINE)
         )
         assertEquals(
-            ValidationResult.TOO_LONG,
-            phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.MOBILE)
+            ValidationResult.TOO_LONG, phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.MOBILE)
         )
         assertEquals(
             ValidationResult.INVALID_LENGTH,
@@ -1860,8 +1778,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
             phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.FIXED_LINE)
         )
         assertEquals(
-            ValidationResult.TOO_LONG,
-            phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.MOBILE)
+            ValidationResult.TOO_LONG, phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.MOBILE)
         )
         assertEquals(
             ValidationResult.IS_POSSIBLE,
@@ -1869,12 +1786,10 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         )
         number.setNationalNumber(1234567L)
         assertEquals(
-            ValidationResult.TOO_LONG,
-            phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.FIXED_LINE)
+            ValidationResult.TOO_LONG, phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.FIXED_LINE)
         )
         assertEquals(
-            ValidationResult.TOO_LONG,
-            phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.MOBILE)
+            ValidationResult.TOO_LONG, phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.MOBILE)
         )
         assertEquals(
             ValidationResult.TOO_LONG,
@@ -1884,8 +1799,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         // 8-digit numbers are possible for toll-free and premium-rate numbers only.
         number.setNationalNumber(12345678L)
         assertEquals(
-            ValidationResult.IS_POSSIBLE,
-            phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.TOLL_FREE)
+            ValidationResult.IS_POSSIBLE, phoneUtil.isPossibleNumberForTypeWithReason(number, PhoneNumberType.TOLL_FREE)
         )
         assertEquals(
             ValidationResult.TOO_LONG,
@@ -1893,6 +1807,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         )
     }
 
+    @Test
     fun testIsNotPossibleNumber() {
         assertFalse(phoneUtil.isPossibleNumber(US_LONG_NUMBER))
         assertFalse(phoneUtil.isPossibleNumber(INTERNATIONAL_TOLL_FREE_TOO_LONG))
@@ -1911,6 +1826,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertFalse(phoneUtil.isPossibleNumber("+800 1234 5678 9", RegionCode.UN001))
     }
 
+    @Test
     fun testTruncateTooLongNumber() {
         // GB number 080 1234 5678, but entered with 4 extra digits at the end.
         val tooLongNumber = PhoneNumber()
@@ -1961,6 +1877,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertEquals(tooShortNumberCopy, tooShortNumber)
     }
 
+    @Test
     fun testIsViablePhoneNumber() {
         assertFalse(PhoneNumberUtil.isViablePhoneNumber("1"))
         // Only one or two digits before strange non-possible punctuation.
@@ -1978,6 +1895,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertFalse(PhoneNumberUtil.isViablePhoneNumber("12. March"))
     }
 
+    @Test
     fun testIsViablePhoneNumberNonAscii() {
         // Only one or two digits before possible punctuation followed by more digits.
         assertTrue(PhoneNumberUtil.isViablePhoneNumber("1\u300034"))
@@ -1988,6 +1906,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertTrue(PhoneNumberUtil.isViablePhoneNumber("+1\uFF09\u30003456789"))
     }
 
+    @Test
     fun testExtractPossibleNumber() {
         // Removes preceding funky punctuation and letters but leaves the rest untouched.
         assertEquals("0800-345-600", extractPossibleNumber("Tel:0800-345-600").toString())
@@ -1996,13 +1915,11 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertEquals("+800-345-600", extractPossibleNumber("Tel:+800-345-600").toString())
         // Should recognise wide digits as possible start values.
         assertEquals(
-            "\uFF10\uFF12\uFF13",
-            extractPossibleNumber("\uFF10\uFF12\uFF13").toString()
+            "\uFF10\uFF12\uFF13", extractPossibleNumber("\uFF10\uFF12\uFF13").toString()
         )
         // Dashes are not possible start values and should be removed.
         assertEquals(
-            "\uFF11\uFF12\uFF13",
-            extractPossibleNumber("Num-\uFF11\uFF12\uFF13").toString()
+            "\uFF11\uFF12\uFF13", extractPossibleNumber("Num-\uFF11\uFF12\uFF13").toString()
         )
         // If not possible number present, return empty string.
         assertEquals("", extractPossibleNumber("Num-....").toString())
@@ -2016,33 +1933,29 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertEquals("650) 253-0000", extractPossibleNumber("(650) 253-0000\u200F").toString())
     }
 
+    @Test
     fun testMaybeStripNationalPrefix() {
         val metadata = PhoneMetadata.newBuilder()
         metadata.setId("ignored")
         metadata.setNationalPrefixForParsing("34")
-        metadata
-            .generalDescBuilder
-            .setNationalNumberPattern("\\d{4,8}")
+        metadata.generalDescBuilder.setNationalNumberPattern("\\d{4,8}")
         var numberToStrip = InplaceStringBuilder("34356778")
         var strippedNumber = "356778"
         assertTrue(phoneUtil.maybeStripNationalPrefixAndCarrierCode(numberToStrip, metadata.build(), null))
         assertEquals(
-            "Should have had national prefix stripped.",
-            strippedNumber, numberToStrip.toString()
+            strippedNumber, numberToStrip.toString(), "Should have had national prefix stripped.",
         )
         // Retry stripping - now the number should not start with the national prefix, so no more
         // stripping should occur.
         assertFalse(phoneUtil.maybeStripNationalPrefixAndCarrierCode(numberToStrip, metadata.build(), null))
         assertEquals(
-            "Should have had no change - no national prefix present.",
-            strippedNumber, numberToStrip.toString()
+            strippedNumber, numberToStrip.toString(), "Should have had no change - no national prefix present.",
         )
         // Some countries have no national prefix. Repeat test with none specified.
         metadata.setNationalPrefixForParsing("")
         assertFalse(phoneUtil.maybeStripNationalPrefixAndCarrierCode(numberToStrip, metadata.build(), null))
         assertEquals(
-            "Should not strip anything with empty national prefix.",
-            strippedNumber, numberToStrip.toString()
+            strippedNumber, numberToStrip.toString(), "Should not strip anything with empty national prefix.",
         )
         // If the resultant number doesn't match the national rule, it shouldn't be stripped.
         metadata.setNationalPrefixForParsing("3")
@@ -2050,9 +1963,9 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         strippedNumber = "3123"
         assertFalse(phoneUtil.maybeStripNationalPrefixAndCarrierCode(numberToStrip, metadata.build(), null))
         assertEquals(
-            "Should have had no change - after stripping, it wouldn't have matched "
-                    + "the national rule.",
-            strippedNumber, numberToStrip.toString()
+            strippedNumber,
+            numberToStrip.toString(),
+            "Should have had no change - after stripping, it wouldn't have matched " + "the national rule.",
         )
         // Test extracting carrier selection code.
         metadata.setNationalPrefixForParsing("0(81)?")
@@ -2066,8 +1979,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         )
         assertEquals("81", carrierCode.toString())
         assertEquals(
-            "Should have had national prefix and carrier code stripped.",
-            strippedNumber, numberToStrip.toString()
+            strippedNumber, numberToStrip.toString(), "Should have had national prefix and carrier code stripped.",
         )
         // If there was a transform rule, check it was applied.
         metadata.setNationalPrefixTransformRule("5$15")
@@ -2079,68 +1991,61 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
             phoneUtil.maybeStripNationalPrefixAndCarrierCode(numberToStrip, metadata.build(), null)
         )
         assertEquals(
-            "Should transform the 031 to a 5315.",
-            transformedNumber, numberToStrip.toString()
+            transformedNumber, numberToStrip.toString(), "Should transform the 031 to a 5315.",
         )
     }
 
+    @Test
     fun testMaybeStripInternationalPrefix() {
         val internationalPrefix = "00[39]"
         var numberToStrip = InplaceStringBuilder("0034567700-3898003")
         // Note the dash is removed as part of the normalization.
         var strippedNumber = InplaceStringBuilder("45677003898003")
         assertEquals(
-            CountryCodeSource.FROM_NUMBER_WITH_IDD,
-            phoneUtil.maybeStripInternationalPrefixAndNormalize(
-                numberToStrip,
-                internationalPrefix
+            CountryCodeSource.FROM_NUMBER_WITH_IDD, phoneUtil.maybeStripInternationalPrefixAndNormalize(
+                numberToStrip, internationalPrefix
             )
         )
         assertEquals(
+            strippedNumber.toString(),
+            numberToStrip.toString(),
             "The number supplied was not stripped of its international prefix.",
-            strippedNumber.toString(), numberToStrip.toString()
         )
         // Now the number no longer starts with an IDD prefix, so it should now report
         // FROM_DEFAULT_COUNTRY.
         assertEquals(
-            CountryCodeSource.FROM_DEFAULT_COUNTRY,
-            phoneUtil.maybeStripInternationalPrefixAndNormalize(
-                numberToStrip,
-                internationalPrefix
+            CountryCodeSource.FROM_DEFAULT_COUNTRY, phoneUtil.maybeStripInternationalPrefixAndNormalize(
+                numberToStrip, internationalPrefix
             )
         )
         numberToStrip = InplaceStringBuilder("00945677003898003")
         assertEquals(
-            CountryCodeSource.FROM_NUMBER_WITH_IDD,
-            phoneUtil.maybeStripInternationalPrefixAndNormalize(
-                numberToStrip,
-                internationalPrefix
+            CountryCodeSource.FROM_NUMBER_WITH_IDD, phoneUtil.maybeStripInternationalPrefixAndNormalize(
+                numberToStrip, internationalPrefix
             )
         )
         assertEquals(
+            strippedNumber.toString(),
+            numberToStrip.toString(),
             "The number supplied was not stripped of its international prefix.",
-            strippedNumber.toString(), numberToStrip.toString()
         )
         // Test it works when the international prefix is broken up by spaces.
         numberToStrip = InplaceStringBuilder("00 9 45677003898003")
         assertEquals(
-            CountryCodeSource.FROM_NUMBER_WITH_IDD,
-            phoneUtil.maybeStripInternationalPrefixAndNormalize(
-                numberToStrip,
-                internationalPrefix
+            CountryCodeSource.FROM_NUMBER_WITH_IDD, phoneUtil.maybeStripInternationalPrefixAndNormalize(
+                numberToStrip, internationalPrefix
             )
         )
         assertEquals(
+            strippedNumber.toString(),
+            numberToStrip.toString(),
             "The number supplied was not stripped of its international prefix.",
-            strippedNumber.toString(), numberToStrip.toString()
         )
         // Now the number no longer starts with an IDD prefix, so it should now report
         // FROM_DEFAULT_COUNTRY.
         assertEquals(
-            CountryCodeSource.FROM_DEFAULT_COUNTRY,
-            phoneUtil.maybeStripInternationalPrefixAndNormalize(
-                numberToStrip,
-                internationalPrefix
+            CountryCodeSource.FROM_DEFAULT_COUNTRY, phoneUtil.maybeStripInternationalPrefixAndNormalize(
+                numberToStrip, internationalPrefix
             )
         )
 
@@ -2148,15 +2053,14 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         numberToStrip = InplaceStringBuilder("+45677003898003")
         strippedNumber = InplaceStringBuilder("45677003898003")
         assertEquals(
-            CountryCodeSource.FROM_NUMBER_WITH_PLUS_SIGN,
-            phoneUtil.maybeStripInternationalPrefixAndNormalize(
-                numberToStrip,
-                internationalPrefix
+            CountryCodeSource.FROM_NUMBER_WITH_PLUS_SIGN, phoneUtil.maybeStripInternationalPrefixAndNormalize(
+                numberToStrip, internationalPrefix
             )
         )
         assertEquals(
+            strippedNumber.toString(),
+            numberToStrip.toString(),
             "The number supplied was not stripped of the plus symbol.",
-            strippedNumber.toString(), numberToStrip.toString()
         )
 
         // If the number afterwards is a zero, we should not strip this - no country calling code begins
@@ -2164,27 +2068,25 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         numberToStrip = InplaceStringBuilder("0090112-3123")
         strippedNumber = InplaceStringBuilder("00901123123")
         assertEquals(
-            CountryCodeSource.FROM_DEFAULT_COUNTRY,
-            phoneUtil.maybeStripInternationalPrefixAndNormalize(
-                numberToStrip,
-                internationalPrefix
+            CountryCodeSource.FROM_DEFAULT_COUNTRY, phoneUtil.maybeStripInternationalPrefixAndNormalize(
+                numberToStrip, internationalPrefix
             )
         )
         assertEquals(
+            strippedNumber.toString(),
+            numberToStrip.toString(),
             "The number supplied had a 0 after the match so shouldn't be stripped.",
-            strippedNumber.toString(), numberToStrip.toString()
         )
         // Here the 0 is separated by a space from the IDD.
         numberToStrip = InplaceStringBuilder("009 0-112-3123")
         assertEquals(
-            CountryCodeSource.FROM_DEFAULT_COUNTRY,
-            phoneUtil.maybeStripInternationalPrefixAndNormalize(
-                numberToStrip,
-                internationalPrefix
+            CountryCodeSource.FROM_DEFAULT_COUNTRY, phoneUtil.maybeStripInternationalPrefixAndNormalize(
+                numberToStrip, internationalPrefix
             )
         )
     }
 
+    @Test
     fun testMaybeExtractCountryCode() {
         val number = PhoneNumber()
         val metadata = phoneUtil.getMetadataForRegion(RegionCode.US)
@@ -2195,22 +2097,20 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
             val countryCallingCode = 1
             val numberToFill = InplaceStringBuilder()
             assertEquals(
-                "Did not extract country calling code $countryCallingCode correctly.",
                 countryCallingCode,
                 phoneUtil.maybeExtractCountryCode(
-                    phoneNumber, metadata, numberToFill, true,
-                    number
-                )
+                    phoneNumber, metadata, numberToFill, true, number
+                ),
+                "Did not extract country calling code $countryCallingCode correctly.",
             )
             assertEquals(
+                CountryCodeSource.FROM_NUMBER_WITH_IDD,
+                number.countryCodeSource,
                 "Did not figure out CountryCodeSource correctly",
-                CountryCodeSource.FROM_NUMBER_WITH_IDD, number.countryCodeSource
             )
             // Should strip and normalize national significant number.
             assertEquals(
-                "Did not strip off the country calling code correctly.",
-                strippedNumber,
-                numberToFill.toString()
+                strippedNumber, numberToFill.toString(), "Did not strip off the country calling code correctly.",
             )
         } catch (e: NumberParseException) {
             fail("Should not have thrown an exception: $e")
@@ -2221,16 +2121,16 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
             val countryCallingCode = 64
             val numberToFill = InplaceStringBuilder()
             assertEquals(
-                "Did not extract country calling code $countryCallingCode correctly.",
                 countryCallingCode,
                 phoneUtil.maybeExtractCountryCode(
-                    phoneNumber, metadata, numberToFill, true,
-                    number
-                )
+                    phoneNumber, metadata, numberToFill, true, number
+                ),
+                "Did not extract country calling code $countryCallingCode correctly.",
             )
             assertEquals(
+                CountryCodeSource.FROM_NUMBER_WITH_PLUS_SIGN,
+                number.countryCodeSource,
                 "Did not figure out CountryCodeSource correctly",
-                CountryCodeSource.FROM_NUMBER_WITH_PLUS_SIGN, number.countryCodeSource
             )
         } catch (e: NumberParseException) {
             fail("Should not have thrown an exception: $e")
@@ -2241,16 +2141,16 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
             val countryCallingCode = 800
             val numberToFill = InplaceStringBuilder()
             assertEquals(
-                "Did not extract country calling code $countryCallingCode correctly.",
                 countryCallingCode,
                 phoneUtil.maybeExtractCountryCode(
-                    phoneNumber, metadata, numberToFill, true,
-                    number
-                )
+                    phoneNumber, metadata, numberToFill, true, number
+                ),
+                "Did not extract country calling code $countryCallingCode correctly.",
             )
             assertEquals(
+                CountryCodeSource.FROM_NUMBER_WITH_PLUS_SIGN,
+                number.countryCodeSource,
                 "Did not figure out CountryCodeSource correctly",
-                CountryCodeSource.FROM_NUMBER_WITH_PLUS_SIGN, number.countryCodeSource
             )
         } catch (e: NumberParseException) {
             fail("Should not have thrown an exception: $e")
@@ -2260,13 +2160,14 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
             val phoneNumber = "2345-6789"
             val numberToFill = InplaceStringBuilder()
             assertEquals(
-                "Should not have extracted a country calling code - no international prefix present.",
                 0,
-                phoneUtil.maybeExtractCountryCode(phoneNumber, metadata, numberToFill, true, number)
+                phoneUtil.maybeExtractCountryCode(phoneNumber, metadata, numberToFill, true, number),
+                "Should not have extracted a country calling code - no international prefix present.",
             )
             assertEquals(
+                CountryCodeSource.FROM_DEFAULT_COUNTRY,
+                number.countryCodeSource,
                 "Did not figure out CountryCodeSource correctly",
-                CountryCodeSource.FROM_DEFAULT_COUNTRY, number.countryCodeSource
             )
         } catch (e: NumberParseException) {
             fail("Should not have thrown an exception: $e")
@@ -2280,9 +2181,9 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         } catch (e: NumberParseException) {
             // Expected.
             assertEquals(
-                "Wrong error type stored in exception.",
                 NumberParseException.ErrorType.INVALID_COUNTRY_CODE,
-                e.errorType
+                e.errorType,
+                "Wrong error type stored in exception.",
             )
         }
         number.clear()
@@ -2291,17 +2192,16 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
             val countryCallingCode = 1
             val numberToFill = InplaceStringBuilder()
             assertEquals(
-                "Should have extracted the country calling code of the region passed in",
                 countryCallingCode,
                 phoneUtil.maybeExtractCountryCode(
-                    phoneNumber, metadata, numberToFill, true,
-                    number
-                )
+                    phoneNumber, metadata, numberToFill, true, number
+                ),
+                "Should have extracted the country calling code of the region passed in",
             )
             assertEquals(
-                "Did not figure out CountryCodeSource correctly",
                 CountryCodeSource.FROM_NUMBER_WITHOUT_PLUS_SIGN,
-                number.countryCodeSource
+                number.countryCodeSource,
+                "Did not figure out CountryCodeSource correctly",
             )
         } catch (e: NumberParseException) {
             fail("Should not have thrown an exception: $e")
@@ -2312,14 +2212,13 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
             val countryCallingCode = 1
             val numberToFill = InplaceStringBuilder()
             assertEquals(
-                "Should have extracted the country calling code of the region passed in",
                 countryCallingCode,
                 phoneUtil.maybeExtractCountryCode(
-                    phoneNumber, metadata, numberToFill, false,
-                    number
-                )
+                    phoneNumber, metadata, numberToFill, false, number
+                ),
+                "Should have extracted the country calling code of the region passed in",
             )
-            assertFalse("Should not contain CountryCodeSource.", number.hasCountryCodeSource())
+            assertFalse(number.hasCountryCodeSource(), "Should not contain CountryCodeSource.")
         } catch (e: NumberParseException) {
             fail("Should not have thrown an exception: $e")
         }
@@ -2328,12 +2227,11 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
             val phoneNumber = "(1 610) 619 446"
             val numberToFill = InplaceStringBuilder()
             assertEquals(
-                "Should not have extracted a country calling code - invalid number after "
-                        + "extraction of uncertain country calling code.",
                 0,
-                phoneUtil.maybeExtractCountryCode(phoneNumber, metadata, numberToFill, false, number)
+                phoneUtil.maybeExtractCountryCode(phoneNumber, metadata, numberToFill, false, number),
+                "Should not have extracted a country calling code - invalid number after " + "extraction of uncertain country calling code.",
             )
-            assertFalse("Should not contain CountryCodeSource.", number.hasCountryCodeSource())
+            assertFalse(number.hasCountryCodeSource(), "Should not contain CountryCodeSource.")
         } catch (e: NumberParseException) {
             fail("Should not have thrown an exception: $e")
         }
@@ -2342,14 +2240,14 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
             val phoneNumber = "(1 610) 619"
             val numberToFill = InplaceStringBuilder()
             assertEquals(
-                "Should not have extracted a country calling code - too short number both "
-                        + "before and after extraction of uncertain country calling code.",
                 0,
-                phoneUtil.maybeExtractCountryCode(phoneNumber, metadata, numberToFill, true, number)
+                phoneUtil.maybeExtractCountryCode(phoneNumber, metadata, numberToFill, true, number),
+                "Should not have extracted a country calling code - too short number both " + "before and after extraction of uncertain country calling code.",
             )
             assertEquals(
+                CountryCodeSource.FROM_DEFAULT_COUNTRY,
+                number.countryCodeSource,
                 "Did not figure out CountryCodeSource correctly",
-                CountryCodeSource.FROM_DEFAULT_COUNTRY, number.countryCodeSource
             )
         } catch (e: NumberParseException) {
             fail("Should not have thrown an exception: $e")
@@ -2357,6 +2255,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testParseNationalNumber() {
         // National prefix attached.
         assertEquals(NZ_NUMBER, phoneUtil.parse("033316005", RegionCode.NZ))
@@ -2380,15 +2279,13 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         // after the context if present.
         assertEquals(
             NZ_NUMBER, phoneUtil.parse(
-                "tel:03-331-6005;phone-context=+64;a=%A1",
-                RegionCode.NZ
+                "tel:03-331-6005;phone-context=+64;a=%A1", RegionCode.NZ
             )
         )
         // Test parsing RFC3966 with an ISDN subaddress.
         assertEquals(
             NZ_NUMBER, phoneUtil.parse(
-                "tel:03-331-6005;isub=12345;phone-context=+64",
-                RegionCode.NZ
+                "tel:03-331-6005;isub=12345;phone-context=+64", RegionCode.NZ
             )
         )
         assertEquals(NZ_NUMBER, phoneUtil.parse("tel:+64-3-331-6005;isub=12345", RegionCode.NZ))
@@ -2407,16 +2304,13 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertEquals(NZ_NUMBER, phoneUtil.parse("+0064 3 331 6005", RegionCode.NZ))
         assertEquals(NZ_NUMBER, phoneUtil.parse("+ 00 64 3 331 6005", RegionCode.NZ))
         assertEquals(
-            US_LOCAL_NUMBER,
-            phoneUtil.parse("tel:253-0000;phone-context=www.google.com", RegionCode.US)
+            US_LOCAL_NUMBER, phoneUtil.parse("tel:253-0000;phone-context=www.google.com", RegionCode.US)
         )
         assertEquals(
-            US_LOCAL_NUMBER,
-            phoneUtil.parse("tel:253-0000;isub=12345;phone-context=www.google.com", RegionCode.US)
+            US_LOCAL_NUMBER, phoneUtil.parse("tel:253-0000;isub=12345;phone-context=www.google.com", RegionCode.US)
         )
         assertEquals(
-            US_LOCAL_NUMBER,
-            phoneUtil.parse("tel:2530000;isub=12345;phone-context=1234.com", RegionCode.US)
+            US_LOCAL_NUMBER, phoneUtil.parse("tel:2530000;isub=12345;phone-context=1234.com", RegionCode.US)
         )
         val nzNumber = PhoneNumber()
         nzNumber.setCountryCode(64).setNationalNumber(64123456L)
@@ -2439,12 +2333,12 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         // Test for short-code with leading zero for a country which has 0 as national prefix. Ensure
         // it's not interpreted as national prefix if the remaining number length is local-only in
         // terms of length. Example: In GB, length 6-7 are only possible local-only.
-        shortNumber.setCountryCode(44).setNationalNumber(123456)
-            .setItalianLeadingZero(true)
+        shortNumber.setCountryCode(44).setNationalNumber(123456).setItalianLeadingZero(true)
         assertEquals(shortNumber, phoneUtil.parse("0123456", RegionCode.GB))
     }
 
     @Throws(Exception::class)
+    @Test
     fun testParseNumberWithAlphaCharacters() {
         // Test case with alpha characters.
         val tollfreeNumber = PhoneNumber()
@@ -2461,6 +2355,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testParseMaliciousInput() {
         // Lots of leading + signs before the possible number.
         val maliciousNumber = InplaceStringBuilder(6000)
@@ -2474,9 +2369,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         } catch (e: NumberParseException) {
             // Expected this exception.
             assertEquals(
-                "Wrong error type stored in exception.",
-                NumberParseException.ErrorType.TOO_LONG,
-                e.errorType
+                NumberParseException.ErrorType.TOO_LONG, e.errorType, "Wrong error type stored in exception."
             )
         }
         val maliciousNumberWithAlmostExt = InplaceStringBuilder(6000)
@@ -2490,14 +2383,13 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         } catch (e: NumberParseException) {
             // Expected this exception.
             assertEquals(
-                "Wrong error type stored in exception.",
-                NumberParseException.ErrorType.TOO_LONG,
-                e.errorType
+                NumberParseException.ErrorType.TOO_LONG, e.errorType, "Wrong error type stored in exception."
             )
         }
     }
 
     @Throws(Exception::class)
+    @Test
     fun testParseWithInternationalPrefixes() {
         assertEquals(US_NUMBER, phoneUtil.parse("+1 (650) 253-0000", RegionCode.NZ))
         assertEquals(INTERNATIONAL_TOLL_FREE, phoneUtil.parse("011 800 1234 5678", RegionCode.US))
@@ -2516,6 +2408,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testParseNonAscii() {
         // Using a full-width plus sign.
         assertEquals(US_NUMBER, phoneUtil.parse("\uFF0B1 (650) 253-0000", RegionCode.SG))
@@ -2524,16 +2417,14 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         // The whole number, including punctuation, is here represented in full-width form.
         assertEquals(
             US_NUMBER, phoneUtil.parse(
-                "\uFF0B\uFF11\u3000\uFF08\uFF16\uFF15\uFF10\uFF09"
-                        + "\u3000\uFF12\uFF15\uFF13\uFF0D\uFF10\uFF10\uFF10\uFF10",
+                "\uFF0B\uFF11\u3000\uFF08\uFF16\uFF15\uFF10\uFF09" + "\u3000\uFF12\uFF15\uFF13\uFF0D\uFF10\uFF10\uFF10\uFF10",
                 RegionCode.SG
             )
         )
         // Using U+30FC dash instead.
         assertEquals(
             US_NUMBER, phoneUtil.parse(
-                "\uFF0B\uFF11\u3000\uFF08\uFF16\uFF15\uFF10\uFF09"
-                        + "\u3000\uFF12\uFF15\uFF13\u30FC\uFF10\uFF10\uFF10\uFF10",
+                "\uFF0B\uFF11\u3000\uFF08\uFF16\uFF15\uFF10\uFF09" + "\u3000\uFF12\uFF15\uFF13\u30FC\uFF10\uFF10\uFF10\uFF10",
                 RegionCode.SG
             )
         )
@@ -2541,14 +2432,13 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         // Using a very strange decimal digit range (Mongolian digits).
         assertEquals(
             US_NUMBER, phoneUtil.parse(
-                "\u1811 \u1816\u1815\u1810 "
-                        + "\u1812\u1815\u1813 \u1810\u1810\u1810\u1810",
-                RegionCode.US
+                "\u1811 \u1816\u1815\u1810 " + "\u1812\u1815\u1813 \u1810\u1810\u1810\u1810", RegionCode.US
             )
         )
     }
 
     @Throws(Exception::class)
+    @Test
     fun testParseWithLeadingZero() {
         assertEquals(IT_NUMBER, phoneUtil.parse("+39 02-36618 300", RegionCode.NZ))
         assertEquals(IT_NUMBER, phoneUtil.parse("02-36618 300", RegionCode.IT))
@@ -2556,6 +2446,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testParseNationalNumberArgentina() {
         // Test parsing mobile numbers of Argentina.
         val arNumber = PhoneNumber()
@@ -2582,6 +2473,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testParseWithXInNumber() {
         // Test that having an 'x' in the phone number at the start is ok and that it just gets removed.
         assertEquals(AR_NUMBER, phoneUtil.parse("01187654321", RegionCode.AR))
@@ -2598,6 +2490,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testParseNumbersMexico() {
         // Test parsing fixed-line numbers of Mexico.
         val mxNumber = PhoneNumber()
@@ -2614,6 +2507,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertEquals(mxNumber, phoneUtil.parse("045 33 1234-5678", RegionCode.MX))
     }
 
+    @Test
     fun testFailedParseOnInvalidNumbers() {
         try {
             val sentencePhoneNumber = "This is not a phone number"
@@ -2622,9 +2516,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         } catch (e: NumberParseException) {
             // Expected this exception.
             assertEquals(
-                "Wrong error type stored in exception.",
-                NumberParseException.ErrorType.NOT_A_NUMBER,
-                e.errorType
+                NumberParseException.ErrorType.NOT_A_NUMBER, e.errorType, "Wrong error type stored in exception."
             )
         }
         try {
@@ -2634,9 +2526,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         } catch (e: NumberParseException) {
             // Expected this exception.
             assertEquals(
-                "Wrong error type stored in exception.",
-                NumberParseException.ErrorType.NOT_A_NUMBER,
-                e.errorType
+                NumberParseException.ErrorType.NOT_A_NUMBER, e.errorType, "Wrong error type stored in exception.",
             )
         }
         try {
@@ -2646,9 +2536,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         } catch (e: NumberParseException) {
             // Expected this exception.
             assertEquals(
-                "Wrong error type stored in exception.",
-                NumberParseException.ErrorType.NOT_A_NUMBER,
-                e.errorType
+                NumberParseException.ErrorType.NOT_A_NUMBER, e.errorType, "Wrong error type stored in exception.",
             )
         }
         try {
@@ -2658,9 +2546,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         } catch (e: NumberParseException) {
             // Expected this exception.
             assertEquals(
-                "Wrong error type stored in exception.",
-                NumberParseException.ErrorType.NOT_A_NUMBER,
-                e.errorType
+                NumberParseException.ErrorType.NOT_A_NUMBER, e.errorType, "Wrong error type stored in exception.",
             )
         }
         try {
@@ -2670,9 +2556,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         } catch (e: NumberParseException) {
             // Expected this exception.
             assertEquals(
-                "Wrong error type stored in exception.",
-                NumberParseException.ErrorType.TOO_LONG,
-                e.errorType
+                NumberParseException.ErrorType.TOO_LONG, e.errorType, "Wrong error type stored in exception.",
             )
         }
         try {
@@ -2682,9 +2566,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         } catch (e: NumberParseException) {
             // Expected this exception.
             assertEquals(
-                "Wrong error type stored in exception.",
-                NumberParseException.ErrorType.NOT_A_NUMBER,
-                e.errorType
+                NumberParseException.ErrorType.NOT_A_NUMBER, e.errorType, "Wrong error type stored in exception.",
             )
         }
         try {
@@ -2694,9 +2576,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         } catch (e: NumberParseException) {
             // Expected this exception.
             assertEquals(
-                "Wrong error type stored in exception.",
-                NumberParseException.ErrorType.NOT_A_NUMBER,
-                e.errorType
+                NumberParseException.ErrorType.NOT_A_NUMBER, e.errorType, "Wrong error type stored in exception.",
             )
         }
         try {
@@ -2706,9 +2586,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         } catch (e: NumberParseException) {
             // Expected this exception.
             assertEquals(
-                "Wrong error type stored in exception.",
-                NumberParseException.ErrorType.NOT_A_NUMBER,
-                e.errorType
+                NumberParseException.ErrorType.NOT_A_NUMBER, e.errorType, "Wrong error type stored in exception.",
             )
         }
         try {
@@ -2718,9 +2596,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         } catch (e: NumberParseException) {
             // Expected this exception.
             assertEquals(
-                "Wrong error type stored in exception.",
-                NumberParseException.ErrorType.TOO_SHORT_NSN,
-                e.errorType
+                NumberParseException.ErrorType.TOO_SHORT_NSN, e.errorType, "Wrong error type stored in exception.",
             )
         }
         try {
@@ -2730,9 +2606,9 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         } catch (e: NumberParseException) {
             // Expected this exception.
             assertEquals(
-                "Wrong error type stored in exception.",
                 NumberParseException.ErrorType.INVALID_COUNTRY_CODE,
-                e.errorType
+                e.errorType,
+                "Wrong error type stored in exception.",
             )
         }
         try {
@@ -2742,9 +2618,9 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         } catch (e: NumberParseException) {
             // Expected this exception. 00 is a correct IDD, but 210 is not a valid country code.
             assertEquals(
-                "Wrong error type stored in exception.",
                 NumberParseException.ErrorType.INVALID_COUNTRY_CODE,
-                e.errorType
+                e.errorType,
+                "Wrong error type stored in exception.",
             )
         }
         try {
@@ -2754,9 +2630,9 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         } catch (e: NumberParseException) {
             // Expected this exception.
             assertEquals(
-                "Wrong error type stored in exception.",
                 NumberParseException.ErrorType.INVALID_COUNTRY_CODE,
-                e.errorType
+                e.errorType,
+                "Wrong error type stored in exception.",
             )
         }
         try {
@@ -2766,9 +2642,9 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         } catch (e: NumberParseException) {
             // Expected this exception.
             assertEquals(
-                "Wrong error type stored in exception.",
                 NumberParseException.ErrorType.INVALID_COUNTRY_CODE,
-                e.errorType
+                e.errorType,
+                "Wrong error type stored in exception.",
             )
         }
         try {
@@ -2778,9 +2654,9 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         } catch (e: NumberParseException) {
             // Expected this exception.
             assertEquals(
-                "Wrong error type stored in exception.",
                 NumberParseException.ErrorType.INVALID_COUNTRY_CODE,
-                e.errorType
+                e.errorType,
+                "Wrong error type stored in exception.",
             )
         }
         try {
@@ -2790,9 +2666,9 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         } catch (e: NumberParseException) {
             // Expected this exception.
             assertEquals(
-                "Wrong error type stored in exception.",
                 NumberParseException.ErrorType.TOO_SHORT_AFTER_IDD,
-                e.errorType
+                e.errorType,
+                "Wrong error type stored in exception.",
             )
         }
         try {
@@ -2802,9 +2678,9 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         } catch (e: NumberParseException) {
             // Expected this exception.
             assertEquals(
-                "Wrong error type stored in exception.",
                 NumberParseException.ErrorType.TOO_SHORT_AFTER_IDD,
-                e.errorType
+                e.errorType,
+                "Wrong error type stored in exception.",
             )
         }
         try {
@@ -2814,9 +2690,9 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         } catch (e: NumberParseException) {
             // Expected this exception.
             assertEquals(
-                "Wrong error type stored in exception.",
                 NumberParseException.ErrorType.TOO_SHORT_AFTER_IDD,
-                e.errorType
+                e.errorType,
+                "Wrong error type stored in exception.",
             )
         }
         try {
@@ -2826,9 +2702,9 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         } catch (e: NumberParseException) {
             // Expected this exception.
             assertEquals(
-                "Wrong error type stored in exception.",
                 NumberParseException.ErrorType.TOO_SHORT_AFTER_IDD,
-                e.errorType
+                e.errorType,
+                "Wrong error type stored in exception.",
             )
         }
         try {
@@ -2839,9 +2715,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         } catch (e: NumberParseException) {
             // Expected this exception.
             assertEquals(
-                "Wrong error type stored in exception.",
-                NumberParseException.ErrorType.NOT_A_NUMBER,
-                e.errorType
+                NumberParseException.ErrorType.NOT_A_NUMBER, e.errorType, "Wrong error type stored in exception.",
             )
         }
         try {
@@ -2852,9 +2726,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         } catch (e: NumberParseException) {
             // Expected this exception.
             assertEquals(
-                "Wrong error type stored in exception.",
-                NumberParseException.ErrorType.NOT_A_NUMBER,
-                e.errorType
+                NumberParseException.ErrorType.NOT_A_NUMBER, e.errorType, "Wrong error type stored in exception.",
             )
         } catch (e: NullPointerException) {
             fail("Null string - but should not throw a null pointer exception.")
@@ -2866,9 +2738,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         } catch (e: NumberParseException) {
             // Expected this exception.
             assertEquals(
-                "Wrong error type stored in exception.",
-                NumberParseException.ErrorType.NOT_A_NUMBER,
-                e.errorType
+                NumberParseException.ErrorType.NOT_A_NUMBER, e.errorType, "Wrong error type stored in exception.",
             )
         } catch (e: NullPointerException) {
             fail("Null string - but should not throw a null pointer exception.")
@@ -2880,9 +2750,9 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         } catch (e: NumberParseException) {
             // Expected this exception.
             assertEquals(
-                "Wrong error type stored in exception.",
                 NumberParseException.ErrorType.INVALID_COUNTRY_CODE,
-                e.errorType
+                e.errorType,
+                "Wrong error type stored in exception.",
             )
         }
         try {
@@ -2894,9 +2764,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         } catch (e: NumberParseException) {
             // Expected this exception.
             assertEquals(
-                "Wrong error type stored in exception.",
-                NumberParseException.ErrorType.NOT_A_NUMBER,
-                e.errorType
+                NumberParseException.ErrorType.NOT_A_NUMBER, e.errorType, "Wrong error type stored in exception.",
             )
         }
         try {
@@ -2907,14 +2775,13 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         } catch (e: NumberParseException) {
             // Expected this exception.
             assertEquals(
-                "Wrong error type stored in exception.",
-                NumberParseException.ErrorType.NOT_A_NUMBER,
-                e.errorType
+                NumberParseException.ErrorType.NOT_A_NUMBER, e.errorType, "Wrong error type stored in exception.",
             )
         }
     }
 
     @Throws(Exception::class)
+    @Test
     fun testParseNumbersWithPlusWithNoRegion() {
         // RegionCode.ZZ is allowed only if the number starts with a '+' - then the country calling code
         // can be calculated.
@@ -2932,16 +2799,14 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertEquals(NZ_NUMBER, phoneUtil.parse("  tel:03-331-6005;phone-context=+64", RegionCode.ZZ))
         assertEquals(
             NZ_NUMBER, phoneUtil.parse(
-                "tel:03-331-6005;isub=12345;phone-context=+64",
-                RegionCode.ZZ
+                "tel:03-331-6005;isub=12345;phone-context=+64", RegionCode.ZZ
             )
         )
         val nzNumberWithRawInput = PhoneNumber().mergeFrom(NZ_NUMBER).setRawInput("+64 3 331 6005")
             .setCountryCodeSource(CountryCodeSource.FROM_NUMBER_WITH_PLUS_SIGN)
         assertEquals(
             nzNumberWithRawInput, phoneUtil.parseAndKeepRawInput(
-                "+64 3 331 6005",
-                RegionCode.ZZ
+                "+64 3 331 6005", RegionCode.ZZ
             )
         )
         // Null is also allowed for the region code in these cases.
@@ -2949,6 +2814,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testParseNumberTooShortIfNationalPrefixStripped() {
         // Test that a number whose first digits happen to coincide with the national prefix does not
         // get them stripped if doing so would result in a number too short to be a possible (regular
@@ -2969,6 +2835,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testParseExtensions() {
         val nzNumber = PhoneNumber()
         nzNumber.setCountryCode(64).setNationalNumber(33316005L).setExtension("3456")
@@ -2999,29 +2866,25 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertEquals(ukNumber, phoneUtil.parse("+44-2034567890;ext=456", RegionCode.GB))
         assertEquals(
             ukNumber, phoneUtil.parse(
-                "tel:2034567890;ext=456;phone-context=+44",
-                RegionCode.ZZ
+                "tel:2034567890;ext=456;phone-context=+44", RegionCode.ZZ
             )
         )
         // Full-width extension, "extn" only.
         assertEquals(
             ukNumber, phoneUtil.parse(
-                "+442034567890\uFF45\uFF58\uFF54\uFF4E456",
-                RegionCode.GB
+                "+442034567890\uFF45\uFF58\uFF54\uFF4E456", RegionCode.GB
             )
         )
         // "xtn" only.
         assertEquals(
             ukNumber, phoneUtil.parse(
-                "+442034567890\uFF58\uFF54\uFF4E456",
-                RegionCode.GB
+                "+442034567890\uFF58\uFF54\uFF4E456", RegionCode.GB
             )
         )
         // "xt" only.
         assertEquals(
             ukNumber, phoneUtil.parse(
-                "+442034567890\uFF58\uFF54456",
-                RegionCode.GB
+                "+442034567890\uFF58\uFF54456", RegionCode.GB
             )
         )
         val usWithExtension = PhoneNumber()
@@ -3032,17 +2895,14 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         // To test an extension character without surrounding spaces.
         assertEquals(usWithExtension, phoneUtil.parse("(800) 901-3355;7246433", RegionCode.US))
         assertEquals(
-            usWithExtension,
-            phoneUtil.parse("(800) 901-3355 ,extension 7246433", RegionCode.US)
+            usWithExtension, phoneUtil.parse("(800) 901-3355 ,extension 7246433", RegionCode.US)
         )
         assertEquals(
-            usWithExtension,
-            phoneUtil.parse("(800) 901-3355 ,extensi\u00F3n 7246433", RegionCode.US)
+            usWithExtension, phoneUtil.parse("(800) 901-3355 ,extensi\u00F3n 7246433", RegionCode.US)
         )
         // Repeat with the small letter o with acute accent created by combining characters.
         assertEquals(
-            usWithExtension,
-            phoneUtil.parse("(800) 901-3355 ,extensio\u0301n 7246433", RegionCode.US)
+            usWithExtension, phoneUtil.parse("(800) 901-3355 ,extensio\u0301n 7246433", RegionCode.US)
         )
         assertEquals(usWithExtension, phoneUtil.parse("(800) 901-3355 , 7246433", RegionCode.US))
         assertEquals(usWithExtension, phoneUtil.parse("(800) 901-3355 ext: 7246433", RegionCode.US))
@@ -3050,29 +2910,23 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         val ruWithExtension = PhoneNumber()
         ruWithExtension.setCountryCode(7).setNationalNumber(4232022511L).setExtension("100")
         assertEquals(
-            ruWithExtension,
-            phoneUtil.parse("8 (423) 202-25-11, \u0434\u043E\u0431. 100", RegionCode.RU)
+            ruWithExtension, phoneUtil.parse("8 (423) 202-25-11, \u0434\u043E\u0431. 100", RegionCode.RU)
         )
         assertEquals(
-            ruWithExtension,
-            phoneUtil.parse("8 (423) 202-25-11 \u0434\u043E\u0431. 100", RegionCode.RU)
+            ruWithExtension, phoneUtil.parse("8 (423) 202-25-11 \u0434\u043E\u0431. 100", RegionCode.RU)
         )
         assertEquals(
-            ruWithExtension,
-            phoneUtil.parse("8 (423) 202-25-11, \u0434\u043E\u0431 100", RegionCode.RU)
+            ruWithExtension, phoneUtil.parse("8 (423) 202-25-11, \u0434\u043E\u0431 100", RegionCode.RU)
         )
         assertEquals(
-            ruWithExtension,
-            phoneUtil.parse("8 (423) 202-25-11 \u0434\u043E\u0431 100", RegionCode.RU)
+            ruWithExtension, phoneUtil.parse("8 (423) 202-25-11 \u0434\u043E\u0431 100", RegionCode.RU)
         )
         assertEquals(
-            ruWithExtension,
-            phoneUtil.parse("8 (423) 202-25-11\u0434\u043E\u0431100", RegionCode.RU)
+            ruWithExtension, phoneUtil.parse("8 (423) 202-25-11\u0434\u043E\u0431100", RegionCode.RU)
         )
         // In upper case
         assertEquals(
-            ruWithExtension,
-            phoneUtil.parse("8 (423) 202-25-11, \u0414\u041E\u0411. 100", RegionCode.RU)
+            ruWithExtension, phoneUtil.parse("8 (423) 202-25-11, \u0414\u041E\u0411. 100", RegionCode.RU)
         )
 
         // Test that if a number has two extensions specified, we ignore the second.
@@ -3080,20 +2934,17 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         usWithTwoExtensionsNumber.setCountryCode(1).setNationalNumber(2121231234L).setExtension("508")
         assertEquals(
             usWithTwoExtensionsNumber, phoneUtil.parse(
-                "(212)123-1234 x508/x1234",
-                RegionCode.US
+                "(212)123-1234 x508/x1234", RegionCode.US
             )
         )
         assertEquals(
             usWithTwoExtensionsNumber, phoneUtil.parse(
-                "(212)123-1234 x508/ x1234",
-                RegionCode.US
+                "(212)123-1234 x508/ x1234", RegionCode.US
             )
         )
         assertEquals(
             usWithTwoExtensionsNumber, phoneUtil.parse(
-                "(212)123-1234 x508\\x1234",
-                RegionCode.US
+                "(212)123-1234 x508\\x1234", RegionCode.US
             )
         )
 
@@ -3107,6 +2958,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testParseHandlesLongExtensionsWithExplicitLabels() {
         // Test lower and upper limits of extension lengths for each type of label.
         val nzNumber = PhoneNumber()
@@ -3123,15 +2975,12 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         try {
             phoneUtil.parse("tel:+6433316005;ext=012345678901234567890", RegionCode.NZ)
             fail(
-                "This should not parse as length of extension is higher than allowed: "
-                        + "tel:+6433316005;ext=012345678901234567890"
+                "This should not parse as length of extension is higher than allowed: " + "tel:+6433316005;ext=012345678901234567890"
             )
         } catch (e: NumberParseException) {
             // Expected this exception.
             assertEquals(
-                "Wrong error type stored in exception.",
-                NumberParseException.ErrorType.NOT_A_NUMBER,
-                e.errorType
+                NumberParseException.ErrorType.NOT_A_NUMBER, e.errorType, "Wrong error type stored in exception.",
             )
         }
 
@@ -3157,20 +3006,18 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         try {
             phoneUtil.parse("03 3316005 extension 123456789012345678901", RegionCode.NZ)
             fail(
-                "This should not parse as length of extension is higher than allowed: "
-                        + "03 3316005 extension 123456789012345678901"
+                "This should not parse as length of extension is higher than allowed: " + "03 3316005 extension 123456789012345678901"
             )
         } catch (e: NumberParseException) {
             // Expected this exception.
             assertEquals(
-                "Wrong error type stored in exception.",
-                NumberParseException.ErrorType.TOO_LONG,
-                e.errorType
+                NumberParseException.ErrorType.TOO_LONG, e.errorType, "Wrong error type stored in exception.",
             )
         }
     }
 
     @Throws(Exception::class)
+    @Test
     fun testParseHandlesLongExtensionsWithAutoDiallingLabels() {
         // Secondly, cases of auto-dialling and other standard extension labels,
         // PhoneNumberUtil.extLimitAfterLikelyLabel
@@ -3190,20 +3037,18 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         try {
             phoneUtil.parse("+12679000000,,1234567890123456#", RegionCode.US)
             fail(
-                "This should not parse as length of extension is higher than allowed: "
-                        + "+12679000000,,1234567890123456#"
+                "This should not parse as length of extension is higher than allowed: " + "+12679000000,,1234567890123456#"
             )
         } catch (e: NumberParseException) {
             // Expected this exception.
             assertEquals(
-                "Wrong error type stored in exception.",
-                NumberParseException.ErrorType.NOT_A_NUMBER,
-                e.errorType
+                NumberParseException.ErrorType.NOT_A_NUMBER, e.errorType, "Wrong error type stored in exception.",
             )
         }
     }
 
     @Throws(Exception::class)
+    @Test
     fun testParseHandlesShortExtensionsWithAmbiguousChar() {
         val nzNumber = PhoneNumber()
         nzNumber.setCountryCode(64).setNationalNumber(33316005L)
@@ -3219,20 +3064,18 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         try {
             phoneUtil.parse("03 3316005 ~ 1234567890", RegionCode.NZ)
             fail(
-                "This should not parse as length of extension is higher than allowed: "
-                        + "03 3316005 ~ 1234567890"
+                "This should not parse as length of extension is higher than allowed: " + "03 3316005 ~ 1234567890"
             )
         } catch (e: NumberParseException) {
             // Expected this exception.
             assertEquals(
-                "Wrong error type stored in exception.",
-                NumberParseException.ErrorType.TOO_LONG,
-                e.errorType
+                NumberParseException.ErrorType.TOO_LONG, e.errorType, "Wrong error type stored in exception.",
             )
         }
     }
 
     @Throws(Exception::class)
+    @Test
     fun testParseHandlesShortExtensionsWhenNotSureOfLabel() {
         // Lastly, when no explicit extension label present, but denoted by tailing #:
         // PhoneNumberUtil.extLimitWhenNotSure
@@ -3245,44 +3088,38 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         try {
             phoneUtil.parse("+1123-456-7890 7777777#", RegionCode.US)
             fail(
-                "This should not parse as length of extension is higher than allowed: "
-                        + "+1123-456-7890 7777777#"
+                "This should not parse as length of extension is higher than allowed: " + "+1123-456-7890 7777777#"
             )
         } catch (e: NumberParseException) {
             // Expected this exception.
             assertEquals(
-                "Wrong error type stored in exception.",
-                NumberParseException.ErrorType.NOT_A_NUMBER,
-                e.errorType
+                NumberParseException.ErrorType.NOT_A_NUMBER, e.errorType, "Wrong error type stored in exception.",
             )
         }
     }
 
     @Throws(Exception::class)
+    @Test
     fun testParseAndKeepRaw() {
         val alphaNumericNumber = PhoneNumber().mergeFrom(ALPHA_NUMERIC_NUMBER).setRawInput("800 six-flags")
             .setCountryCodeSource(CountryCodeSource.FROM_DEFAULT_COUNTRY)
         assertEquals(
-            alphaNumericNumber,
-            phoneUtil.parseAndKeepRawInput("800 six-flags", RegionCode.US)
+            alphaNumericNumber, phoneUtil.parseAndKeepRawInput("800 six-flags", RegionCode.US)
         )
         val shorterAlphaNumber =
             PhoneNumber().setCountryCode(1).setNationalNumber(8007493524L).setRawInput("1800 six-flag")
                 .setCountryCodeSource(CountryCodeSource.FROM_NUMBER_WITHOUT_PLUS_SIGN)
         assertEquals(
-            shorterAlphaNumber,
-            phoneUtil.parseAndKeepRawInput("1800 six-flag", RegionCode.US)
+            shorterAlphaNumber, phoneUtil.parseAndKeepRawInput("1800 six-flag", RegionCode.US)
         )
         shorterAlphaNumber.setRawInput("+1800 six-flag")
             .setCountryCodeSource(CountryCodeSource.FROM_NUMBER_WITH_PLUS_SIGN)
         assertEquals(
-            shorterAlphaNumber,
-            phoneUtil.parseAndKeepRawInput("+1800 six-flag", RegionCode.NZ)
+            shorterAlphaNumber, phoneUtil.parseAndKeepRawInput("+1800 six-flag", RegionCode.NZ)
         )
         shorterAlphaNumber.setRawInput("001800 six-flag").setCountryCodeSource(CountryCodeSource.FROM_NUMBER_WITH_IDD)
         assertEquals(
-            shorterAlphaNumber,
-            phoneUtil.parseAndKeepRawInput("001800 six-flag", RegionCode.NZ)
+            shorterAlphaNumber, phoneUtil.parseAndKeepRawInput("001800 six-flag", RegionCode.NZ)
         )
 
         // Invalid region code supplied.
@@ -3292,9 +3129,9 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         } catch (e: NumberParseException) {
             // Expected this exception.
             assertEquals(
-                "Wrong error type stored in exception.",
                 NumberParseException.ErrorType.INVALID_COUNTRY_CODE,
-                e.errorType
+                e.errorType,
+                "Wrong error type stored in exception.",
             )
         }
         val koreanNumber = PhoneNumber()
@@ -3304,6 +3141,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testParseItalianLeadingZeros() {
         // Test the number "011".
         val oneZero = PhoneNumber()
@@ -3312,24 +3150,22 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
 
         // Test the number "001".
         val twoZeros = PhoneNumber()
-        twoZeros.setCountryCode(61).setNationalNumber(1).setItalianLeadingZero(true)
-            .setNumberOfLeadingZeros(2)
+        twoZeros.setCountryCode(61).setNationalNumber(1).setItalianLeadingZero(true).setNumberOfLeadingZeros(2)
         assertEquals(twoZeros, phoneUtil.parse("001", RegionCode.AU))
 
         // Test the number "000". This number has 2 leading zeros.
         val stillTwoZeros = PhoneNumber()
-        stillTwoZeros.setCountryCode(61).setNationalNumber(0L).setItalianLeadingZero(true)
-            .setNumberOfLeadingZeros(2)
+        stillTwoZeros.setCountryCode(61).setNationalNumber(0L).setItalianLeadingZero(true).setNumberOfLeadingZeros(2)
         assertEquals(stillTwoZeros, phoneUtil.parse("000", RegionCode.AU))
 
         // Test the number "0000". This number has 3 leading zeros.
         val threeZeros = PhoneNumber()
-        threeZeros.setCountryCode(61).setNationalNumber(0L).setItalianLeadingZero(true)
-            .setNumberOfLeadingZeros(3)
+        threeZeros.setCountryCode(61).setNationalNumber(0L).setItalianLeadingZero(true).setNumberOfLeadingZeros(3)
         assertEquals(threeZeros, phoneUtil.parse("0000", RegionCode.AU))
     }
 
     @Throws(Exception::class)
+    @Test
     fun testParseWithPhoneContext() {
         // context    = ";phone-context=" descriptor
         // descriptor = domainname / global-number-digits
@@ -3337,36 +3173,30 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         // Valid global-phone-digits
         assertEquals(NZ_NUMBER, phoneUtil.parse("tel:033316005;phone-context=+64", RegionCode.ZZ))
         assertEquals(
-            NZ_NUMBER,
-            phoneUtil.parse(
-                "tel:033316005;phone-context=+64;{this isn't part of phone-context anymore!}",
-                RegionCode.ZZ
+            NZ_NUMBER, phoneUtil.parse(
+                "tel:033316005;phone-context=+64;{this isn't part of phone-context anymore!}", RegionCode.ZZ
             )
         )
         val nzFromPhoneContext = PhoneNumber()
         nzFromPhoneContext.setCountryCode(64).setNationalNumber(3033316005L)
         assertEquals(
-            nzFromPhoneContext,
-            phoneUtil.parse("tel:033316005;phone-context=+64-3", RegionCode.ZZ)
+            nzFromPhoneContext, phoneUtil.parse("tel:033316005;phone-context=+64-3", RegionCode.ZZ)
         )
         val brFromPhoneContext = PhoneNumber()
         brFromPhoneContext.setCountryCode(55).setNationalNumber(5033316005L)
         assertEquals(
-            brFromPhoneContext,
-            phoneUtil.parse("tel:033316005;phone-context=+(555)", RegionCode.ZZ)
+            brFromPhoneContext, phoneUtil.parse("tel:033316005;phone-context=+(555)", RegionCode.ZZ)
         )
         val usFromPhoneContext = PhoneNumber()
         usFromPhoneContext.setCountryCode(1).setNationalNumber(23033316005L)
         assertEquals(
-            usFromPhoneContext,
-            phoneUtil.parse("tel:033316005;phone-context=+-1-2.3()", RegionCode.ZZ)
+            usFromPhoneContext, phoneUtil.parse("tel:033316005;phone-context=+-1-2.3()", RegionCode.ZZ)
         )
 
         // Valid domainname
         assertEquals(NZ_NUMBER, phoneUtil.parse("tel:033316005;phone-context=abc.nz", RegionCode.NZ))
         assertEquals(
-            NZ_NUMBER,
-            phoneUtil.parse("tel:033316005;phone-context=www.PHONE-numb3r.com", RegionCode.NZ)
+            NZ_NUMBER, phoneUtil.parse("tel:033316005;phone-context=www.PHONE-numb3r.com", RegionCode.NZ)
         )
         assertEquals(NZ_NUMBER, phoneUtil.parse("tel:033316005;phone-context=a", RegionCode.NZ))
         assertEquals(
@@ -3388,13 +3218,13 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
 
     private fun assertThrowsForInvalidPhoneContext(numberToParse: String) {
         assertEquals(
-            NumberParseException.ErrorType.NOT_A_NUMBER,
-            Assert.assertThrows(
+            NumberParseException.ErrorType.NOT_A_NUMBER, Assert.assertThrows(
                 NumberParseException::class.java
             ) { phoneUtil.parse(numberToParse, RegionCode.ZZ) }.errorType
         )
     }
 
+    @Test
     fun testCountryWithNoNumberDesc() {
         // Andorra is a country where we don't have PhoneNumberDesc info in the metadata.
         val adNumber = PhoneNumber()
@@ -3407,49 +3237,43 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
 
         // Test dialing a US number from within Andorra.
         assertEquals(
-            "00 1 650 253 0000",
-            phoneUtil.formatOutOfCountryCallingNumber(US_NUMBER, RegionCode.AD)
+            "00 1 650 253 0000", phoneUtil.formatOutOfCountryCallingNumber(US_NUMBER, RegionCode.AD)
         )
     }
 
+    @Test
     fun testUnknownCountryCallingCode() {
         assertFalse(phoneUtil.isValidNumber(UNKNOWN_COUNTRY_CODE_NO_RAW_INPUT))
         // It's not very well defined as to what the E164 representation for a number with an invalid
         // country calling code is, but just prefixing the country code and national number is about
         // the best we can do.
         assertEquals(
-            "+212345",
-            phoneUtil.format(UNKNOWN_COUNTRY_CODE_NO_RAW_INPUT, PhoneNumberFormat.E164)
+            "+212345", phoneUtil.format(UNKNOWN_COUNTRY_CODE_NO_RAW_INPUT, PhoneNumberFormat.E164)
         )
     }
 
     @Throws(Exception::class)
+    @Test
     fun testIsNumberMatchMatches() {
         // Test simple matches where formatting is different, or leading zeros, or country calling code
         // has been specified.
         assertEquals(
-            PhoneNumberUtil.MatchType.EXACT_MATCH,
-            phoneUtil.isNumberMatch("+64 3 331 6005", "+64 03 331 6005")
+            PhoneNumberUtil.MatchType.EXACT_MATCH, phoneUtil.isNumberMatch("+64 3 331 6005", "+64 03 331 6005")
         )
         assertEquals(
-            PhoneNumberUtil.MatchType.EXACT_MATCH,
-            phoneUtil.isNumberMatch("+800 1234 5678", "+80012345678")
+            PhoneNumberUtil.MatchType.EXACT_MATCH, phoneUtil.isNumberMatch("+800 1234 5678", "+80012345678")
         )
         assertEquals(
-            PhoneNumberUtil.MatchType.EXACT_MATCH,
-            phoneUtil.isNumberMatch("+64 03 331-6005", "+64 03331 6005")
+            PhoneNumberUtil.MatchType.EXACT_MATCH, phoneUtil.isNumberMatch("+64 03 331-6005", "+64 03331 6005")
         )
         assertEquals(
-            PhoneNumberUtil.MatchType.EXACT_MATCH,
-            phoneUtil.isNumberMatch("+643 331-6005", "+64033316005")
+            PhoneNumberUtil.MatchType.EXACT_MATCH, phoneUtil.isNumberMatch("+643 331-6005", "+64033316005")
         )
         assertEquals(
-            PhoneNumberUtil.MatchType.EXACT_MATCH,
-            phoneUtil.isNumberMatch("+643 331-6005", "+6433316005")
+            PhoneNumberUtil.MatchType.EXACT_MATCH, phoneUtil.isNumberMatch("+643 331-6005", "+6433316005")
         )
         assertEquals(
-            PhoneNumberUtil.MatchType.EXACT_MATCH,
-            phoneUtil.isNumberMatch("+64 3 331-6005", "+6433316005")
+            PhoneNumberUtil.MatchType.EXACT_MATCH, phoneUtil.isNumberMatch("+64 3 331-6005", "+6433316005")
         )
         assertEquals(
             PhoneNumberUtil.MatchType.EXACT_MATCH,
@@ -3457,8 +3281,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         )
         // Test alpha numbers.
         assertEquals(
-            PhoneNumberUtil.MatchType.EXACT_MATCH,
-            phoneUtil.isNumberMatch("+1800 siX-Flags", "+1 800 7493 5247")
+            PhoneNumberUtil.MatchType.EXACT_MATCH, phoneUtil.isNumberMatch("+1800 siX-Flags", "+1 800 7493 5247")
         )
         // Test numbers with extensions.
         assertEquals(
@@ -3470,37 +3293,33 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
             phoneUtil.isNumberMatch("+64 3 331-6005 ext. 1234", "+6433316005;1234")
         )
         assertEquals(
-            PhoneNumberUtil.MatchType.EXACT_MATCH,
-            phoneUtil.isNumberMatch(
-                "+7 423 202-25-11 ext 100",
-                "+7 4232022511 \u0434\u043E\u0431. 100"
+            PhoneNumberUtil.MatchType.EXACT_MATCH, phoneUtil.isNumberMatch(
+                "+7 423 202-25-11 ext 100", "+7 4232022511 \u0434\u043E\u0431. 100"
             )
         )
         // Test proto buffers.
         assertEquals(
-            PhoneNumberUtil.MatchType.EXACT_MATCH,
-            phoneUtil.isNumberMatch(NZ_NUMBER, "+6403 331 6005")
+            PhoneNumberUtil.MatchType.EXACT_MATCH, phoneUtil.isNumberMatch(NZ_NUMBER, "+6403 331 6005")
         )
         val nzNumber = PhoneNumber().mergeFrom(NZ_NUMBER).setExtension("3456")
         assertEquals(
-            PhoneNumberUtil.MatchType.EXACT_MATCH,
-            phoneUtil.isNumberMatch(nzNumber, "+643 331 6005 ext 3456")
+            PhoneNumberUtil.MatchType.EXACT_MATCH, phoneUtil.isNumberMatch(nzNumber, "+643 331 6005 ext 3456")
         )
         // Check empty extensions are ignored.
         nzNumber.setExtension("")
         assertEquals(
-            PhoneNumberUtil.MatchType.EXACT_MATCH,
-            phoneUtil.isNumberMatch(nzNumber, "+6403 331 6005")
+            PhoneNumberUtil.MatchType.EXACT_MATCH, phoneUtil.isNumberMatch(nzNumber, "+6403 331 6005")
         )
         // Check variant with two proto buffers.
         assertEquals(
-            "Number " + nzNumber.toString() + " did not match " + NZ_NUMBER.toString(),
             PhoneNumberUtil.MatchType.EXACT_MATCH,
-            phoneUtil.isNumberMatch(nzNumber, NZ_NUMBER)
+            phoneUtil.isNumberMatch(nzNumber, NZ_NUMBER),
+            "Number $nzNumber did not match $NZ_NUMBER",
         )
     }
 
     @Throws(Exception::class)
+    @Test
     fun testIsNumberMatchShortMatchIfDiffNumLeadingZeros() {
         val nzNumberOne = PhoneNumber()
         val nzNumberTwo = PhoneNumber()
@@ -3508,20 +3327,19 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         nzNumberTwo.setCountryCode(64).setNationalNumber(33316005L).setItalianLeadingZero(true)
             .setNumberOfLeadingZeros(2)
         assertEquals(
-            PhoneNumberUtil.MatchType.SHORT_NSN_MATCH,
-            phoneUtil.isNumberMatch(nzNumberOne, nzNumberTwo)
+            PhoneNumberUtil.MatchType.SHORT_NSN_MATCH, phoneUtil.isNumberMatch(nzNumberOne, nzNumberTwo)
         )
         nzNumberOne.setItalianLeadingZero(false).setNumberOfLeadingZeros(1)
         nzNumberTwo.setItalianLeadingZero(true).setNumberOfLeadingZeros(1)
         // Since one doesn't have the "italian_leading_zero" set to true, we ignore the number of
         // leading zeros present (1 is in any case the default value).
         assertEquals(
-            PhoneNumberUtil.MatchType.SHORT_NSN_MATCH,
-            phoneUtil.isNumberMatch(nzNumberOne, nzNumberTwo)
+            PhoneNumberUtil.MatchType.SHORT_NSN_MATCH, phoneUtil.isNumberMatch(nzNumberOne, nzNumberTwo)
         )
     }
 
     @Throws(Exception::class)
+    @Test
     fun testIsNumberMatchAcceptsProtoDefaultsAsMatch() {
         val nzNumberOne = PhoneNumber()
         val nzNumberTwo = PhoneNumber()
@@ -3531,12 +3349,12 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         nzNumberTwo.setCountryCode(64).setNationalNumber(33316005L).setItalianLeadingZero(true)
             .setNumberOfLeadingZeros(1)
         assertEquals(
-            PhoneNumberUtil.MatchType.EXACT_MATCH,
-            phoneUtil.isNumberMatch(nzNumberOne, nzNumberTwo)
+            PhoneNumberUtil.MatchType.EXACT_MATCH, phoneUtil.isNumberMatch(nzNumberOne, nzNumberTwo)
         )
     }
 
     @Throws(Exception::class)
+    @Test
     fun testIsNumberMatchMatchesDiffLeadingZerosIfItalianLeadingZeroFalse() {
         val nzNumberOne = PhoneNumber()
         val nzNumberTwo = PhoneNumber()
@@ -3545,56 +3363,51 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         // is it should be considered equivalent.
         nzNumberTwo.setCountryCode(64).setNationalNumber(33316005L).setNumberOfLeadingZeros(1)
         assertEquals(
-            PhoneNumberUtil.MatchType.EXACT_MATCH,
-            phoneUtil.isNumberMatch(nzNumberOne, nzNumberTwo)
+            PhoneNumberUtil.MatchType.EXACT_MATCH, phoneUtil.isNumberMatch(nzNumberOne, nzNumberTwo)
         )
 
         // Even if it is set to ten, it is still equivalent because in both cases
         // italian_leading_zero is not true.
         nzNumberTwo.setNumberOfLeadingZeros(10)
         assertEquals(
-            PhoneNumberUtil.MatchType.EXACT_MATCH,
-            phoneUtil.isNumberMatch(nzNumberOne, nzNumberTwo)
+            PhoneNumberUtil.MatchType.EXACT_MATCH, phoneUtil.isNumberMatch(nzNumberOne, nzNumberTwo)
         )
     }
 
     @Throws(Exception::class)
+    @Test
     fun testIsNumberMatchIgnoresSomeFields() {
         // Check raw_input, country_code_source and preferred_domestic_carrier_code are ignored.
         val brNumberOne = PhoneNumber()
         val brNumberTwo = PhoneNumber()
         brNumberOne.setCountryCode(55).setNationalNumber(3121286979L)
-            .setCountryCodeSource(CountryCodeSource.FROM_NUMBER_WITH_PLUS_SIGN)
-            .setPreferredDomesticCarrierCode("12").setRawInput("012 3121286979")
+            .setCountryCodeSource(CountryCodeSource.FROM_NUMBER_WITH_PLUS_SIGN).setPreferredDomesticCarrierCode("12")
+            .setRawInput("012 3121286979")
         brNumberTwo.setCountryCode(55).setNationalNumber(3121286979L)
-            .setCountryCodeSource(CountryCodeSource.FROM_DEFAULT_COUNTRY)
-            .setPreferredDomesticCarrierCode("14").setRawInput("143121286979")
+            .setCountryCodeSource(CountryCodeSource.FROM_DEFAULT_COUNTRY).setPreferredDomesticCarrierCode("14")
+            .setRawInput("143121286979")
         assertEquals(
-            PhoneNumberUtil.MatchType.EXACT_MATCH,
-            phoneUtil.isNumberMatch(brNumberOne, brNumberTwo)
+            PhoneNumberUtil.MatchType.EXACT_MATCH, phoneUtil.isNumberMatch(brNumberOne, brNumberTwo)
         )
     }
 
     @Throws(Exception::class)
+    @Test
     fun testIsNumberMatchNonMatches() {
         // Non-matches.
         assertEquals(
-            PhoneNumberUtil.MatchType.NO_MATCH,
-            phoneUtil.isNumberMatch("03 331 6005", "03 331 6006")
+            PhoneNumberUtil.MatchType.NO_MATCH, phoneUtil.isNumberMatch("03 331 6005", "03 331 6006")
         )
         assertEquals(
-            PhoneNumberUtil.MatchType.NO_MATCH,
-            phoneUtil.isNumberMatch("+800 1234 5678", "+1 800 1234 5678")
+            PhoneNumberUtil.MatchType.NO_MATCH, phoneUtil.isNumberMatch("+800 1234 5678", "+1 800 1234 5678")
         )
         // Different country calling code, partial number match.
         assertEquals(
-            PhoneNumberUtil.MatchType.NO_MATCH,
-            phoneUtil.isNumberMatch("+64 3 331-6005", "+16433316005")
+            PhoneNumberUtil.MatchType.NO_MATCH, phoneUtil.isNumberMatch("+64 3 331-6005", "+16433316005")
         )
         // Different country calling code, same number.
         assertEquals(
-            PhoneNumberUtil.MatchType.NO_MATCH,
-            phoneUtil.isNumberMatch("+64 3 331-6005", "+6133316005")
+            PhoneNumberUtil.MatchType.NO_MATCH, phoneUtil.isNumberMatch("+64 3 331-6005", "+6133316005")
         )
         // Extension different, all else the same.
         assertEquals(
@@ -3602,59 +3415,50 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
             phoneUtil.isNumberMatch("+64 3 331-6005 extn 1234", "0116433316005#1235")
         )
         assertEquals(
-            PhoneNumberUtil.MatchType.NO_MATCH,
-            phoneUtil.isNumberMatch(
+            PhoneNumberUtil.MatchType.NO_MATCH, phoneUtil.isNumberMatch(
                 "+64 3 331-6005 extn 1234", "tel:+64-3-331-6005;ext=1235"
             )
         )
         // NSN matches, but extension is different - not the same number.
         assertEquals(
-            PhoneNumberUtil.MatchType.NO_MATCH,
-            phoneUtil.isNumberMatch("+64 3 331-6005 ext.1235", "3 331 6005#1234")
+            PhoneNumberUtil.MatchType.NO_MATCH, phoneUtil.isNumberMatch("+64 3 331-6005 ext.1235", "3 331 6005#1234")
         )
 
         // Invalid numbers that can't be parsed.
         assertEquals(
-            PhoneNumberUtil.MatchType.NOT_A_NUMBER,
-            phoneUtil.isNumberMatch("4", "3 331 6043")
+            PhoneNumberUtil.MatchType.NOT_A_NUMBER, phoneUtil.isNumberMatch("4", "3 331 6043")
         )
         assertEquals(
-            PhoneNumberUtil.MatchType.NOT_A_NUMBER,
-            phoneUtil.isNumberMatch("+43", "+64 3 331 6005")
+            PhoneNumberUtil.MatchType.NOT_A_NUMBER, phoneUtil.isNumberMatch("+43", "+64 3 331 6005")
         )
         assertEquals(
-            PhoneNumberUtil.MatchType.NOT_A_NUMBER,
-            phoneUtil.isNumberMatch("+43", "64 3 331 6005")
+            PhoneNumberUtil.MatchType.NOT_A_NUMBER, phoneUtil.isNumberMatch("+43", "64 3 331 6005")
         )
         assertEquals(
-            PhoneNumberUtil.MatchType.NOT_A_NUMBER,
-            phoneUtil.isNumberMatch("Dog", "64 3 331 6005")
+            PhoneNumberUtil.MatchType.NOT_A_NUMBER, phoneUtil.isNumberMatch("Dog", "64 3 331 6005")
         )
     }
 
     @Throws(Exception::class)
+    @Test
     fun testIsNumberMatchNsnMatches() {
         // NSN matches.
         assertEquals(
-            PhoneNumberUtil.MatchType.NSN_MATCH,
-            phoneUtil.isNumberMatch("+64 3 331-6005", "03 331 6005")
+            PhoneNumberUtil.MatchType.NSN_MATCH, phoneUtil.isNumberMatch("+64 3 331-6005", "03 331 6005")
         )
         assertEquals(
-            PhoneNumberUtil.MatchType.NSN_MATCH,
-            phoneUtil.isNumberMatch(
+            PhoneNumberUtil.MatchType.NSN_MATCH, phoneUtil.isNumberMatch(
                 "+64 3 331-6005", "tel:03-331-6005;isub=1234;phone-context=abc.nz"
             )
         )
         assertEquals(
-            PhoneNumberUtil.MatchType.NSN_MATCH,
-            phoneUtil.isNumberMatch(NZ_NUMBER, "03 331 6005")
+            PhoneNumberUtil.MatchType.NSN_MATCH, phoneUtil.isNumberMatch(NZ_NUMBER, "03 331 6005")
         )
         // Here the second number possibly starts with the country calling code for New Zealand,
         // although we are unsure.
         val unchangedNzNumber = PhoneNumber().mergeFrom(NZ_NUMBER)
         assertEquals(
-            PhoneNumberUtil.MatchType.NSN_MATCH,
-            phoneUtil.isNumberMatch(unchangedNzNumber, "(64-3) 331 6005")
+            PhoneNumberUtil.MatchType.NSN_MATCH, phoneUtil.isNumberMatch(unchangedNzNumber, "(64-3) 331 6005")
         )
         // Check the phone number proto was not edited during the method call.
         assertEquals(NZ_NUMBER, unchangedNzNumber)
@@ -3662,95 +3466,78 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         // Here, the 1 might be a national prefix, if we compare it to the US number, so the resultant
         // match is an NSN match.
         assertEquals(
-            PhoneNumberUtil.MatchType.NSN_MATCH,
-            phoneUtil.isNumberMatch(US_NUMBER, "1-650-253-0000")
+            PhoneNumberUtil.MatchType.NSN_MATCH, phoneUtil.isNumberMatch(US_NUMBER, "1-650-253-0000")
         )
         assertEquals(
-            PhoneNumberUtil.MatchType.NSN_MATCH,
-            phoneUtil.isNumberMatch(US_NUMBER, "6502530000")
+            PhoneNumberUtil.MatchType.NSN_MATCH, phoneUtil.isNumberMatch(US_NUMBER, "6502530000")
         )
         assertEquals(
-            PhoneNumberUtil.MatchType.NSN_MATCH,
-            phoneUtil.isNumberMatch("+1 650-253 0000", "1 650 253 0000")
+            PhoneNumberUtil.MatchType.NSN_MATCH, phoneUtil.isNumberMatch("+1 650-253 0000", "1 650 253 0000")
         )
         assertEquals(
-            PhoneNumberUtil.MatchType.NSN_MATCH,
-            phoneUtil.isNumberMatch("1 650-253 0000", "1 650 253 0000")
+            PhoneNumberUtil.MatchType.NSN_MATCH, phoneUtil.isNumberMatch("1 650-253 0000", "1 650 253 0000")
         )
         assertEquals(
-            PhoneNumberUtil.MatchType.NSN_MATCH,
-            phoneUtil.isNumberMatch("1 650-253 0000", "+1 650 253 0000")
+            PhoneNumberUtil.MatchType.NSN_MATCH, phoneUtil.isNumberMatch("1 650-253 0000", "+1 650 253 0000")
         )
         // For this case, the match will be a short NSN match, because we cannot assume that the 1 might
         // be a national prefix, so don't remove it when parsing.
         val randomNumber = PhoneNumber()
         randomNumber.setCountryCode(41).setNationalNumber(6502530000L)
         assertEquals(
-            PhoneNumberUtil.MatchType.SHORT_NSN_MATCH,
-            phoneUtil.isNumberMatch(randomNumber, "1-650-253-0000")
+            PhoneNumberUtil.MatchType.SHORT_NSN_MATCH, phoneUtil.isNumberMatch(randomNumber, "1-650-253-0000")
         )
     }
 
     @Throws(Exception::class)
+    @Test
     fun testIsNumberMatchShortNsnMatches() {
         // Short NSN matches with the country not specified for either one or both numbers.
         assertEquals(
-            PhoneNumberUtil.MatchType.SHORT_NSN_MATCH,
-            phoneUtil.isNumberMatch("+64 3 331-6005", "331 6005")
+            PhoneNumberUtil.MatchType.SHORT_NSN_MATCH, phoneUtil.isNumberMatch("+64 3 331-6005", "331 6005")
         )
         assertEquals(
             PhoneNumberUtil.MatchType.SHORT_NSN_MATCH,
             phoneUtil.isNumberMatch("+64 3 331-6005", "tel:331-6005;phone-context=abc.nz")
         )
         assertEquals(
-            PhoneNumberUtil.MatchType.SHORT_NSN_MATCH,
-            phoneUtil.isNumberMatch(
-                "+64 3 331-6005",
-                "tel:331-6005;isub=1234;phone-context=abc.nz"
+            PhoneNumberUtil.MatchType.SHORT_NSN_MATCH, phoneUtil.isNumberMatch(
+                "+64 3 331-6005", "tel:331-6005;isub=1234;phone-context=abc.nz"
             )
         )
         assertEquals(
-            PhoneNumberUtil.MatchType.SHORT_NSN_MATCH,
-            phoneUtil.isNumberMatch(
-                "+64 3 331-6005",
-                "tel:331-6005;isub=1234;phone-context=abc.nz;a=%A1"
+            PhoneNumberUtil.MatchType.SHORT_NSN_MATCH, phoneUtil.isNumberMatch(
+                "+64 3 331-6005", "tel:331-6005;isub=1234;phone-context=abc.nz;a=%A1"
             )
         )
         // We did not know that the "0" was a national prefix since neither number has a country code,
         // so this is considered a SHORT_NSN_MATCH.
         assertEquals(
-            PhoneNumberUtil.MatchType.SHORT_NSN_MATCH,
-            phoneUtil.isNumberMatch("3 331-6005", "03 331 6005")
+            PhoneNumberUtil.MatchType.SHORT_NSN_MATCH, phoneUtil.isNumberMatch("3 331-6005", "03 331 6005")
         )
         assertEquals(
-            PhoneNumberUtil.MatchType.SHORT_NSN_MATCH,
-            phoneUtil.isNumberMatch("3 331-6005", "331 6005")
+            PhoneNumberUtil.MatchType.SHORT_NSN_MATCH, phoneUtil.isNumberMatch("3 331-6005", "331 6005")
         )
         assertEquals(
             PhoneNumberUtil.MatchType.SHORT_NSN_MATCH,
             phoneUtil.isNumberMatch("3 331-6005", "tel:331-6005;phone-context=abc.nz")
         )
         assertEquals(
-            PhoneNumberUtil.MatchType.SHORT_NSN_MATCH,
-            phoneUtil.isNumberMatch("3 331-6005", "+64 331 6005")
+            PhoneNumberUtil.MatchType.SHORT_NSN_MATCH, phoneUtil.isNumberMatch("3 331-6005", "+64 331 6005")
         )
         // Short NSN match with the country specified.
         assertEquals(
-            PhoneNumberUtil.MatchType.SHORT_NSN_MATCH,
-            phoneUtil.isNumberMatch("03 331-6005", "331 6005")
+            PhoneNumberUtil.MatchType.SHORT_NSN_MATCH, phoneUtil.isNumberMatch("03 331-6005", "331 6005")
         )
         assertEquals(
-            PhoneNumberUtil.MatchType.SHORT_NSN_MATCH,
-            phoneUtil.isNumberMatch("1 234 345 6789", "345 6789")
+            PhoneNumberUtil.MatchType.SHORT_NSN_MATCH, phoneUtil.isNumberMatch("1 234 345 6789", "345 6789")
         )
         assertEquals(
-            PhoneNumberUtil.MatchType.SHORT_NSN_MATCH,
-            phoneUtil.isNumberMatch("+1 (234) 345 6789", "345 6789")
+            PhoneNumberUtil.MatchType.SHORT_NSN_MATCH, phoneUtil.isNumberMatch("+1 (234) 345 6789", "345 6789")
         )
         // NSN matches, country calling code omitted for one number, extension missing for one.
         assertEquals(
-            PhoneNumberUtil.MatchType.SHORT_NSN_MATCH,
-            phoneUtil.isNumberMatch("+64 3 331-6005", "3 331 6005#1234")
+            PhoneNumberUtil.MatchType.SHORT_NSN_MATCH, phoneUtil.isNumberMatch("+64 3 331-6005", "3 331 6005#1234")
         )
         // One has Italian leading zero, one does not.
         val italianNumberOne = PhoneNumber()
@@ -3758,19 +3545,18 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         val italianNumberTwo = PhoneNumber()
         italianNumberTwo.setCountryCode(39).setNationalNumber(1234L)
         assertEquals(
-            PhoneNumberUtil.MatchType.SHORT_NSN_MATCH,
-            phoneUtil.isNumberMatch(italianNumberOne, italianNumberTwo)
+            PhoneNumberUtil.MatchType.SHORT_NSN_MATCH, phoneUtil.isNumberMatch(italianNumberOne, italianNumberTwo)
         )
         // One has an extension, the other has an extension of "".
         italianNumberOne.setExtension("1234").clearItalianLeadingZero()
         italianNumberTwo.setExtension("")
         assertEquals(
-            PhoneNumberUtil.MatchType.SHORT_NSN_MATCH,
-            phoneUtil.isNumberMatch(italianNumberOne, italianNumberTwo)
+            PhoneNumberUtil.MatchType.SHORT_NSN_MATCH, phoneUtil.isNumberMatch(italianNumberOne, italianNumberTwo)
         )
     }
 
     @Throws(Exception::class)
+    @Test
     fun testCanBeInternationallyDialled() {
         // We have no-international-dialling rules for the US in our test metadata that say that
         // toll-free numbers cannot be dialled internationally.
@@ -3788,6 +3574,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testIsAlphaNumber() {
         assertTrue(phoneUtil.isAlphaNumber("1800 six-flags"))
         assertTrue(phoneUtil.isAlphaNumber("1800 six-flags ext. 1234"))
@@ -3800,6 +3587,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertFalse(phoneUtil.isAlphaNumber("+800 1234-1234"))
     }
 
+    @Test
     fun testIsMobileNumberPortableRegion() {
         assertTrue(phoneUtil.isMobileNumberPortableRegion(RegionCode.US))
         assertTrue(phoneUtil.isMobileNumberPortableRegion(RegionCode.GB))
@@ -3807,24 +3595,29 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         assertFalse(phoneUtil.isMobileNumberPortableRegion(RegionCode.BS))
     }
 
+    @Test
     fun testGetMetadataForRegionForNonGeoEntity_shouldBeNull() {
         assertNull(phoneUtil.getMetadataForRegion(RegionCode.UN001))
     }
 
+    @Test
     fun testGetMetadataForRegionForUnknownRegion_shouldBeNull() {
         assertNull(phoneUtil.getMetadataForRegion(RegionCode.ZZ))
     }
 
+    @Test
     fun testGetMetadataForNonGeographicalRegionForGeoRegion_shouldBeNull() {
         assertNull(phoneUtil.getMetadataForNonGeographicalRegion( /* countryCallingCode = */1))
     }
 
+    @Test
     fun testGetMetadataForRegionForMissingMetadata() {
         Assert.assertThrows(
             MissingMetadataException::class.java
         ) { phoneNumberUtilWithMissingMetadata.getMetadataForRegion(RegionCode.US) }
     }
 
+    @Test
     fun testGetMetadataForNonGeographicalRegionForMissingMetadata() {
         Assert.assertThrows(
             MissingMetadataException::class.java
@@ -3872,8 +3665,8 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
         private val US_SHORT_BY_ONE_NUMBER = PhoneNumber().setCountryCode(1).setNationalNumber(650253000L)
         private val US_TOLLFREE = PhoneNumber().setCountryCode(1).setNationalNumber(8002530000L)
         private val US_SPOOF = PhoneNumber().setCountryCode(1).setNationalNumber(0L)
-        private val US_SPOOF_WITH_RAW_INPUT = PhoneNumber().setCountryCode(1).setNationalNumber(0L)
-            .setRawInput("000-000-0000")
+        private val US_SPOOF_WITH_RAW_INPUT =
+            PhoneNumber().setCountryCode(1).setNationalNumber(0L).setRawInput("000-000-0000")
         private val UZ_FIXED_LINE = PhoneNumber().setCountryCode(998).setNationalNumber(612201234L)
         private val UZ_MOBILE = PhoneNumber().setCountryCode(998).setNationalNumber(950123456L)
         private val INTERNATIONAL_TOLL_FREE = PhoneNumber().setCountryCode(800).setNationalNumber(12345678L)

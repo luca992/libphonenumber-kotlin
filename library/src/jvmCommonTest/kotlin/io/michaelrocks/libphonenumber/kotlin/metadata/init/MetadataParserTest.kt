@@ -18,35 +18,41 @@ package io.michaelrocks.libphonenumber.kotlin.metadata.init
 
 import io.michaelrocks.libphonenumber.kotlin.Phonemetadata
 import io.michaelrocks.libphonenumber.kotlin.metadata.PhoneMetadataCollectionUtil
-import junit.framework.TestCase
-import org.junit.Assert
+import io.michaelrocks.libphonenumber.kotlin.utils.assertThrows
+import org.junit.Test
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream
 import java.nio.charset.StandardCharsets
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
-class MetadataParserTest : TestCase() {
+class MetadataParserTest {
+    @Test
     fun test_parse_shouldThrowExceptionForNullInput() {
-        Assert.assertThrows(
-            IllegalArgumentException::class.java
+        assertThrows(
+            IllegalArgumentException::class
         ) { metadataParser.parse(null) }
     }
 
+    @Test
     fun test_parse_shouldThrowExceptionForEmptyInput() {
         val emptyInput: InputStream = ByteArrayInputStream(ByteArray(0))
-        Assert.assertThrows(
-            IllegalStateException::class.java
+        assertThrows(
+            IllegalStateException::class
         ) { metadataParser.parse(emptyInput) }
     }
 
+    @Test
     fun test_parse_shouldThrowExceptionForInvalidInput() {
         val invalidInput: InputStream = ByteArrayInputStream("Some random input".toByteArray(StandardCharsets.UTF_8))
-        Assert.assertThrows(
-            IllegalStateException::class.java
+        assertThrows(
+            IllegalStateException::class
         ) { metadataParser.parse(invalidInput) }
     }
 
     @Throws(IOException::class)
+    @Test
     fun test_parse_shouldParseValidInput() {
         val input: InputStream = PhoneMetadataCollectionUtil.toInputStream(
             Phonemetadata.PhoneMetadataCollection.newBuilder()
@@ -56,6 +62,7 @@ class MetadataParserTest : TestCase() {
         assertEquals(1, actual.size)
     }
 
+    @Test
     fun test_parse_shouldReturnEmptyCollectionForNullInput() {
         val actual: Collection<Phonemetadata.PhoneMetadata> = MetadataParser.newLenientParser().parse(null)
         assertTrue(actual.isEmpty())

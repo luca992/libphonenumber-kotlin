@@ -14,37 +14,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.michaelrocks.libphonenumber.kotlin.metadata.source
+package io.michaelrocks.libphonenumber.kotlin.source
 
 import io.michaelrocks.libphonenumber.kotlin.Phonemetadata.PhoneMetadata.Companion.newBuilder
 import io.michaelrocks.libphonenumber.kotlin.internal.GeoEntityUtility
 import io.michaelrocks.libphonenumber.kotlin.metadata.source.CompositeMetadataContainer
-import junit.framework.TestCase
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertNull
+import kotlin.test.assertSame
 
-class CompositeMetadataContainerTest : TestCase() {
+class CompositeMetadataContainerTest {
     private var metadataContainer: CompositeMetadataContainer? = null
-    public override fun setUp() {
+
+    @BeforeTest
+    fun setUp() {
         metadataContainer = CompositeMetadataContainer()
     }
 
+    @Test
     fun test_getMetadataBy_shouldReturnNullForNonExistingRegionCode() {
         assertNull(metadataContainer!!.getMetadataBy(REGION_CODE))
     }
 
+    @Test
     fun test_getMetadataBy_shouldReturnMetadataForExistingRegionCode() {
         metadataContainer!!.accept(PHONE_METADATA_WITH_REGION_CODE)
         assertSame(PHONE_METADATA_WITH_REGION_CODE, metadataContainer!!.getMetadataBy(REGION_CODE))
     }
 
+    @Test
     fun test_getMetadataBy_shouldReturnNullForNonExistingCountryCode() {
         assertNull(metadataContainer!!.getMetadataBy(COUNTRY_CODE))
     }
 
+    @Test
     fun test_getMetadataBy_shouldReturnMetadataForExistingCountryCode() {
         metadataContainer!!.accept(PHONE_METADATA_WITH_COUNTRY_CODE)
         assertSame(PHONE_METADATA_WITH_COUNTRY_CODE, metadataContainer!!.getMetadataBy(COUNTRY_CODE))
     }
 
+    @Test
     fun test_getMetadataBy_shouldReturnNullForExistingCountryCodeOfGeoRegion() {
         metadataContainer!!.accept(PHONE_METADATA_WITH_REGION_CODE)
         assertNull(metadataContainer!!.getMetadataBy(COUNTRY_CODE))

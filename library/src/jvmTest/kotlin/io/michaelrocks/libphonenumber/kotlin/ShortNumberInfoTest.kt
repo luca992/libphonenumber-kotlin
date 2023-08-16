@@ -16,12 +16,12 @@
  */
 package io.michaelrocks.libphonenumber.kotlin
 
-import io.michaelrocks.libphonenumber.kotlin.RegionCode
-import io.michaelrocks.libphonenumber.kotlin.TestMetadataTestCase
 import io.michaelrocks.libphonenumber.kotlin.PhoneNumberUtil.Companion.createInstance
 import io.michaelrocks.libphonenumber.kotlin.Phonenumber.PhoneNumber
 import io.michaelrocks.libphonenumber.kotlin.metadata.init.ClassPathResourceMetadataLoader
+import io.michaelrocks.libphonenumber.kotlin.utils.RegionCode
 import junit.framework.TestCase
+import kotlin.test.Test
 
 /**
  * Unit tests for ShortNumberInfo.java
@@ -33,6 +33,8 @@ class ShortNumberInfoTest : TestMetadataTestCase() {
         get() = ClassPathResourceMetadataLoader()
 
     private val shortInfo = createInstance(ClassPathResourceMetadataLoader()).shortNumberInfo
+
+    @Test
     fun testIsPossibleShortNumber() {
         val possibleNumber = PhoneNumber()
         possibleNumber.setCountryCode(33).setNationalNumber(123456L)
@@ -53,6 +55,7 @@ class ShortNumberInfoTest : TestMetadataTestCase() {
         )
     }
 
+    @Test
     fun testIsValidShortNumber() {
         TestCase.assertTrue(
             shortInfo!!.isValidShortNumber(
@@ -77,6 +80,7 @@ class ShortNumberInfoTest : TestMetadataTestCase() {
         )
     }
 
+    @Test
     fun testIsCarrierSpecific() {
         val carrierSpecificNumber = PhoneNumber()
         carrierSpecificNumber.setCountryCode(1).setNationalNumber(33669L)
@@ -101,6 +105,7 @@ class ShortNumberInfoTest : TestMetadataTestCase() {
         )
     }
 
+    @Test
     fun testIsSmsService() {
         val smsServiceNumberForSomeRegion = PhoneNumber()
         smsServiceNumberForSomeRegion.setCountryCode(1).setNationalNumber(21234L)
@@ -108,10 +113,10 @@ class ShortNumberInfoTest : TestMetadataTestCase() {
         TestCase.assertFalse(shortInfo.isSmsServiceForRegion(smsServiceNumberForSomeRegion, RegionCode.BB))
     }
 
+    @Test
     fun testGetExpectedCost() {
         val premiumRateExample = shortInfo!!.getExampleShortNumberForCost(
-            RegionCode.FR,
-            ShortNumberInfo.ShortNumberCost.PREMIUM_RATE
+            RegionCode.FR, ShortNumberInfo.ShortNumberCost.PREMIUM_RATE
         )
         TestCase.assertEquals(
             ShortNumberInfo.ShortNumberCost.PREMIUM_RATE, shortInfo.getExpectedCostForRegion(
@@ -121,12 +126,10 @@ class ShortNumberInfoTest : TestMetadataTestCase() {
         val premiumRateNumber = PhoneNumber()
         premiumRateNumber.setCountryCode(33).setNationalNumber(premiumRateExample.toInt().toLong())
         TestCase.assertEquals(
-            ShortNumberInfo.ShortNumberCost.PREMIUM_RATE,
-            shortInfo.getExpectedCost(premiumRateNumber)
+            ShortNumberInfo.ShortNumberCost.PREMIUM_RATE, shortInfo.getExpectedCost(premiumRateNumber)
         )
         val standardRateExample = shortInfo.getExampleShortNumberForCost(
-            RegionCode.FR,
-            ShortNumberInfo.ShortNumberCost.STANDARD_RATE
+            RegionCode.FR, ShortNumberInfo.ShortNumberCost.STANDARD_RATE
         )
         TestCase.assertEquals(
             ShortNumberInfo.ShortNumberCost.STANDARD_RATE, shortInfo.getExpectedCostForRegion(
@@ -136,12 +139,10 @@ class ShortNumberInfoTest : TestMetadataTestCase() {
         val standardRateNumber = PhoneNumber()
         standardRateNumber.setCountryCode(33).setNationalNumber(standardRateExample.toInt().toLong())
         TestCase.assertEquals(
-            ShortNumberInfo.ShortNumberCost.STANDARD_RATE,
-            shortInfo.getExpectedCost(standardRateNumber)
+            ShortNumberInfo.ShortNumberCost.STANDARD_RATE, shortInfo.getExpectedCost(standardRateNumber)
         )
         val tollFreeExample = shortInfo.getExampleShortNumberForCost(
-            RegionCode.FR,
-            ShortNumberInfo.ShortNumberCost.TOLL_FREE
+            RegionCode.FR, ShortNumberInfo.ShortNumberCost.TOLL_FREE
         )
         TestCase.assertEquals(
             ShortNumberInfo.ShortNumberCost.TOLL_FREE,
@@ -150,8 +151,7 @@ class ShortNumberInfoTest : TestMetadataTestCase() {
         val tollFreeNumber = PhoneNumber()
         tollFreeNumber.setCountryCode(33).setNationalNumber(tollFreeExample.toInt().toLong())
         TestCase.assertEquals(
-            ShortNumberInfo.ShortNumberCost.TOLL_FREE,
-            shortInfo.getExpectedCost(tollFreeNumber)
+            ShortNumberInfo.ShortNumberCost.TOLL_FREE, shortInfo.getExpectedCost(tollFreeNumber)
         )
         TestCase.assertEquals(
             ShortNumberInfo.ShortNumberCost.UNKNOWN_COST,
@@ -160,8 +160,7 @@ class ShortNumberInfoTest : TestMetadataTestCase() {
         val unknownCostNumber = PhoneNumber()
         unknownCostNumber.setCountryCode(33).setNationalNumber(12345L)
         TestCase.assertEquals(
-            ShortNumberInfo.ShortNumberCost.UNKNOWN_COST,
-            shortInfo.getExpectedCost(unknownCostNumber)
+            ShortNumberInfo.ShortNumberCost.UNKNOWN_COST, shortInfo.getExpectedCost(unknownCostNumber)
         )
 
         // Test that an invalid number may nevertheless have a cost other than UNKNOWN_COST.
@@ -176,8 +175,7 @@ class ShortNumberInfoTest : TestMetadataTestCase() {
         invalidNumber.setCountryCode(33).setNationalNumber(116123L)
         TestCase.assertFalse(shortInfo.isValidShortNumber(invalidNumber))
         TestCase.assertEquals(
-            ShortNumberInfo.ShortNumberCost.TOLL_FREE,
-            shortInfo.getExpectedCost(invalidNumber)
+            ShortNumberInfo.ShortNumberCost.TOLL_FREE, shortInfo.getExpectedCost(invalidNumber)
         )
 
         // Test a nonexistent country code.
@@ -188,11 +186,11 @@ class ShortNumberInfoTest : TestMetadataTestCase() {
         unknownCostNumber.clear()
         unknownCostNumber.setCountryCode(123).setNationalNumber(911L)
         TestCase.assertEquals(
-            ShortNumberInfo.ShortNumberCost.UNKNOWN_COST,
-            shortInfo.getExpectedCost(unknownCostNumber)
+            ShortNumberInfo.ShortNumberCost.UNKNOWN_COST, shortInfo.getExpectedCost(unknownCostNumber)
         )
     }
 
+    @Test
     fun testGetExpectedCostForSharedCountryCallingCode() {
         // Test some numbers which have different costs in countries sharing the same country calling
         // code. In Australia, 1234 is premium-rate, 1194 is standard-rate, and 733 is toll-free. These
@@ -228,8 +226,7 @@ class ShortNumberInfoTest : TestMetadataTestCase() {
         )
         // PREMIUM_RATE takes precedence over UNKNOWN_COST.
         TestCase.assertEquals(
-            ShortNumberInfo.ShortNumberCost.PREMIUM_RATE,
-            shortInfo.getExpectedCost(ambiguousPremiumRateNumber)
+            ShortNumberInfo.ShortNumberCost.PREMIUM_RATE, shortInfo.getExpectedCost(ambiguousPremiumRateNumber)
         )
         TestCase.assertTrue(
             shortInfo.isValidShortNumberForRegion(
@@ -252,13 +249,11 @@ class ShortNumberInfoTest : TestMetadataTestCase() {
             )
         )
         TestCase.assertEquals(
-            ShortNumberInfo.ShortNumberCost.UNKNOWN_COST,
-            shortInfo.getExpectedCost(ambiguousStandardRateNumber)
+            ShortNumberInfo.ShortNumberCost.UNKNOWN_COST, shortInfo.getExpectedCost(ambiguousStandardRateNumber)
         )
         TestCase.assertTrue(
             shortInfo.isValidShortNumberForRegion(
-                parse(ambiguousTollFreeString, RegionCode.AU),
-                RegionCode.AU
+                parse(ambiguousTollFreeString, RegionCode.AU), RegionCode.AU
             )
         )
         TestCase.assertEquals(
@@ -268,8 +263,7 @@ class ShortNumberInfoTest : TestMetadataTestCase() {
         )
         TestCase.assertFalse(
             shortInfo.isValidShortNumberForRegion(
-                parse(ambiguousTollFreeString, RegionCode.CX),
-                RegionCode.CX
+                parse(ambiguousTollFreeString, RegionCode.CX), RegionCode.CX
             )
         )
         TestCase.assertEquals(
@@ -278,11 +272,11 @@ class ShortNumberInfoTest : TestMetadataTestCase() {
             )
         )
         TestCase.assertEquals(
-            ShortNumberInfo.ShortNumberCost.UNKNOWN_COST,
-            shortInfo.getExpectedCost(ambiguousTollFreeNumber)
+            ShortNumberInfo.ShortNumberCost.UNKNOWN_COST, shortInfo.getExpectedCost(ambiguousTollFreeNumber)
         )
     }
 
+    @Test
     fun testExampleShortNumberPresence() {
         TestCase.assertFalse(shortInfo!!.getExampleShortNumber(RegionCode.AD).isEmpty())
         TestCase.assertFalse(shortInfo.getExampleShortNumber(RegionCode.FR).isEmpty())
@@ -290,24 +284,28 @@ class ShortNumberInfoTest : TestMetadataTestCase() {
         TestCase.assertTrue(shortInfo.getExampleShortNumber(null).isEmpty())
     }
 
+    @Test
     fun testConnectsToEmergencyNumber_US() {
         TestCase.assertTrue(shortInfo!!.connectsToEmergencyNumber("911", RegionCode.US))
         TestCase.assertTrue(shortInfo.connectsToEmergencyNumber("112", RegionCode.US))
         TestCase.assertFalse(shortInfo.connectsToEmergencyNumber("999", RegionCode.US))
     }
 
+    @Test
     fun testConnectsToEmergencyNumberLongNumber_US() {
         TestCase.assertTrue(shortInfo!!.connectsToEmergencyNumber("9116666666", RegionCode.US))
         TestCase.assertTrue(shortInfo.connectsToEmergencyNumber("1126666666", RegionCode.US))
         TestCase.assertFalse(shortInfo.connectsToEmergencyNumber("9996666666", RegionCode.US))
     }
 
+    @Test
     fun testConnectsToEmergencyNumberWithFormatting_US() {
         TestCase.assertTrue(shortInfo!!.connectsToEmergencyNumber("9-1-1", RegionCode.US))
         TestCase.assertTrue(shortInfo.connectsToEmergencyNumber("1-1-2", RegionCode.US))
         TestCase.assertFalse(shortInfo.connectsToEmergencyNumber("9-9-9", RegionCode.US))
     }
 
+    @Test
     fun testConnectsToEmergencyNumberWithPlusSign_US() {
         TestCase.assertFalse(shortInfo!!.connectsToEmergencyNumber("+911", RegionCode.US))
         TestCase.assertFalse(shortInfo.connectsToEmergencyNumber("\uFF0B911", RegionCode.US))
@@ -316,12 +314,14 @@ class ShortNumberInfoTest : TestMetadataTestCase() {
         TestCase.assertFalse(shortInfo.connectsToEmergencyNumber("+999", RegionCode.US))
     }
 
+    @Test
     fun testConnectsToEmergencyNumber_BR() {
         TestCase.assertTrue(shortInfo!!.connectsToEmergencyNumber("911", RegionCode.BR))
         TestCase.assertTrue(shortInfo.connectsToEmergencyNumber("190", RegionCode.BR))
         TestCase.assertFalse(shortInfo.connectsToEmergencyNumber("999", RegionCode.BR))
     }
 
+    @Test
     fun testConnectsToEmergencyNumberLongNumber_BR() {
         // Brazilian emergency numbers don't work when additional digits are appended.
         TestCase.assertFalse(shortInfo!!.connectsToEmergencyNumber("9111", RegionCode.BR))
@@ -329,17 +329,20 @@ class ShortNumberInfoTest : TestMetadataTestCase() {
         TestCase.assertFalse(shortInfo.connectsToEmergencyNumber("9996", RegionCode.BR))
     }
 
+    @Test
     fun testConnectsToEmergencyNumber_CL() {
         TestCase.assertTrue(shortInfo!!.connectsToEmergencyNumber("131", RegionCode.CL))
         TestCase.assertTrue(shortInfo.connectsToEmergencyNumber("133", RegionCode.CL))
     }
 
+    @Test
     fun testConnectsToEmergencyNumberLongNumber_CL() {
         // Chilean emergency numbers don't work when additional digits are appended.
         TestCase.assertFalse(shortInfo!!.connectsToEmergencyNumber("1313", RegionCode.CL))
         TestCase.assertFalse(shortInfo.connectsToEmergencyNumber("1330", RegionCode.CL))
     }
 
+    @Test
     fun testConnectsToEmergencyNumber_AO() {
         // Angola doesn't have any metadata for emergency numbers in the test metadata.
         TestCase.assertFalse(shortInfo!!.connectsToEmergencyNumber("911", RegionCode.AO))
@@ -347,6 +350,7 @@ class ShortNumberInfoTest : TestMetadataTestCase() {
         TestCase.assertFalse(shortInfo.connectsToEmergencyNumber("923123456", RegionCode.AO))
     }
 
+    @Test
     fun testConnectsToEmergencyNumber_ZW() {
         // Zimbabwe doesn't have any metadata in the test metadata.
         TestCase.assertFalse(shortInfo!!.connectsToEmergencyNumber("911", RegionCode.ZW))
@@ -354,18 +358,21 @@ class ShortNumberInfoTest : TestMetadataTestCase() {
         TestCase.assertFalse(shortInfo.connectsToEmergencyNumber("0711234567", RegionCode.ZW))
     }
 
+    @Test
     fun testIsEmergencyNumber_US() {
         TestCase.assertTrue(shortInfo!!.isEmergencyNumber("911", RegionCode.US))
         TestCase.assertTrue(shortInfo.isEmergencyNumber("112", RegionCode.US))
         TestCase.assertFalse(shortInfo.isEmergencyNumber("999", RegionCode.US))
     }
 
+    @Test
     fun testIsEmergencyNumberLongNumber_US() {
         TestCase.assertFalse(shortInfo!!.isEmergencyNumber("9116666666", RegionCode.US))
         TestCase.assertFalse(shortInfo.isEmergencyNumber("1126666666", RegionCode.US))
         TestCase.assertFalse(shortInfo.isEmergencyNumber("9996666666", RegionCode.US))
     }
 
+    @Test
     fun testIsEmergencyNumberWithFormatting_US() {
         TestCase.assertTrue(shortInfo!!.isEmergencyNumber("9-1-1", RegionCode.US))
         TestCase.assertTrue(shortInfo.isEmergencyNumber("*911", RegionCode.US))
@@ -375,6 +382,7 @@ class ShortNumberInfoTest : TestMetadataTestCase() {
         TestCase.assertFalse(shortInfo.isEmergencyNumber("*999", RegionCode.US))
     }
 
+    @Test
     fun testIsEmergencyNumberWithPlusSign_US() {
         TestCase.assertFalse(shortInfo!!.isEmergencyNumber("+911", RegionCode.US))
         TestCase.assertFalse(shortInfo.isEmergencyNumber("\uFF0B911", RegionCode.US))
@@ -383,18 +391,21 @@ class ShortNumberInfoTest : TestMetadataTestCase() {
         TestCase.assertFalse(shortInfo.isEmergencyNumber("+999", RegionCode.US))
     }
 
+    @Test
     fun testIsEmergencyNumber_BR() {
         TestCase.assertTrue(shortInfo!!.isEmergencyNumber("911", RegionCode.BR))
         TestCase.assertTrue(shortInfo.isEmergencyNumber("190", RegionCode.BR))
         TestCase.assertFalse(shortInfo.isEmergencyNumber("999", RegionCode.BR))
     }
 
+    @Test
     fun testIsEmergencyNumberLongNumber_BR() {
         TestCase.assertFalse(shortInfo!!.isEmergencyNumber("9111", RegionCode.BR))
         TestCase.assertFalse(shortInfo.isEmergencyNumber("1900", RegionCode.BR))
         TestCase.assertFalse(shortInfo.isEmergencyNumber("9996", RegionCode.BR))
     }
 
+    @Test
     fun testIsEmergencyNumber_AO() {
         // Angola doesn't have any metadata for emergency numbers in the test metadata.
         TestCase.assertFalse(shortInfo!!.isEmergencyNumber("911", RegionCode.AO))
@@ -402,6 +413,7 @@ class ShortNumberInfoTest : TestMetadataTestCase() {
         TestCase.assertFalse(shortInfo.isEmergencyNumber("923123456", RegionCode.AO))
     }
 
+    @Test
     fun testIsEmergencyNumber_ZW() {
         // Zimbabwe doesn't have any metadata in the test metadata.
         TestCase.assertFalse(shortInfo!!.isEmergencyNumber("911", RegionCode.ZW))
@@ -409,6 +421,7 @@ class ShortNumberInfoTest : TestMetadataTestCase() {
         TestCase.assertFalse(shortInfo.isEmergencyNumber("0711234567", RegionCode.ZW))
     }
 
+    @Test
     fun testEmergencyNumberForSharedCountryCallingCode() {
         // Test the emergency number 112, which is valid in both Australia and the Christmas Islands.
         TestCase.assertTrue(shortInfo!!.isEmergencyNumber("112", RegionCode.AU))
@@ -426,11 +439,11 @@ class ShortNumberInfoTest : TestMetadataTestCase() {
         val sharedEmergencyNumber = PhoneNumber().setCountryCode(61).setNationalNumber(112L)
         TestCase.assertTrue(shortInfo.isValidShortNumber(sharedEmergencyNumber))
         TestCase.assertEquals(
-            ShortNumberInfo.ShortNumberCost.TOLL_FREE,
-            shortInfo.getExpectedCost(sharedEmergencyNumber)
+            ShortNumberInfo.ShortNumberCost.TOLL_FREE, shortInfo.getExpectedCost(sharedEmergencyNumber)
         )
     }
 
+    @Test
     fun testOverlappingNANPANumber() {
         // 211 is an emergency number in Barbados, while it is a toll-free information line in Canada
         // and the USA.
@@ -451,6 +464,7 @@ class ShortNumberInfoTest : TestMetadataTestCase() {
         )
     }
 
+    @Test
     fun testCountryCallingCodeIsNotIgnored() {
         // +46 is the country calling code for Sweden (SE), and 40404 is a valid short number in the US.
         TestCase.assertFalse(
@@ -464,8 +478,7 @@ class ShortNumberInfoTest : TestMetadataTestCase() {
             )
         )
         TestCase.assertEquals(
-            ShortNumberInfo.ShortNumberCost.UNKNOWN_COST,
-            shortInfo.getExpectedCostForRegion(
+            ShortNumberInfo.ShortNumberCost.UNKNOWN_COST, shortInfo.getExpectedCostForRegion(
                 parse("+4640404", RegionCode.SE), RegionCode.US
             )
         )

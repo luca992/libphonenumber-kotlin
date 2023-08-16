@@ -14,16 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.michaelrocks.libphonenumber.kotlin.metadata.source
+package io.michaelrocks.libphonenumber.kotlin.source
 
 import io.michaelrocks.libphonenumber.kotlin.metadata.source.PhoneMetadataResourceProvider
 import io.michaelrocks.libphonenumber.kotlin.metadata.source.SingleFileModeResourceProvider
-import junit.framework.TestCase
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
-class SingleFileModeFileNameProviderTest : TestCase() {
+class SingleFileModeFileNameProviderTest {
     private val metadataFileNameProvider: PhoneMetadataResourceProvider = SingleFileModeResourceProvider("some/file")
+
+    @Test
     fun test_getFor_shouldReturnTheFileNameBase() {
         val metadataFileName = metadataFileNameProvider.getFor("key1")
-        assertEquals("some/file", metadataFileName)
+        assertEquals("some/file", metadataFileName.toString())
     }
 }

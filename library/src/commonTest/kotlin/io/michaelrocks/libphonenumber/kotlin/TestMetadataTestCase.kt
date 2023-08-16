@@ -19,7 +19,6 @@ package io.michaelrocks.libphonenumber.kotlin
 import io.michaelrocks.libphonenumber.kotlin.metadata.DefaultMetadataDependenciesProvider
 import io.michaelrocks.libphonenumber.kotlin.metadata.source.MetadataSourceImpl
 import io.michaelrocks.libphonenumber.kotlin.metadata.source.MultiFileModeResourceProvider
-import junit.framework.TestCase
 import io.michaelrocks.libphonenumber.test.MR
 
 /**
@@ -38,7 +37,7 @@ import io.michaelrocks.libphonenumber.test.MR
  *
  * @author Shaopeng Jia
  */
-abstract class TestMetadataTestCase : TestCase() {
+abstract class TestMetadataTestCase {
 
 
     abstract val metadataLoader: MetadataLoader
@@ -47,7 +46,6 @@ abstract class TestMetadataTestCase : TestCase() {
     /**
      * An instance of PhoneNumberUtil that uses test metadata.
      */
-    @JvmField
     protected val phoneUtil: PhoneNumberUtil = PhoneNumberUtil(
         MetadataSourceImpl(
             MultiFileModeResourceProvider(TEST_METADATA_FILE_PREFIX, MR.assets),

@@ -20,10 +20,11 @@ import io.michaelrocks.libphonenumber.kotlin.PhoneNumberUtil.PhoneNumberType
 import io.michaelrocks.libphonenumber.kotlin.Phonenumber.PhoneNumber
 import io.michaelrocks.libphonenumber.kotlin.metadata.DefaultMetadataDependenciesProvider
 import io.michaelrocks.libphonenumber.kotlin.metadata.init.ClassPathResourceMetadataLoader
-import junit.framework.TestCase
 import java.util.*
 import java.util.logging.Level
 import java.util.logging.Logger
+import kotlin.collections.ArrayList
+import kotlin.test.*
 
 /**
  * Verifies all of the example numbers in the metadata are valid and of the correct type. If no
@@ -31,7 +32,7 @@ import java.util.logging.Logger
  * relevant for all regions. Tests that check the XML schema will ensure that an exampleNumber
  * node is present for every phone number description.
  */
-class ExampleNumbersTest : TestCase() {
+class ExampleNumbersTest {
     private val metadataDependenciesProvider = DefaultMetadataDependenciesProvider(ClassPathResourceMetadataLoader())
     private val phoneNumberUtil = PhoneNumberUtil.createInstance(metadataDependenciesProvider.metadataLoader)
     private val shortNumberInfo: ShortNumberInfo = phoneNumberUtil.shortNumberInfo!!
@@ -75,6 +76,7 @@ class ExampleNumbersTest : TestCase() {
         }
     }
 
+    @Test
     fun testFixedLine() {
         val fixedLineTypes: Set<PhoneNumberType> = EnumSet.of(
             PhoneNumberType.FIXED_LINE,
@@ -85,6 +87,7 @@ class ExampleNumbersTest : TestCase() {
         assertEquals(0, wrongTypeCases.size)
     }
 
+    @Test
     fun testMobile() {
         val mobileTypes: Set<PhoneNumberType> = EnumSet.of(
             PhoneNumberType.MOBILE,
@@ -95,6 +98,7 @@ class ExampleNumbersTest : TestCase() {
         assertEquals(0, wrongTypeCases.size)
     }
 
+    @Test
     fun testTollFree() {
         val tollFreeTypes: Set<PhoneNumberType> = EnumSet.of(PhoneNumberType.TOLL_FREE)
         checkNumbersValidAndCorrectType(PhoneNumberType.TOLL_FREE, tollFreeTypes)
@@ -102,6 +106,7 @@ class ExampleNumbersTest : TestCase() {
         assertEquals(0, wrongTypeCases.size)
     }
 
+    @Test
     fun testPremiumRate() {
         val premiumRateTypes: Set<PhoneNumberType> = EnumSet.of(PhoneNumberType.PREMIUM_RATE)
         checkNumbersValidAndCorrectType(PhoneNumberType.PREMIUM_RATE, premiumRateTypes)
@@ -109,6 +114,7 @@ class ExampleNumbersTest : TestCase() {
         assertEquals(0, wrongTypeCases.size)
     }
 
+    @Test
     fun testVoip() {
         val voipTypes: Set<PhoneNumberType> = EnumSet.of(PhoneNumberType.VOIP)
         checkNumbersValidAndCorrectType(PhoneNumberType.VOIP, voipTypes)
@@ -116,6 +122,7 @@ class ExampleNumbersTest : TestCase() {
         assertEquals(0, wrongTypeCases.size)
     }
 
+    @Test
     fun testPager() {
         val pagerTypes: Set<PhoneNumberType> = EnumSet.of(PhoneNumberType.PAGER)
         checkNumbersValidAndCorrectType(PhoneNumberType.PAGER, pagerTypes)
@@ -123,6 +130,7 @@ class ExampleNumbersTest : TestCase() {
         assertEquals(0, wrongTypeCases.size)
     }
 
+    @Test
     fun testUan() {
         val uanTypes: Set<PhoneNumberType> = EnumSet.of(PhoneNumberType.UAN)
         checkNumbersValidAndCorrectType(PhoneNumberType.UAN, uanTypes)
@@ -130,6 +138,7 @@ class ExampleNumbersTest : TestCase() {
         assertEquals(0, wrongTypeCases.size)
     }
 
+    @Test
     fun testVoicemail() {
         val voicemailTypes: Set<PhoneNumberType> = EnumSet.of(PhoneNumberType.VOICEMAIL)
         checkNumbersValidAndCorrectType(PhoneNumberType.VOICEMAIL, voicemailTypes)
@@ -137,6 +146,7 @@ class ExampleNumbersTest : TestCase() {
         assertEquals(0, wrongTypeCases.size)
     }
 
+    @Test
     fun testSharedCost() {
         val sharedCostTypes: Set<PhoneNumberType> = EnumSet.of(PhoneNumberType.SHARED_COST)
         checkNumbersValidAndCorrectType(PhoneNumberType.SHARED_COST, sharedCostTypes)
@@ -144,6 +154,7 @@ class ExampleNumbersTest : TestCase() {
         assertEquals(0, wrongTypeCases.size)
     }
 
+    @Test
     fun testCanBeInternationallyDialled() {
         for (regionCode in phoneNumberUtil.getSupportedRegions()) {
             var exampleNumber: PhoneNumber? = null
@@ -166,10 +177,11 @@ class ExampleNumbersTest : TestCase() {
         assertEquals(0, wrongTypeCases.size)
     }
 
+    @Test
     fun testGlobalNetworkNumbers() {
         for (callingCode in phoneNumberUtil.supportedGlobalNetworkCallingCodes) {
             val exampleNumber = phoneNumberUtil.getExampleNumberForNonGeoEntity(callingCode)
-            assertNotNull("No example phone number for calling code $callingCode", exampleNumber)
+            assertNotNull( exampleNumber, "No example phone number for calling code $callingCode",)
             if (!phoneNumberUtil.isValidNumber(exampleNumber!!)) {
                 invalidCases.add(exampleNumber)
                 logger.log(Level.SEVERE, "Failed validation for $exampleNumber")
@@ -178,31 +190,35 @@ class ExampleNumbersTest : TestCase() {
         assertEquals(0, invalidCases.size)
     }
 
+    @Test
     fun testEveryRegionHasAnExampleNumber() {
         for (regionCode in phoneNumberUtil.getSupportedRegions()) {
             val exampleNumber = phoneNumberUtil.getExampleNumber(regionCode)
-            assertNotNull("No example number found for region $regionCode", exampleNumber)
+            assertNotNull(exampleNumber, "No example number found for region $regionCode",)
         }
     }
 
+    @Test
     fun testEveryRegionHasAnInvalidExampleNumber() {
         for (regionCode in phoneNumberUtil.getSupportedRegions()) {
             val exampleNumber = phoneNumberUtil.getInvalidExampleNumber(regionCode)
-            assertNotNull("No invalid example number found for region $regionCode", exampleNumber)
+            assertNotNull(exampleNumber, "No invalid example number found for region $regionCode",)
         }
     }
 
+    @Test
     fun testEveryTypeHasAnExampleNumber() {
         for (type in PhoneNumberType.entries.toTypedArray()) {
             if (type === PhoneNumberType.UNKNOWN) {
                 continue
             }
             val exampleNumber = phoneNumberUtil.getExampleNumberForType(type)
-            assertNotNull("No example number found for type $type", exampleNumber)
+            assertNotNull(exampleNumber, "No example number found for type $type")
         }
     }
 
     @Throws(Exception::class)
+    @Test
     fun testShortNumbersValidAndCorrectCost() {
         val invalidStringCases: MutableList<String> = ArrayList()
         for (regionCode in shortNumberSupportedRegions) {
@@ -244,6 +260,7 @@ class ExampleNumbersTest : TestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testEmergency() {
         var wrongTypeCounter = 0
         for (regionCode in shortNumberSupportedRegions) {
@@ -268,6 +285,7 @@ class ExampleNumbersTest : TestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testCarrierSpecificShortNumbers() {
         var wrongTagCounter = 0
         for (regionCode in shortNumberSupportedRegions) {
@@ -287,6 +305,7 @@ class ExampleNumbersTest : TestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testSmsServiceShortNumbers() {
         var wrongTagCounter = 0
         for (regionCode in shortNumberSupportedRegions) {

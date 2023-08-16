@@ -16,13 +16,13 @@
  */
 package io.michaelrocks.libphonenumber.kotlin
 
-import io.michaelrocks.libphonenumber.kotlin.RegionCode
-import io.michaelrocks.libphonenumber.kotlin.TestMetadataTestCase
 import io.michaelrocks.libphonenumber.kotlin.PhoneNumberUtil.Leniency
 import io.michaelrocks.libphonenumber.kotlin.Phonenumber.PhoneNumber
 import io.michaelrocks.libphonenumber.kotlin.Phonenumber.PhoneNumber.CountryCodeSource
 import io.michaelrocks.libphonenumber.kotlin.metadata.init.ClassPathResourceMetadataLoader
+import io.michaelrocks.libphonenumber.kotlin.utils.RegionCode
 import java.util.*
+import kotlin.test.*
 
 /**
  * Tests for [PhoneNumberMatcher]. This only tests basic functionality based on test metadata.
@@ -35,6 +35,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
         get() = ClassPathResourceMetadataLoader()
 
     @Throws(Exception::class)
+    @Test
     fun testContainsMoreThanOneSlashInNationalNumber() {
         // A date should return true.
         var number = PhoneNumber()
@@ -78,6 +79,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
 
     /** See [PhoneNumberUtilTest.testParseNationalNumber].  */
     @Throws(Exception::class)
+    @Test
     fun testFindNationalNumber() {
         // same cases as in testParseNationalNumber
         doTestFindInContext("033316005", RegionCode.NZ)
@@ -102,6 +104,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
 
     /** See [PhoneNumberUtilTest.testParseWithInternationalPrefixes].  */
     @Throws(Exception::class)
+    @Test
     fun testFindWithInternationalPrefixes() {
         doTestFindInContext("+1 (650) 333-6000", RegionCode.NZ)
         doTestFindInContext("1-650-333-6000", RegionCode.US)
@@ -120,14 +123,14 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
         doTestFindInContext("\uFF0B1 (650) 333-6000", RegionCode.SG)
         // The whole number, including punctuation, is here represented in full-width form.
         doTestFindInContext(
-            "\uFF0B\uFF11\u3000\uFF08\uFF16\uFF15\uFF10\uFF09"
-                    + "\u3000\uFF13\uFF13\uFF13\uFF0D\uFF16\uFF10\uFF10\uFF10",
+            "\uFF0B\uFF11\u3000\uFF08\uFF16\uFF15\uFF10\uFF09" + "\u3000\uFF13\uFF13\uFF13\uFF0D\uFF16\uFF10\uFF10\uFF10",
             RegionCode.SG
         )
     }
 
     /** See [PhoneNumberUtilTest.testParseWithLeadingZero].  */
     @Throws(Exception::class)
+    @Test
     fun testFindWithLeadingZero() {
         doTestFindInContext("+39 02-36618 300", RegionCode.NZ)
         doTestFindInContext("02-36618 300", RegionCode.IT)
@@ -136,6 +139,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
 
     /** See [PhoneNumberUtilTest.testParseNationalNumberArgentina].  */
     @Throws(Exception::class)
+    @Test
     fun testFindNationalNumberArgentina() {
         // Test parsing mobile numbers of Argentina.
         doTestFindInContext("+54 9 343 555 1212", RegionCode.AR)
@@ -154,6 +158,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
 
     /** See [PhoneNumberUtilTest.testParseWithXInNumber].  */
     @Throws(Exception::class)
+    @Test
     fun testFindWithXInNumber() {
         doTestFindInContext("(0xx) 123456789", RegionCode.AR)
         // A case where x denotes both carrier codes and extension symbol.
@@ -168,6 +173,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
 
     /** See [PhoneNumberUtilTest.testParseNumbersMexico].  */
     @Throws(Exception::class)
+    @Test
     fun testFindNumbersMexico() {
         // Test parsing fixed-line numbers of Mexico.
         doTestFindInContext("+52 (449)978-0001", RegionCode.MX)
@@ -182,6 +188,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
 
     /** See [PhoneNumberUtilTest.testParseNumbersWithPlusWithNoRegion].  */
     @Throws(Exception::class)
+    @Test
     fun testFindNumbersWithPlusWithNoRegion() {
         // RegionCode.ZZ is allowed only if the number starts with a '+' - then the country code can be
         // calculated.
@@ -192,6 +199,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
 
     /** See [PhoneNumberUtilTest.testParseExtensions].  */
     @Throws(Exception::class)
+    @Test
     fun testFindExtensions() {
         doTestFindInContext("03 331 6005 ext 3456", RegionCode.NZ)
         doTestFindInContext("03-3316005x3456", RegionCode.NZ)
@@ -220,6 +228,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testFindInterspersedWithSpace() {
         doTestFindInContext("0 3   3 3 1   6 0 0 5", RegionCode.NZ)
     }
@@ -228,6 +237,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
      * Test matching behavior when starting in the middle of a phone number.
      */
     @Throws(Exception::class)
+    @Test
     fun testIntermediateParsePositions() {
         val text = "Call 033316005  or 032316005!"
         //             |    |    |    |    |    |
@@ -247,6 +257,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testFourMatchesInARow() {
         val number1 = "415-666-7777"
         val number2 = "800-443-1223"
@@ -265,6 +276,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testMatchesFoundWithMultipleSpaces() {
         val number1 = "(415) 666-7777"
         val number2 = "(800) 443-1223"
@@ -277,6 +289,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testMatchWithSurroundingZipcodes() {
         var number = "415-666-7777"
         val zipPreceding = "My address is CA 34215 - $number is my number."
@@ -293,6 +306,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testIsLatinLetter() {
         assertTrue(PhoneNumberMatcher.isLatinLetter('c'))
         assertTrue(PhoneNumberMatcher.isLatinLetter('C'))
@@ -309,6 +323,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testMatchesWithSurroundingLatinChars() {
         val possibleOnlyContexts = ArrayList<NumberContext>()
         possibleOnlyContexts.add(NumberContext("abc", "def"))
@@ -325,6 +340,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testMoneyNotSeenAsPhoneNumber() {
         val possibleOnlyContexts = ArrayList<NumberContext>()
         possibleOnlyContexts.add(NumberContext("$", ""))
@@ -335,6 +351,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testPercentageNotSeenAsPhoneNumber() {
         val possibleOnlyContexts = ArrayList<NumberContext>()
         possibleOnlyContexts.add(NumberContext("", "%"))
@@ -343,6 +360,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testPhoneNumberWithLeadingOrTrailingMoneyMatches() {
         // Because of the space after the 20 (or before the 100) these dollar amounts should not stop
         // the actual number from being found.
@@ -353,6 +371,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testMatchesWithSurroundingLatinCharsAndLeadingPunctuation() {
         // Contexts with trailing characters. Leading characters are okay here since the numbers we will
         // insert start with punctuation, but trailing characters are still not allowed.
@@ -379,6 +398,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testMatchesWithSurroundingChineseChars() {
         val validContexts = ArrayList<NumberContext>()
         validContexts.add(NumberContext("\u6211\u7684\u7535\u8BDD\u53F7\u7801\u662F", ""))
@@ -390,6 +410,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testMatchesWithSurroundingPunctuation() {
         val validContexts = ArrayList<NumberContext>()
         validContexts.add(NumberContext("My number-", "")) // At end of text.
@@ -402,6 +423,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testMatchesMultiplePhoneNumbersSeparatedByPhoneNumberPunctuation() {
         val text = "Call 650-253-4561 -- 455-234-3451"
         val region = RegionCode.US
@@ -419,6 +441,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testDoesNotMatchMultiplePhoneNumbersSeparatedWithNoWhiteSpace() {
         // No white-space found between numbers - neither is found.
         val text = "Call 650-253-4561--455-234-3451"
@@ -427,6 +450,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testMatchesWithPossibleLeniency() {
         val testCases: MutableList<NumberTest> = ArrayList()
         testCases.addAll(Arrays.asList(*STRICT_GROUPING_CASES))
@@ -437,6 +461,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testNonMatchesWithPossibleLeniency() {
         val testCases: MutableList<NumberTest> = ArrayList()
         testCases.addAll(Arrays.asList(*IMPOSSIBLE_CASES))
@@ -444,6 +469,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testMatchesWithValidLeniency() {
         val testCases: MutableList<NumberTest> = ArrayList()
         testCases.addAll(Arrays.asList(*STRICT_GROUPING_CASES))
@@ -453,6 +479,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testNonMatchesWithValidLeniency() {
         val testCases: MutableList<NumberTest> = ArrayList()
         testCases.addAll(Arrays.asList(*IMPOSSIBLE_CASES))
@@ -461,6 +488,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testMatchesWithStrictGroupingLeniency() {
         val testCases: MutableList<NumberTest> = ArrayList()
         testCases.addAll(Arrays.asList(*STRICT_GROUPING_CASES))
@@ -469,6 +497,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testNonMatchesWithStrictGroupLeniency() {
         val testCases: MutableList<NumberTest> = ArrayList()
         testCases.addAll(Arrays.asList(*IMPOSSIBLE_CASES))
@@ -478,6 +507,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testMatchesWithExactGroupingLeniency() {
         val testCases: MutableList<NumberTest> = ArrayList()
         testCases.addAll(Arrays.asList(*EXACT_GROUPING_CASES))
@@ -485,6 +515,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testNonMatchesExactGroupLeniency() {
         val testCases: MutableList<NumberTest> = ArrayList()
         testCases.addAll(Arrays.asList(*IMPOSSIBLE_CASES))
@@ -507,8 +538,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
                 if (test.rawString != match.rawString()) {
                     wrongMatchFoundCount++
                     System.err.println(
-                        "Found wrong match in test " + test.toString()
-                                + ". Found " + match.rawString()
+                        "Found wrong match in test " + test.toString() + ". Found " + match.rawString()
                     )
                 }
             }
@@ -538,8 +568,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
      * matching is set to POSSIBLE; else no test number should be extracted at that leniency level
      */
     private fun findMatchesInContexts(
-        contexts: List<NumberContext>, isValid: Boolean,
-        isPossible: Boolean, region: String, number: String
+        contexts: List<NumberContext>, isValid: Boolean, isPossible: Boolean, region: String, number: String
     ) {
         if (isValid) {
             doTestInContext(number, region, contexts, Leniency.VALID)
@@ -547,8 +576,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
             for (context in contexts) {
                 val text = context.leadingText + number + context.trailingText
                 assertTrue(
-                    "Should not have found a number in $text",
-                    hasNoMatches(phoneUtil.findNumbers(text, region))
+                    hasNoMatches(phoneUtil.findNumbers(text, region)), "Should not have found a number in $text"
                 )
             }
         }
@@ -558,8 +586,8 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
             for (context in contexts) {
                 val text = context.leadingText + number + context.trailingText
                 assertTrue(
-                    "Should not have found a number in $text",
-                    hasNoMatches(phoneUtil.findNumbers(text, region, Leniency.POSSIBLE, Long.MAX_VALUE))
+                    hasNoMatches(phoneUtil.findNumbers(text, region, Leniency.POSSIBLE, Long.MAX_VALUE)),
+                    "Should not have found a number in $text"
                 )
             }
         }
@@ -569,8 +597,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
      * Variant of findMatchesInContexts that uses a default number and region.
      */
     private fun findMatchesInContexts(
-        contexts: List<NumberContext>, isValid: Boolean,
-        isPossible: Boolean
+        contexts: List<NumberContext>, isValid: Boolean, isPossible: Boolean
     ) {
         val region = RegionCode.US
         val number = "415-666-7777"
@@ -578,6 +605,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testNonMatchingBracketsAreInvalid() {
         // The digits up to the ", " form a valid US number, but it shouldn't be matched as one since
         // there was a non-matching bracket present.
@@ -617,6 +645,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testNoMatchIfRegionIsNull() {
         // Fail on non-international prefix if region code is null.
         assertTrue(
@@ -629,12 +658,14 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testNoMatchInEmptyString() {
         assertTrue(hasNoMatches(phoneUtil.findNumbers("", RegionCode.US)))
         assertTrue(hasNoMatches(phoneUtil.findNumbers("  ", RegionCode.US)))
     }
 
     @Throws(Exception::class)
+    @Test
     fun testNoMatchIfNoNumber() {
         assertTrue(
             hasNoMatches(
@@ -646,6 +677,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testSequences() {
         // Test multiple occurrences.
         val text = "Call 033316005  or 032316005!"
@@ -665,12 +697,14 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testNullInput() {
         assertTrue(hasNoMatches(phoneUtil.findNumbers(null, RegionCode.US)))
         assertTrue(hasNoMatches(phoneUtil.findNumbers(null, null)))
     }
 
     @Throws(Exception::class)
+    @Test
     fun testMaxMatches() {
         // Set up text with 100 valid phone numbers.
         val numbers = StringBuilder()
@@ -694,6 +728,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testMaxMatchesInvalid() {
         // Set up text with 10 invalid phone numbers followed by 100 valid.
         val numbers = StringBuilder()
@@ -709,6 +744,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testMaxMatchesMixed() {
         // Set up text with 100 valid numbers inside an invalid number.
         val numbers = StringBuilder()
@@ -732,6 +768,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     }
 
     @Throws(Exception::class)
+    @Test
     fun testNonPlusPrefixedNumbersNotFoundForInvalidRegion() {
         // Does not start with a "+", we won't match it.
         val iterable: Iterable<PhoneNumberMatch> = phoneUtil.findNumbers("1 456 764 156", RegionCode.ZZ)
@@ -739,13 +776,14 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
         assertFalse(iterator.hasNext())
         try {
             iterator.next()
-            fail("Violation of the Iterator contract.")
+            assertTrue(false, "Violation of the Iterator contract.")
         } catch (e: NoSuchElementException) { /* Success */
         }
         assertFalse(iterator.hasNext())
     }
 
     @Throws(Exception::class)
+    @Test
     fun testEmptyIteration() {
         val iterable: Iterable<PhoneNumberMatch> = phoneUtil.findNumbers("", RegionCode.ZZ)
         val iterator: Iterator<PhoneNumberMatch> = iterable.iterator()
@@ -753,13 +791,14 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
         assertFalse(iterator.hasNext())
         try {
             iterator.next()
-            fail("Violation of the Iterator contract.")
+            assertTrue(false, "Violation of the Iterator contract.")
         } catch (e: NoSuchElementException) { /* Success */
         }
         assertFalse(iterator.hasNext())
     }
 
     @Throws(Exception::class)
+    @Test
     fun testSingleIteration() {
         val iterable: Iterable<PhoneNumberMatch> = phoneUtil.findNumbers("+14156667777", RegionCode.ZZ)
 
@@ -772,7 +811,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
         assertFalse(iterator.hasNext())
         try {
             iterator.next()
-            fail("Violation of the Iterator contract.")
+            assertTrue(false, "Violation of the Iterator contract.")
         } catch (e: NoSuchElementException) { /* Success */
         }
         assertFalse(iterator.hasNext())
@@ -782,12 +821,13 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
         assertNotNull(iterator.next())
         try {
             iterator.next()
-            fail("Violation of the Iterator contract.")
+            assertTrue(false, "Violation of the Iterator contract.")
         } catch (e: NoSuchElementException) { /* Success */
         }
     }
 
     @Throws(Exception::class)
+    @Test
     fun testDoubleIteration() {
         val iterable: Iterable<PhoneNumberMatch> =
             phoneUtil.findNumbers("+14156667777 foobar +14156667777 ", RegionCode.ZZ)
@@ -804,7 +844,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
         assertFalse(iterator.hasNext())
         try {
             iterator.next()
-            fail("Violation of the Iterator contract.")
+            assertTrue(false, "Violation of the Iterator contract.")
         } catch (e: NoSuchElementException) { /* Success */
         }
         assertFalse(iterator.hasNext())
@@ -815,38 +855,10 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
         assertNotNull(iterator.next())
         try {
             iterator.next()
-            fail("Violation of the Iterator contract.")
+            assertTrue(false, "Violation of the Iterator contract.")
         } catch (e: NoSuchElementException) { /* Success */
         }
     }
-
-//    /**
-//     * Ensures that [Iterator.remove] is not supported and that calling it does not
-//     * change iteration behavior.
-//     */
-//    @Throws(Exception::class)
-//    fun testRemovalNotSupported() {
-//        val iterable: Iterable<PhoneNumberMatch> = phoneUtil.findNumbers("+14156667777", RegionCode.ZZ)
-//        val iterator: Iterator<PhoneNumberMatch> = iterable.iterator()
-//        try {
-//            iterator.remove()
-//            fail("Iterator must not support remove.")
-//        } catch (e: UnsupportedOperationException) { /* success */
-//        }
-//        assertTrue(iterator.hasNext())
-//        try {
-//            iterator.remove()
-//            fail("Iterator must not support remove.")
-//        } catch (e: UnsupportedOperationException) { /* success */
-//        }
-//        assertNotNull(iterator.next())
-//        try {
-//            iterator.remove()
-//            fail("Iterator must not support remove.")
-//        } catch (e: UnsupportedOperationException) { /* success */
-//        }
-//        assertFalse(iterator.hasNext())
-//    }
 
     /**
      * Asserts that the expected match is non-null, and that the raw string and expected
@@ -857,7 +869,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
         match: PhoneNumberMatch?, text: String, number: String, region: String
     ) {
         val expectedResult = phoneUtil.parse(number, region)
-        assertNotNull("Did not find a number in '$text'; expected $number", match)
+        assertNotNull(match, "Did not find a number in '$text'; expected $number")
         assertEquals(expectedResult, match!!.number())
         assertEquals(number, match.rawString())
     }
@@ -959,8 +971,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     }
 
     private fun doTestInContext(
-        number: String, defaultCountry: String?,
-        contextPairs: List<NumberContext>, leniency: Leniency
+        number: String, defaultCountry: String?, contextPairs: List<NumberContext>, leniency: Leniency
     ) {
         for (context in contextPairs) {
             val prefix = context.leadingText
@@ -970,11 +981,11 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
             val iterator: Iterator<PhoneNumberMatch> =
                 phoneUtil.findNumbers(text, defaultCountry, leniency, Long.MAX_VALUE).iterator()
             val match: PhoneNumberMatch? = if (iterator.hasNext()) iterator.next() else null
-            assertNotNull("Did not find a number in '$text'; expected '$number'", match)
+            assertNotNull(match, "Did not find a number in '$text'; expected '$number'")
             val extracted = text.subSequence(match!!.start(), match.end())
             assertTrue(
-                "Unexpected phone region in '$text'; extracted '$extracted'",
-                start == match.start() && end == match.end()
+                start == match.start() && end == match.end(),
+                "Unexpected phone region in '$text'; extracted '$extracted'"
             )
             assertTrue(number.contentEquals(extracted))
             assertTrue(match.rawString().contentEquals(extracted))
@@ -1051,8 +1062,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
          */
         private val POSSIBLE_ONLY_CASES = arrayOf( // US numbers cannot start with 7 in the test metadata to be valid.
             NumberTest(
-                "7121115678",
-                RegionCode.US
+                "7121115678", RegionCode.US
             ),  // 'X' should not be found in numbers at leniencies stricter than POSSIBLE, unless it represents
             // a carrier code or extension.
             NumberTest("1650 x 253 - 1234", RegionCode.US),
@@ -1084,8 +1094,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
             NumberTest("03 0 -3 2 23 12 34", RegionCode.DE),
             NumberTest("(0)3 0 -3 2 23 12 34", RegionCode.DE),
             NumberTest(
-                "0 3 0 -3 2 23 12 34",
-                RegionCode.DE
+                "0 3 0 -3 2 23 12 34", RegionCode.DE
             ),  // Fits an alternate pattern, but the leading digits don't match.
             NumberTest("+52 332 123 23 23", RegionCode.MX)
         )
@@ -1095,22 +1104,16 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
          * "strict_grouping" leniency level.
          */
         private val STRICT_GROUPING_CASES = arrayOf(
-            NumberTest("(415) 6667777", RegionCode.US),
-            NumberTest(
-                "415-6667777",
-                RegionCode.US
+            NumberTest("(415) 6667777", RegionCode.US), NumberTest(
+                "415-6667777", RegionCode.US
             ),  // Should be found by strict grouping but not exact grouping, as the last two groups are
             // formatted together as a block.
             NumberTest(
-                "0800-2491234",
-                RegionCode.DE
+                "0800-2491234", RegionCode.DE
             ),  // Doesn't match any formatting in the test file, but almost matches an alternate format (the
             // last two groups have been squashed together here).
-            NumberTest("0900-1 123123", RegionCode.DE),
-            NumberTest("(0)900-1 123123", RegionCode.DE),
-            NumberTest(
-                "0 900-1 123123",
-                RegionCode.DE
+            NumberTest("0900-1 123123", RegionCode.DE), NumberTest("(0)900-1 123123", RegionCode.DE), NumberTest(
+                "0 900-1 123123", RegionCode.DE
             ),  // NDC also found as part of the country calling code; this shouldn't ruin the grouping
             // expectations.
             NumberTest("+33 3 34 2312", RegionCode.FR)
