@@ -16,14 +16,11 @@
  */
 package io.michaelrocks.libphonenumber.kotlin
 
+import co.touchlab.kermit.Logger
 import io.michaelrocks.libphonenumber.kotlin.PhoneNumberUtil.PhoneNumberType
 import io.michaelrocks.libphonenumber.kotlin.Phonenumber.PhoneNumber
 import io.michaelrocks.libphonenumber.kotlin.metadata.DefaultMetadataDependenciesProvider
-import io.michaelrocks.libphonenumber.kotlin.metadata.init.ClassPathResourceMetadataLoader
-import java.util.*
-import java.util.logging.Level
-import java.util.logging.Logger
-import kotlin.collections.ArrayList
+import io.michaelrocks.libphonenumber.kotlin.metadata.defaultMetadataLoader
 import kotlin.test.*
 
 /**
@@ -33,7 +30,7 @@ import kotlin.test.*
  * node is present for every phone number description.
  */
 class ExampleNumbersTest {
-    private val metadataDependenciesProvider = DefaultMetadataDependenciesProvider(ClassPathResourceMetadataLoader())
+    private val metadataDependenciesProvider = DefaultMetadataDependenciesProvider(defaultMetadataLoader)
     private val phoneNumberUtil = PhoneNumberUtil.createInstance(metadataDependenciesProvider.metadataLoader)
     private val shortNumberInfo: ShortNumberInfo = phoneNumberUtil.shortNumberInfo!!
     private val shortNumberMetadataSource = metadataDependenciesProvider.shortNumberMetadataSource
@@ -47,28 +44,25 @@ class ExampleNumbersTest {
      * FIXED_LINE and FIXED_LINE_OR_MOBILE for a fixed line example number.
      */
     private fun checkNumbersValidAndCorrectType(
-        exampleNumberRequestedType: PhoneNumberType,
-        possibleExpectedTypes: Set<PhoneNumberType>
+        exampleNumberRequestedType: PhoneNumberType, possibleExpectedTypes: Set<PhoneNumberType>
     ) {
         for (regionCode in phoneNumberUtil.getSupportedRegions()) {
             val exampleNumber = phoneNumberUtil.getExampleNumberForType(regionCode, exampleNumberRequestedType)
             if (exampleNumber != null) {
                 if (!phoneNumberUtil.isValidNumber(exampleNumber)) {
                     invalidCases.add(exampleNumber)
-                    logger.log(Level.SEVERE, "Failed validation for $exampleNumber")
+                    logger.e("Failed validation for $exampleNumber")
                 } else {
                     // We know the number is valid, now we check the type.
                     val exampleNumberType = phoneNumberUtil.getNumberType(exampleNumber)
                     if (!possibleExpectedTypes.contains(exampleNumberType)) {
                         wrongTypeCases.add(exampleNumber)
-                        logger.log(
-                            Level.SEVERE, "Wrong type for "
-                                    + exampleNumber
-                                    + ": got " + exampleNumberType
+                        logger.e(
+                            "Wrong type for " + exampleNumber + ": got " + exampleNumberType
                         )
-                        logger.log(Level.WARNING, "Expected types: ")
+                        logger.w("Expected types: ")
                         for (type in possibleExpectedTypes) {
-                            logger.log(Level.WARNING, type.toString())
+                            logger.w(type.toString())
                         }
                     }
                 }
@@ -78,9 +72,8 @@ class ExampleNumbersTest {
 
     @Test
     fun testFixedLine() {
-        val fixedLineTypes: Set<PhoneNumberType> = EnumSet.of(
-            PhoneNumberType.FIXED_LINE,
-            PhoneNumberType.FIXED_LINE_OR_MOBILE
+        val fixedLineTypes: Set<PhoneNumberType> = setOf(
+            PhoneNumberType.FIXED_LINE, PhoneNumberType.FIXED_LINE_OR_MOBILE
         )
         checkNumbersValidAndCorrectType(PhoneNumberType.FIXED_LINE, fixedLineTypes)
         assertEquals(0, invalidCases.size)
@@ -89,9 +82,8 @@ class ExampleNumbersTest {
 
     @Test
     fun testMobile() {
-        val mobileTypes: Set<PhoneNumberType> = EnumSet.of(
-            PhoneNumberType.MOBILE,
-            PhoneNumberType.FIXED_LINE_OR_MOBILE
+        val mobileTypes: Set<PhoneNumberType> = setOf(
+            PhoneNumberType.MOBILE, PhoneNumberType.FIXED_LINE_OR_MOBILE
         )
         checkNumbersValidAndCorrectType(PhoneNumberType.MOBILE, mobileTypes)
         assertEquals(0, invalidCases.size)
@@ -100,7 +92,7 @@ class ExampleNumbersTest {
 
     @Test
     fun testTollFree() {
-        val tollFreeTypes: Set<PhoneNumberType> = EnumSet.of(PhoneNumberType.TOLL_FREE)
+        val tollFreeTypes: Set<PhoneNumberType> = setOf(PhoneNumberType.TOLL_FREE)
         checkNumbersValidAndCorrectType(PhoneNumberType.TOLL_FREE, tollFreeTypes)
         assertEquals(0, invalidCases.size)
         assertEquals(0, wrongTypeCases.size)
@@ -108,7 +100,7 @@ class ExampleNumbersTest {
 
     @Test
     fun testPremiumRate() {
-        val premiumRateTypes: Set<PhoneNumberType> = EnumSet.of(PhoneNumberType.PREMIUM_RATE)
+        val premiumRateTypes: Set<PhoneNumberType> = setOf(PhoneNumberType.PREMIUM_RATE)
         checkNumbersValidAndCorrectType(PhoneNumberType.PREMIUM_RATE, premiumRateTypes)
         assertEquals(0, invalidCases.size)
         assertEquals(0, wrongTypeCases.size)
@@ -116,7 +108,7 @@ class ExampleNumbersTest {
 
     @Test
     fun testVoip() {
-        val voipTypes: Set<PhoneNumberType> = EnumSet.of(PhoneNumberType.VOIP)
+        val voipTypes: Set<PhoneNumberType> = setOf(PhoneNumberType.VOIP)
         checkNumbersValidAndCorrectType(PhoneNumberType.VOIP, voipTypes)
         assertEquals(0, invalidCases.size)
         assertEquals(0, wrongTypeCases.size)
@@ -124,7 +116,7 @@ class ExampleNumbersTest {
 
     @Test
     fun testPager() {
-        val pagerTypes: Set<PhoneNumberType> = EnumSet.of(PhoneNumberType.PAGER)
+        val pagerTypes: Set<PhoneNumberType> = setOf(PhoneNumberType.PAGER)
         checkNumbersValidAndCorrectType(PhoneNumberType.PAGER, pagerTypes)
         assertEquals(0, invalidCases.size)
         assertEquals(0, wrongTypeCases.size)
@@ -132,7 +124,7 @@ class ExampleNumbersTest {
 
     @Test
     fun testUan() {
-        val uanTypes: Set<PhoneNumberType> = EnumSet.of(PhoneNumberType.UAN)
+        val uanTypes: Set<PhoneNumberType> = setOf(PhoneNumberType.UAN)
         checkNumbersValidAndCorrectType(PhoneNumberType.UAN, uanTypes)
         assertEquals(0, invalidCases.size)
         assertEquals(0, wrongTypeCases.size)
@@ -140,7 +132,7 @@ class ExampleNumbersTest {
 
     @Test
     fun testVoicemail() {
-        val voicemailTypes: Set<PhoneNumberType> = EnumSet.of(PhoneNumberType.VOICEMAIL)
+        val voicemailTypes: Set<PhoneNumberType> = setOf(PhoneNumberType.VOICEMAIL)
         checkNumbersValidAndCorrectType(PhoneNumberType.VOICEMAIL, voicemailTypes)
         assertEquals(0, invalidCases.size)
         assertEquals(0, wrongTypeCases.size)
@@ -148,7 +140,7 @@ class ExampleNumbersTest {
 
     @Test
     fun testSharedCost() {
-        val sharedCostTypes: Set<PhoneNumberType> = EnumSet.of(PhoneNumberType.SHARED_COST)
+        val sharedCostTypes: Set<PhoneNumberType> = setOf(PhoneNumberType.SHARED_COST)
         checkNumbersValidAndCorrectType(PhoneNumberType.SHARED_COST, sharedCostTypes)
         assertEquals(0, invalidCases.size)
         assertEquals(0, wrongTypeCases.size)
@@ -164,13 +156,12 @@ class ExampleNumbersTest {
                     exampleNumber = phoneNumberUtil.parse(desc.exampleNumber, regionCode)
                 }
             } catch (e: NumberParseException) {
-                logger.log(Level.SEVERE, e.toString())
+                logger.e(e.toString())
             }
             if (exampleNumber != null && phoneNumberUtil.canBeInternationallyDialled(exampleNumber)) {
                 wrongTypeCases.add(exampleNumber)
-                logger.log(
-                    Level.SEVERE, "Number " + exampleNumber
-                            + " should not be internationally diallable"
+                logger.e(
+                    "Number " + exampleNumber + " should not be internationally diallable"
                 )
             }
         }
@@ -181,10 +172,10 @@ class ExampleNumbersTest {
     fun testGlobalNetworkNumbers() {
         for (callingCode in phoneNumberUtil.supportedGlobalNetworkCallingCodes) {
             val exampleNumber = phoneNumberUtil.getExampleNumberForNonGeoEntity(callingCode)
-            assertNotNull( exampleNumber, "No example phone number for calling code $callingCode",)
-            if (!phoneNumberUtil.isValidNumber(exampleNumber!!)) {
+            assertNotNull(exampleNumber, "No example phone number for calling code $callingCode")
+            if (!phoneNumberUtil.isValidNumber(exampleNumber)) {
                 invalidCases.add(exampleNumber)
-                logger.log(Level.SEVERE, "Failed validation for $exampleNumber")
+                logger.e("Failed validation for $exampleNumber")
             }
         }
         assertEquals(0, invalidCases.size)
@@ -194,7 +185,7 @@ class ExampleNumbersTest {
     fun testEveryRegionHasAnExampleNumber() {
         for (regionCode in phoneNumberUtil.getSupportedRegions()) {
             val exampleNumber = phoneNumberUtil.getExampleNumber(regionCode)
-            assertNotNull(exampleNumber, "No example number found for region $regionCode",)
+            assertNotNull(exampleNumber, "No example number found for region $regionCode")
         }
     }
 
@@ -202,7 +193,7 @@ class ExampleNumbersTest {
     fun testEveryRegionHasAnInvalidExampleNumber() {
         for (regionCode in phoneNumberUtil.getSupportedRegions()) {
             val exampleNumber = phoneNumberUtil.getInvalidExampleNumber(regionCode)
-            assertNotNull(exampleNumber, "No invalid example number found for region $regionCode",)
+            assertNotNull(exampleNumber, "No invalid example number found for region $regionCode")
         }
     }
 
@@ -227,15 +218,14 @@ class ExampleNumbersTest {
                     phoneNumberUtil.parse(exampleShortNumber, regionCode), regionCode
                 )
             ) {
-                val invalidStringCase = ("region_code: " + regionCode + ", national_number: "
-                        + exampleShortNumber)
+                val invalidStringCase = ("region_code: " + regionCode + ", national_number: " + exampleShortNumber)
                 invalidStringCases.add(invalidStringCase)
-                logger.log(Level.SEVERE, "Failed validation for string $invalidStringCase")
+                logger.e("Failed validation for string $invalidStringCase")
             }
             var phoneNumber = phoneNumberUtil.parse(exampleShortNumber, regionCode)
             if (!shortNumberInfo.isValidShortNumber(phoneNumber)) {
                 invalidCases.add(phoneNumber)
-                logger.log(Level.SEVERE, "Failed validation for $phoneNumber")
+                logger.e("Failed validation for $phoneNumber")
             }
             for (cost in ShortNumberInfo.ShortNumberCost.values()) {
                 exampleShortNumber = shortNumberInfo.getExampleShortNumberForCost(regionCode, cost)
@@ -245,10 +235,8 @@ class ExampleNumbersTest {
                         shortNumberInfo.getExpectedCostForRegion(phoneNumber, regionCode)
                     if (cost !== exampleShortNumberCost) {
                         wrongTypeCases.add(phoneNumber)
-                        logger.log(
-                            Level.SEVERE, "Wrong cost for " + phoneNumber.toString()
-                                    + ": got " + exampleShortNumberCost
-                                    + ", expected: " + cost
+                        logger.e(
+                            "Wrong cost for " + phoneNumber.toString() + ": got " + exampleShortNumberCost + ", expected: " + cost
                         )
                     }
                 }
@@ -268,16 +256,18 @@ class ExampleNumbersTest {
             if (desc!!.hasExampleNumber()) {
                 val exampleNumber = desc.exampleNumber
                 val phoneNumber = phoneNumberUtil.parse(exampleNumber, regionCode)
-                if (!shortNumberInfo.isPossibleShortNumberForRegion(phoneNumber, regionCode)
-                    || !shortNumberInfo.isEmergencyNumber(exampleNumber, regionCode)
+                if (!shortNumberInfo.isPossibleShortNumberForRegion(
+                        phoneNumber, regionCode
+                    ) || !shortNumberInfo.isEmergencyNumber(exampleNumber, regionCode)
                 ) {
                     wrongTypeCounter++
-                    logger.log(Level.SEVERE, "Emergency example number test failed for $regionCode")
-                } else if (shortNumberInfo.getExpectedCostForRegion(phoneNumber, regionCode)
-                    !== ShortNumberInfo.ShortNumberCost.TOLL_FREE
+                    logger.e("Emergency example number test failed for $regionCode")
+                } else if (shortNumberInfo.getExpectedCostForRegion(
+                        phoneNumber, regionCode
+                    ) !== ShortNumberInfo.ShortNumberCost.TOLL_FREE
                 ) {
                     wrongTypeCounter++
-                    logger.log(Level.WARNING, "Emergency example number not toll free for $regionCode")
+                    logger.w("Emergency example number not toll free for $regionCode")
                 }
             }
         }
@@ -293,11 +283,12 @@ class ExampleNumbersTest {
             if (desc!!.hasExampleNumber()) {
                 val exampleNumber = desc.exampleNumber
                 val carrierSpecificNumber = phoneNumberUtil.parse(exampleNumber, regionCode)
-                if (!shortNumberInfo.isPossibleShortNumberForRegion(carrierSpecificNumber, regionCode)
-                    || !shortNumberInfo.isCarrierSpecificForRegion(carrierSpecificNumber, regionCode)
+                if (!shortNumberInfo.isPossibleShortNumberForRegion(
+                        carrierSpecificNumber, regionCode
+                    ) || !shortNumberInfo.isCarrierSpecificForRegion(carrierSpecificNumber, regionCode)
                 ) {
                     wrongTagCounter++
-                    logger.log(Level.SEVERE, "Carrier-specific test failed for $regionCode")
+                    logger.e("Carrier-specific test failed for $regionCode")
                 }
             }
         }
@@ -313,11 +304,12 @@ class ExampleNumbersTest {
             if (desc!!.hasExampleNumber()) {
                 val exampleNumber = desc.exampleNumber
                 val smsServiceNumber = phoneNumberUtil.parse(exampleNumber, regionCode)
-                if (!shortNumberInfo.isPossibleShortNumberForRegion(smsServiceNumber, regionCode)
-                    || !shortNumberInfo.isSmsServiceForRegion(smsServiceNumber, regionCode)
+                if (!shortNumberInfo.isPossibleShortNumberForRegion(
+                        smsServiceNumber, regionCode
+                    ) || !shortNumberInfo.isSmsServiceForRegion(smsServiceNumber, regionCode)
                 ) {
                     wrongTagCounter++
-                    logger.log(Level.SEVERE, "SMS service test failed for $regionCode")
+                    logger.e("SMS service test failed for $regionCode")
                 }
             }
         }
@@ -325,6 +317,6 @@ class ExampleNumbersTest {
     }
 
     companion object {
-        private val logger = Logger.getLogger(ExampleNumbersTest::class.java.getName())
+        private val logger = Logger.withTag(ExampleNumbersTest::class.simpleName.toString())
     }
 }
