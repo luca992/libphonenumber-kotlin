@@ -27,6 +27,6 @@ class SingleFileModeFileNameProviderTest {
     @Test
     fun test_getFor_shouldReturnTheFileNameBase() {
         val metadataFileName = metadataFileNameProvider.getFor("key1")
-        assertEquals("some/file", metadataFileName.toString())
+        assertEquals("some/file", metadataFileName.originalPath)
     }
 }

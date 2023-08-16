@@ -17,13 +17,18 @@
 package io.michaelrocks.libphonenumber.kotlin.metadata.source
 
 import dev.icerock.moko.resources.AssetResource
+import dev.icerock.moko.resources.ResourceContainer
+import io.michaelrocks.libphonenumber.MR
 
 /**
  * [PhoneMetadataResourceProvider] implementation that returns the same metadata file name for
  * each key
  */
-class SingleFileModeResourceProvider(private val phoneMetadataFileName: String) : PhoneMetadataResourceProvider {
+class SingleFileModeResourceProvider(
+    private val phoneMetadataFileName: String, val assets: ResourceContainer<AssetResource> = MR.assets
+) : PhoneMetadataResourceProvider {
     override fun getFor(key: Any): AssetResource {
-        return TODO()
+        return assets.getAssetByFilePath(phoneMetadataFileName)
+            ?: throw NotImplementedError("Couldn't get asset resource for key: $phoneMetadataFileName")
     }
 }
