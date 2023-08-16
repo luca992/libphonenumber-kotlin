@@ -16,12 +16,12 @@
  */
 package io.michaelrocks.libphonenumber.kotlin
 
+import co.touchlab.kermit.Logger
 import io.michaelrocks.libphonenumber.kotlin.PhoneNumberUtil.Leniency
 import io.michaelrocks.libphonenumber.kotlin.Phonenumber.PhoneNumber
 import io.michaelrocks.libphonenumber.kotlin.Phonenumber.PhoneNumber.CountryCodeSource
-import io.michaelrocks.libphonenumber.kotlin.metadata.init.ClassPathResourceMetadataLoader
+import io.michaelrocks.libphonenumber.kotlin.metadata.defaultMetadataLoader
 import io.michaelrocks.libphonenumber.kotlin.utils.RegionCode
-import java.util.*
 import kotlin.test.*
 
 /**
@@ -32,7 +32,7 @@ import kotlin.test.*
 class PhoneNumberMatcherTest : TestMetadataTestCase() {
 
     override val metadataLoader: MetadataLoader
-        get() = ClassPathResourceMetadataLoader()
+        get() = defaultMetadataLoader
 
     @Throws(Exception::class)
     @Test
@@ -453,10 +453,10 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     @Test
     fun testMatchesWithPossibleLeniency() {
         val testCases: MutableList<NumberTest> = ArrayList()
-        testCases.addAll(Arrays.asList(*STRICT_GROUPING_CASES))
-        testCases.addAll(Arrays.asList(*EXACT_GROUPING_CASES))
-        testCases.addAll(Arrays.asList(*VALID_CASES))
-        testCases.addAll(Arrays.asList(*POSSIBLE_ONLY_CASES))
+        testCases.addAll(STRICT_GROUPING_CASES)
+        testCases.addAll(EXACT_GROUPING_CASES)
+        testCases.addAll(VALID_CASES)
+        testCases.addAll(POSSIBLE_ONLY_CASES)
         doTestNumberMatchesForLeniency(testCases, Leniency.POSSIBLE)
     }
 
@@ -464,7 +464,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     @Test
     fun testNonMatchesWithPossibleLeniency() {
         val testCases: MutableList<NumberTest> = ArrayList()
-        testCases.addAll(Arrays.asList(*IMPOSSIBLE_CASES))
+        testCases.addAll(IMPOSSIBLE_CASES)
         doTestNumberNonMatchesForLeniency(testCases, Leniency.POSSIBLE)
     }
 
@@ -472,9 +472,9 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     @Test
     fun testMatchesWithValidLeniency() {
         val testCases: MutableList<NumberTest> = ArrayList()
-        testCases.addAll(Arrays.asList(*STRICT_GROUPING_CASES))
-        testCases.addAll(Arrays.asList(*EXACT_GROUPING_CASES))
-        testCases.addAll(Arrays.asList(*VALID_CASES))
+        testCases.addAll(STRICT_GROUPING_CASES)
+        testCases.addAll(EXACT_GROUPING_CASES)
+        testCases.addAll(VALID_CASES)
         doTestNumberMatchesForLeniency(testCases, Leniency.VALID)
     }
 
@@ -482,8 +482,8 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     @Test
     fun testNonMatchesWithValidLeniency() {
         val testCases: MutableList<NumberTest> = ArrayList()
-        testCases.addAll(Arrays.asList(*IMPOSSIBLE_CASES))
-        testCases.addAll(Arrays.asList(*POSSIBLE_ONLY_CASES))
+        testCases.addAll(IMPOSSIBLE_CASES)
+        testCases.addAll(POSSIBLE_ONLY_CASES)
         doTestNumberNonMatchesForLeniency(testCases, Leniency.VALID)
     }
 
@@ -491,8 +491,8 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     @Test
     fun testMatchesWithStrictGroupingLeniency() {
         val testCases: MutableList<NumberTest> = ArrayList()
-        testCases.addAll(Arrays.asList(*STRICT_GROUPING_CASES))
-        testCases.addAll(Arrays.asList(*EXACT_GROUPING_CASES))
+        testCases.addAll(STRICT_GROUPING_CASES)
+        testCases.addAll(EXACT_GROUPING_CASES)
         doTestNumberMatchesForLeniency(testCases, Leniency.STRICT_GROUPING)
     }
 
@@ -500,9 +500,9 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     @Test
     fun testNonMatchesWithStrictGroupLeniency() {
         val testCases: MutableList<NumberTest> = ArrayList()
-        testCases.addAll(Arrays.asList(*IMPOSSIBLE_CASES))
-        testCases.addAll(Arrays.asList(*POSSIBLE_ONLY_CASES))
-        testCases.addAll(Arrays.asList(*VALID_CASES))
+        testCases.addAll(IMPOSSIBLE_CASES)
+        testCases.addAll(POSSIBLE_ONLY_CASES)
+        testCases.addAll(VALID_CASES)
         doTestNumberNonMatchesForLeniency(testCases, Leniency.STRICT_GROUPING)
     }
 
@@ -510,7 +510,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     @Test
     fun testMatchesWithExactGroupingLeniency() {
         val testCases: MutableList<NumberTest> = ArrayList()
-        testCases.addAll(Arrays.asList(*EXACT_GROUPING_CASES))
+        testCases.addAll(EXACT_GROUPING_CASES)
         doTestNumberMatchesForLeniency(testCases, Leniency.EXACT_GROUPING)
     }
 
@@ -518,10 +518,10 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     @Test
     fun testNonMatchesExactGroupLeniency() {
         val testCases: MutableList<NumberTest> = ArrayList()
-        testCases.addAll(Arrays.asList(*IMPOSSIBLE_CASES))
-        testCases.addAll(Arrays.asList(*POSSIBLE_ONLY_CASES))
-        testCases.addAll(Arrays.asList(*VALID_CASES))
-        testCases.addAll(Arrays.asList(*STRICT_GROUPING_CASES))
+        testCases.addAll(IMPOSSIBLE_CASES)
+        testCases.addAll(POSSIBLE_ONLY_CASES)
+        testCases.addAll(VALID_CASES)
+        testCases.addAll(STRICT_GROUPING_CASES)
         doTestNumberNonMatchesForLeniency(testCases, Leniency.EXACT_GROUPING)
     }
 
@@ -533,11 +533,11 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
             val match: PhoneNumberMatch? = if (iterator.hasNext()) iterator.next() else null
             if (match == null) {
                 noMatchFoundCount++
-                System.err.println("No match found in $test for leniency: $leniency")
+                ("No match found in $test for leniency: $leniency")
             } else {
                 if (test.rawString != match.rawString()) {
                     wrongMatchFoundCount++
-                    System.err.println(
+                    logger.e(
                         "Found wrong match in test " + test.toString() + ". Found " + match.rawString()
                     )
                 }
@@ -554,7 +554,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
             val match: PhoneNumberMatch? = if (iterator.hasNext()) iterator.next() else null
             if (match != null) {
                 matchFoundCount++
-                System.err.println("Match found in $test for leniency: $leniency")
+                logger.e("Match found in $test for leniency: $leniency")
             }
         }
         assertEquals(0, matchFoundCount)
@@ -1034,6 +1034,9 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     }
 
     companion object {
+
+        private val logger = Logger.withTag(PhoneNumberMatcherTest::class.simpleName.toString())
+
         /**
          * Strings with number-like things that shouldn't be found under any level.
          */
