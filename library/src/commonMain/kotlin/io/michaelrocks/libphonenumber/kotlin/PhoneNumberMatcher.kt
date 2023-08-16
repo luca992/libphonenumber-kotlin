@@ -177,9 +177,8 @@ class PhoneNumberMatcher(
     private fun extractInnerMatch(candidate: CharSequence, offset: Int): PhoneNumberMatch? {
         for (possibleInnerMatch in INNER_MATCHES) {
             var isFirstMatch = true
+            var groupMatcherResult: MatchResult? = null
             while (maxTries > 0) {
-                var groupMatcherResult: MatchResult? = null
-
                 if (isFirstMatch) {
                     groupMatcherResult = possibleInnerMatch.find(candidate) ?: break
                     // We should handle any group before this one too.
@@ -199,7 +198,10 @@ class PhoneNumberMatcher(
                 val group = trimAfterFirstMatch(
                     PhoneNumberUtil.UNWANTED_END_CHAR_PATTERN, groupMatcherResult.groupValues[1]
                 )
-                val match = parseAndVerify(group, offset + groupMatcherResult.range.first)
+                // val match = parseAndVerify(group, offset + groupMatcherResult.groups[1].range.first)
+                // todo: this is a hack to work around the fact that kotlin 1.9.0 doesn't expose group ranges don't do this if possible
+                val groupOneStart = candidate.indexOf(groupMatcherResult.groupValues[1])
+                val match = parseAndVerify(group, offset + groupOneStart)
                 if (match != null) {
                     return match
                 }
