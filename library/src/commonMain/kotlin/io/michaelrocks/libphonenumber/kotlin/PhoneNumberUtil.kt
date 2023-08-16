@@ -2425,7 +2425,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
                 if (m.groups[i] != null) {
                     // We go through the capturing groups until we find one that captured some digits. If none
                     // did, then we will return the empty string.
-                    val extension = m.groups[i]
+                    val extension = m.groups[i]?.value
                     number.removeRange(m.range.first, number.length)
                     return extension.toString()
                 }
