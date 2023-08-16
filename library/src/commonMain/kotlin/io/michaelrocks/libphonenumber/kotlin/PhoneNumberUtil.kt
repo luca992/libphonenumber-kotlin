@@ -3171,9 +3171,10 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
             Thai: \u0E50-\u0E59
             Mongolian: \u1810-\u1819
          */
-//        private const val DIGITS = """[0-9\uFF10-\uFF19\u0660-\u0669\u06F0-\u06F9\u09E6-\u09EF\u0966-\u096F\u0E50-\u0E59\u1810-\u1819]"""
+        private const val DIGITS = """[0-9\uFF10-\uFF19\u0660-\u0669\u06F0-\u06F9\u09E6-\u09EF\u0966-\u096F\u0E50-\u0E59\u1810-\u1819]"""
+        // TODO: Use expect/actuals
         // the original regex statement from java
-        private const val DIGITS = "\\p{Nd}"
+        //private const val DIGITS = "\\p{Nd}"
 
         // We accept alpha characters in phone numbers, ASCII only, upper and lower case.
         private val VALID_ALPHA = (ALPHA_MAPPINGS!!.keys.toTypedArray().contentToString()
