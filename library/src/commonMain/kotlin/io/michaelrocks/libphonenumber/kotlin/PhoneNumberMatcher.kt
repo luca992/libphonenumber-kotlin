@@ -26,6 +26,7 @@ import io.michaelrocks.libphonenumber.kotlin.Phonenumber.PhoneNumber
 import io.michaelrocks.libphonenumber.kotlin.Phonenumber.PhoneNumber.CountryCodeSource
 import io.michaelrocks.libphonenumber.kotlin.internal.RegexCache
 import io.michaelrocks.libphonenumber.kotlin.util.InplaceStringBuilder
+import io.michaelrocks.libphonenumber.kotlin.util.currencySymbols
 
 /**
  * A stateful class that finds and extracts telephone numbers from [text][CharSequence].
@@ -514,7 +515,7 @@ class PhoneNumberMatcher(
         }
 
         private fun isCurrencySymbol(character: Char): Boolean {
-            return (character.code in 36..63) || (character.code in 1536..1541) || (character.code in 8352..8361) || (character.code in 65020..65023)
+            return character in currencySymbols
         }
 
         fun allNumberGroupsRemainGrouped(
