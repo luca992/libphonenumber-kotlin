@@ -2787,7 +2787,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         // appear at the same time with isdn-subaddress according to paragraph 5.3 of the RFC3966 spec,
         val indexOfIsdn = nationalNumber.indexOf(RFC3966_ISDN_SUBADDRESS)
         if (indexOfIsdn > 0) {
-            nationalNumber.removeRange(indexOfIsdn, indexOfIsdn + nationalNumber.length)
+            nationalNumber.removeRange(indexOfIsdn, nationalNumber.length)
         }
         // If both phone context and isdn-subaddress are absent but other parameters are present, the
         // parameters are left in nationalNumber. This is because we are concerned about deleting
