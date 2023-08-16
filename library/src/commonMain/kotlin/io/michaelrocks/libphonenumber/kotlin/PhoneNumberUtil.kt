@@ -3159,11 +3159,21 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         const val VALID_PUNCTUATION =
             ("-x\u2010-\u2015\u2212\u30FC\uFF0D-\uFF0F " + "\u00A0\u00AD\u200B\u2060\u3000()\uFF08\uFF09\uFF3B\uFF3D.\\[\\]/~\u2053\u223C\uFF5E")
 
-        // taken from js due to issues with the regex statement not working on web
+        // partly taken from js due to issues with the regex statement not working on web
         // https://github.com/google/libphonenumber/blob/e3b0e10884bcb64b052508530bfaa72b53add3ff/javascript/i18n/phonenumbers/phonenumberutil.js#L547-L556
-        private const val DIGITS = "0-9\uFF10-\uFF19\u0660-\u0669\u06F0-\u06F9\u1810-\u1819"
+        /*
+            ASCII: 0-9
+            Full-width (East Asian): \uFF10-\uFF19
+            Arabic-Indic: \u0660-\u0669
+            Extended Arabic-Indic (Persian/Urdu): \u06F0-\u06F9
+            Bengali: \u09E6-\u09EF
+            Devanagari: \u0966-\u096F
+            Thai: \u0E50-\u0E59
+            Mongolian: \u1810-\u1819
+         */
+//        private const val DIGITS = """[0-9\uFF10-\uFF19\u0660-\u0669\u06F0-\u06F9\u09E6-\u09EF\u0966-\u096F\u0E50-\u0E59\u1810-\u1819]"""
         // the original regex statement from java
-        //private const val DIGITS = "\\p{Nd}"
+        private const val DIGITS = "\\p{Nd}"
 
         // We accept alpha characters in phone numbers, ASCII only, upper and lower case.
         private val VALID_ALPHA = (ALPHA_MAPPINGS!!.keys.toTypedArray().contentToString()
