@@ -58,6 +58,6 @@ abstract class TestMetadataTestCase {
 
     companion object {
         private const val TEST_METADATA_FILE_PREFIX =
-            "/io/michaelrocks/libphonenumber/kotlin/data/PhoneNumberMetadataProtoForTesting"
+            "io/michaelrocks/libphonenumber/kotlin/data/PhoneNumberMetadataProtoForTesting"
     }
 }

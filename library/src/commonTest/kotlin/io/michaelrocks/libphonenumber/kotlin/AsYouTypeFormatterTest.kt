@@ -16,7 +16,7 @@
  */
 package io.michaelrocks.libphonenumber.kotlin
 
-import io.michaelrocks.libphonenumber.kotlin.metadata.init.ClassPathResourceMetadataLoader
+import io.michaelrocks.libphonenumber.kotlin.metadata.defaultMetadataLoader
 import io.michaelrocks.libphonenumber.kotlin.utils.RegionCode
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -32,7 +32,7 @@ import kotlin.test.assertEquals
 class AsYouTypeFormatterTest : TestMetadataTestCase() {
 
     override val metadataLoader: MetadataLoader
-        get() = ClassPathResourceMetadataLoader()
+        get() = defaultMetadataLoader
 
     @Test
     fun testInvalidRegion() {
