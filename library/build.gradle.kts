@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.org.jetbrains.kotlin.multiplatform)
     alias(libs.plugins.com.android.library)
     alias(libs.plugins.dev.icerock.mobile.multiplatform.resources)
+    id("org.kodein.mock.mockmp") version "1.15.0"
     id("maven-publish")
     id("signing")
 }
@@ -157,6 +158,10 @@ android {
 
 multiplatformResources {
     multiplatformResourcesPackage = "io.michaelrocks.libphonenumber"
+}
+
+mockmp {
+    usesHelper = true
 }
 
 /*

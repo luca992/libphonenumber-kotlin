@@ -26,12 +26,13 @@ import io.michaelrocks.libphonenumber.kotlin.Phonemetadata.PhoneMetadata
 import io.michaelrocks.libphonenumber.kotlin.Phonenumber.PhoneNumber
 import io.michaelrocks.libphonenumber.kotlin.Phonenumber.PhoneNumber.CountryCodeSource
 import io.michaelrocks.libphonenumber.kotlin.metadata.DefaultMetadataDependenciesProvider
-import io.michaelrocks.libphonenumber.kotlin.metadata.init.ClassPathResourceMetadataLoader
+import io.michaelrocks.libphonenumber.kotlin.metadata.defaultMetadataLoader
 import io.michaelrocks.libphonenumber.kotlin.metadata.source.MetadataSource
 import io.michaelrocks.libphonenumber.kotlin.util.InplaceStringBuilder
 import io.michaelrocks.libphonenumber.kotlin.utils.RegionCode
-import org.junit.Assert
-import org.mockito.Mockito
+import io.michaelrocks.libphonenumber.kotlin.utils.assertThrows
+import org.kodein.mock.Mock
+import org.kodein.mock.Mocker
 import kotlin.test.*
 
 /**
@@ -45,14 +46,23 @@ import kotlin.test.*
 class PhoneNumberUtilTest : TestMetadataTestCase() {
 
     override val metadataLoader: MetadataLoader
-        get() = ClassPathResourceMetadataLoader()
+        get() = defaultMetadataLoader
 
-    private val mockedMetadataSource = Mockito.mock(
-        MetadataSource::class.java
-    )
-    private val phoneNumberUtilWithMissingMetadata = PhoneNumberUtil(
-        mockedMetadataSource, DefaultMetadataDependenciesProvider(metadataLoader), countryCodeToRegionCodeMap
-    )
+    @Mock
+    lateinit var mockedMetadataSource: MetadataSource
+
+    lateinit var phoneNumberUtilWithMissingMetadata: PhoneNumberUtil
+
+    val mocker = Mocker()
+
+    @BeforeTest
+    fun setUp() {
+        mocker.reset() //(1)
+        this.injectMocks(mocker) //(2)
+        phoneNumberUtilWithMissingMetadata = PhoneNumberUtil(
+            mockedMetadataSource, DefaultMetadataDependenciesProvider(metadataLoader), countryCodeToRegionCodeMap
+        )
+    }
 
     @Test
     fun testGetSupportedRegions() {
@@ -3217,11 +3227,9 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
     }
 
     private fun assertThrowsForInvalidPhoneContext(numberToParse: String) {
-        assertEquals(
-            NumberParseException.ErrorType.NOT_A_NUMBER, Assert.assertThrows(
-                NumberParseException::class.java
-            ) { phoneUtil.parse(numberToParse, RegionCode.ZZ) }.errorType
-        )
+        assertEquals(NumberParseException.ErrorType.NOT_A_NUMBER, (assertThrows(NumberParseException::class) {
+            phoneUtil.parse(numberToParse, RegionCode.ZZ)
+        } as NumberParseException).errorType)
     }
 
     @Test
@@ -3612,15 +3620,17 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
 
     @Test
     fun testGetMetadataForRegionForMissingMetadata() {
-        Assert.assertThrows(
-            MissingMetadataException::class.java
+        mocker.every { mockedMetadataSource.getMetadataForRegion(isAny()) } returns null
+        assertThrows(
+            MissingMetadataException::class
         ) { phoneNumberUtilWithMissingMetadata.getMetadataForRegion(RegionCode.US) }
     }
 
     @Test
     fun testGetMetadataForNonGeographicalRegionForMissingMetadata() {
-        Assert.assertThrows(
-            MissingMetadataException::class.java
+        mocker.every { mockedMetadataSource.getMetadataForNonGeographicalRegion(isAny()) } returns null
+        assertThrows(
+            MissingMetadataException::class
         ) { phoneNumberUtilWithMissingMetadata.getMetadataForNonGeographicalRegion(800) }
     }
 

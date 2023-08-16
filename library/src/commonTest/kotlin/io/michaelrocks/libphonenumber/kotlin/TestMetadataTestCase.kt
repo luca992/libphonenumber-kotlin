@@ -51,9 +51,7 @@ abstract class TestMetadataTestCase {
             MultiFileModeResourceProvider(TEST_METADATA_FILE_PREFIX, MR.assets),
             metadataDependenciesProvider.metadataLoader,
             metadataDependenciesProvider.metadataParser
-        ),
-        metadataDependenciesProvider,
-        CountryCodeToRegionCodeMapForTesting.countryCodeToRegionCodeMap
+        ), metadataDependenciesProvider, CountryCodeToRegionCodeMapForTesting.countryCodeToRegionCodeMap
     )
 
     companion object {
