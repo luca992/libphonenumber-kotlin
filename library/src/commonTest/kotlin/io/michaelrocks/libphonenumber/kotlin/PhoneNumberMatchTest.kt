@@ -16,20 +16,19 @@
  */
 package io.michaelrocks.libphonenumber.kotlin
 
-import io.michaelrocks.libphonenumber.kotlin.PhoneNumberMatch
 import io.michaelrocks.libphonenumber.kotlin.Phonenumber.PhoneNumber
-import junit.framework.TestCase
+import kotlin.test.*
 
 /**
  * Tests for [PhoneNumberMatch].
  */
-class PhoneNumberMatchTest : TestCase() {
+class PhoneNumberMatchTest {
     /**
      * Tests the value type semantics. Equality and hash code must be based on the covered range and
      * corresponding phone number. Range and number correctness are tested by
      * [PhoneNumberMatcherTest].
      */
-    @Throws(Exception::class)
+    @Test
     fun testValueTypeSemantics() {
         val number = PhoneNumber()
         val match1 = PhoneNumberMatch(10, "1 800 234 45 67", number)

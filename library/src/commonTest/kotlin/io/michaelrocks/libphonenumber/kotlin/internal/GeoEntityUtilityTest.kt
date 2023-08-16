@@ -17,25 +17,32 @@
 package io.michaelrocks.libphonenumber.kotlin.internal
 
 import io.michaelrocks.libphonenumber.kotlin.internal.GeoEntityUtility.isGeoEntity
-import junit.framework.TestCase
+import kotlin.test.Test
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
-class GeoEntityUtilityTest : TestCase() {
+class GeoEntityUtilityTest {
+    @Test
     fun test_isGeoEntity_shouldReturnTrueForCountryRegionCode() {
         assertTrue(isGeoEntity("DE"))
     }
 
+    @Test
     fun test_isGeoEntity_shouldReturnFalseForWorldRegionCode() {
         assertFalse(isGeoEntity("001"))
     }
 
+    @Test
     fun test_isGeoEntity_shouldReturnTrueForCountryCallingCode() {
         assertTrue(isGeoEntity(41))
     }
 
+    @Test
     fun test_isGeoEntity_shouldReturnFalseForInternationalSharedCostServiceCallingCode() {
         assertFalse(isGeoEntity(808))
     }
 
+    @Test
     fun test_isGeoEntity_shouldReturnFalseForNonExistingCountryCallingCode() {
         assertFalse(isGeoEntity(111111111))
     }

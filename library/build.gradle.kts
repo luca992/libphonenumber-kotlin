@@ -57,6 +57,7 @@ kotlin {
                 // need to make a separate module to import the resources because moko resources doesn't commonTest
                 // resources yet: https://github.com/icerockdev/moko-resources/issues/193
                 implementation(project(":library-test-resources"))
+                implementation(kotlin("test"))
             }
         }
         val jvmCommonMain by creating {

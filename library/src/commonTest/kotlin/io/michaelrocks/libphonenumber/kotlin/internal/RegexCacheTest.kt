@@ -16,17 +16,19 @@
  */
 package io.michaelrocks.libphonenumber.kotlin.internal
 
-import io.michaelrocks.libphonenumber.kotlin.internal.RegexCache
-import junit.framework.TestCase
+import kotlin.test.Test
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 /**
  * Unittests for LRU Cache for compiled regular expressions used by the libphonenumbers libary.
  *
  * @author Shaopeng Jia
  */
-class RegexCacheTest : TestCase() {
+class RegexCacheTest {
     private val regexCache: RegexCache = RegexCache(2)
 
+    @Test
     fun testRegexInsertion() {
         val regex1 = "[1-5]"
         val regex2 = "(?:12|34)"

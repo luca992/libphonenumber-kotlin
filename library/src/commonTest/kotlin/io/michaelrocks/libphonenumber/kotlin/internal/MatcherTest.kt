@@ -18,14 +18,17 @@ package io.michaelrocks.libphonenumber.kotlin.internal
 
 import io.michaelrocks.libphonenumber.kotlin.Phonemetadata.PhoneNumberDesc
 import io.michaelrocks.libphonenumber.kotlin.Phonemetadata.PhoneNumberDesc.Companion.newBuilder
-import io.michaelrocks.libphonenumber.kotlin.internal.MatcherApi
 import io.michaelrocks.libphonenumber.kotlin.internal.RegexBasedMatcher.Companion.create
-import junit.framework.TestCase
+import kotlin.test.Test
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 /**
  * Tests that all implementations of `MatcherApi` are consistent.
  */
-class MatcherTest : TestCase() {
+class MatcherTest {
+
+    @Test
     fun testRegexBasedMatcher() {
         checkMatcherBehavesAsExpected(create())
     }
@@ -65,34 +68,34 @@ class MatcherTest : TestCase() {
 
     private fun assertMatched(matcher: MatcherApi, number: String, desc: PhoneNumberDesc) {
         assertTrue(
-            String.format("%s should have matched %s.", number, toString(desc)),
-            matcher.matchNationalNumber(number, desc, false)
+            matcher.matchNationalNumber(number, desc, false),
+            "$number should have matched ${toString(desc)}."
         )
         assertTrue(
-            String.format("%s should have matched %s.", number, toString(desc)),
-            matcher.matchNationalNumber(number, desc, true)
+            matcher.matchNationalNumber(number, desc, true),
+            "$number should have matched ${toString(desc)}."
         )
     }
 
     private fun assertInvalid(matcher: MatcherApi, number: String, desc: PhoneNumberDesc) {
         assertFalse(
-            String.format("%s should not have matched %s.", number, toString(desc)),
-            matcher.matchNationalNumber(number, desc, false)
+            matcher.matchNationalNumber(number, desc, false),
+            "$number should not have matched ${toString(desc)}."
         )
         assertFalse(
-            String.format("%s should not have matched %s.", number, toString(desc)),
-            matcher.matchNationalNumber(number, desc, true)
+            matcher.matchNationalNumber(number, desc, true),
+            "$number should not have matched ${toString(desc)}."
         )
     }
 
     private fun assertTooLong(matcher: MatcherApi, number: String, desc: PhoneNumberDesc) {
         assertFalse(
-            String.format("%s should have been too long for %s.", number, toString(desc)),
-            matcher.matchNationalNumber(number, desc, false)
+            matcher.matchNationalNumber(number, desc, false),
+            "$number should have been too long for ${toString(desc)}."
         )
         assertTrue(
-            String.format("%s should have been too long for %s.", number, toString(desc)),
-            matcher.matchNationalNumber(number, desc, true)
+            matcher.matchNationalNumber(number, desc, true),
+            "$number should have been too long for ${toString(desc)}."
         )
     }
 

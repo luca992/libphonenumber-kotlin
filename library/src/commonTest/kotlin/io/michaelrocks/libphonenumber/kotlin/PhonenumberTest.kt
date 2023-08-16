@@ -18,15 +18,17 @@ package io.michaelrocks.libphonenumber.kotlin
 
 import io.michaelrocks.libphonenumber.kotlin.Phonenumber.PhoneNumber
 import io.michaelrocks.libphonenumber.kotlin.Phonenumber.PhoneNumber.CountryCodeSource
-import junit.framework.TestCase
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 
 /**
  * Tests for the Phonenumber.PhoneNumber object itself.
  *
  * @author Lara Rennie
  */
-class PhonenumberTest : TestCase() {
-    @Throws(Exception::class)
+class PhonenumberTest {
+    @Test
     fun testEqualSimpleNumber() {
         val numberA = PhoneNumber()
         numberA.setCountryCode(1).setNationalNumber(6502530000L)
@@ -36,7 +38,7 @@ class PhonenumberTest : TestCase() {
         assertEquals(numberA.hashCode(), numberB.hashCode())
     }
 
-    @Throws(Exception::class)
+    @Test
     fun testEqualWithItalianLeadingZeroSetToDefault() {
         val numberA = PhoneNumber()
         numberA.setCountryCode(1).setNationalNumber(6502530000L).setItalianLeadingZero(false)
@@ -48,7 +50,7 @@ class PhonenumberTest : TestCase() {
         assertEquals(numberA.hashCode(), numberB.hashCode())
     }
 
-    @Throws(Exception::class)
+    @Test
     fun testEqualWithCountryCodeSourceSet() {
         val numberA = PhoneNumber()
         numberA.setRawInput("+1 650 253 00 00").setCountryCodeSource(CountryCodeSource.FROM_NUMBER_WITH_PLUS_SIGN)
@@ -58,7 +60,7 @@ class PhonenumberTest : TestCase() {
         assertEquals(numberA.hashCode(), numberB.hashCode())
     }
 
-    @Throws(Exception::class)
+    @Test
     fun testNonEqualWithItalianLeadingZeroSetToTrue() {
         val numberA = PhoneNumber()
         numberA.setCountryCode(1).setNationalNumber(6502530000L).setItalianLeadingZero(true)
@@ -82,7 +84,7 @@ class PhonenumberTest : TestCase() {
         assertFalse(numberA.hashCode() == numberB.hashCode())
     }
 
-    @Throws(Exception::class)
+    @Test
     fun testNonEqualWithPreferredDomesticCarrierCodeSetToDefault() {
         val numberA = PhoneNumber()
         numberA.setCountryCode(1).setNationalNumber(6502530000L).setPreferredDomesticCarrierCode("")
@@ -92,7 +94,7 @@ class PhonenumberTest : TestCase() {
         assertFalse(numberA.hashCode() == numberB.hashCode())
     }
 
-    @Throws(Exception::class)
+    @Test
     fun testEqualWithPreferredDomesticCarrierCodeSetToDefault() {
         val numberA = PhoneNumber()
         numberA.setCountryCode(1).setNationalNumber(6502530000L).setPreferredDomesticCarrierCode("")
