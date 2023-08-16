@@ -65,7 +65,7 @@ kotlin {
         }
         val jvmCommonTest by creating {
             dependsOn(commonTest)
-            dependencies{
+            dependencies {
                 implementation(libs.junit)
                 implementation(libs.mockito.core)
             }
@@ -215,3 +215,5 @@ afterEvaluate {
   }
 }
 */
+
+apply(from = "$rootDir/gradle/pack-library-test-resources.gradle.kts")
