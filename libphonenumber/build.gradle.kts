@@ -1,15 +1,15 @@
+import com.vanniktech.maven.publish.SonatypeHost
+
 plugins {
     alias(libs.plugins.org.jetbrains.kotlin.multiplatform)
     alias(libs.plugins.com.android.library)
     alias(libs.plugins.dev.icerock.mobile.multiplatform.resources)
     alias(libs.plugins.org.kodein.mock.mockmp)
-    id("maven-publish")
-    id("signing")
+    alias(libs.plugins.com.vanniktech.maven.publish)
 }
 
-val artifactName = rootProject.name
-group = rootProject.group
-version = rootProject.version
+group = project.property("GROUP") as String
+version = project.property("VERSION_NAME") as String
 
 object Targets {
     // limited by moko resources https://github.com/icerockdev/moko-resources/issues/73
@@ -160,61 +160,26 @@ mockmp {
     usesHelper = true
 }
 
-/*
-afterEvaluate {
-  publishing {
-    publications {
-      release(MavenPublication) {
-        from components.release
-        artifactId artifactName
-        pom {
-          name = 'libphonenumber-android'
-          description = 'An Android port of Google\'s libphonenumber.'
-          inceptionYear = '2016'
-          url = 'https://github.com/michaelrocks/libphonenumber-android'
-          packaging = 'aar'
-
-          licenses {
-            license {
-              name = 'The Apache License, Version 2.0'
-              url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-              distribution = 'repo'
-            }
-          }
-          developers {
-            developer {
-              id = 'MichaelRocks'
-              name = 'Michael Rozumyanskiy'
-              email = 'michael.rozumyanskiy@gmail.com'
-            }
-          }
-          scm {
-            connection = 'scm:git:git://github.com/michaelrocks/libphonenumber-android.git'
-            developerConnection = 'scm:git:ssh://git@github.com/michaelrocks/libphonenumber-android.git'
-            url = 'https://github.com/michaelrocks/libphonenumber-android'
-          }
-        }
-      }
-    }
-
-    repositories {
-      if (project.hasProperty('mavenCentralRepositoryUsername') && project.hasProperty('mavenCentralRepositoryPassword')) {
-        maven {
-          name 'Sonatype'
-          url 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
-          credentials {
-            username mavenCentralRepositoryUsername
-            password mavenCentralRepositoryPassword
-          }
-        }
-      }
-    }
-  }
-
-  signing {
-    sign publishing.publications.release
-  }
+// https://youtrack.jetbrains.com/issue/KT-46466
+val dependsOnTasks = mutableListOf<String>()
+tasks.withType<AbstractPublishToMaven>().configureEach {
+    dependsOnTasks.add(this.name.replace("publish", "sign").replaceAfter("Publication", ""))
+    dependsOn(dependsOnTasks)
 }
-*/
+
+plugins.withId("com.vanniktech.maven.publish") {
+    mavenPublishing {
+        publishToMavenCentral(SonatypeHost.S01)
+        signAllPublications()
+    }
+}
 
 apply(from = "$rootDir/gradle/pack-library-test-resources.gradle.kts")
+
+// not sure why only native has a gradle dependency order issue when publishing
+// possibly related to https://github.com/icerockdev/moko-resources/issues/535
+tasks.getByName("iosX64SourcesJar").dependsOn("generateMRiosX64Main")
+tasks.getByName("iosArm64SourcesJar").dependsOn("generateMRiosArm64Main")
+tasks.getByName("iosSimulatorArm64SourcesJar").dependsOn("generateMRiosSimulatorArm64Main")
+tasks.getByName("macosArm64SourcesJar").dependsOn("generateMRmacosArm64Main")
+tasks.getByName("macosX64SourcesJar").dependsOn("generateMRmacosX64Main")

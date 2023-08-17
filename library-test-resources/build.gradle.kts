@@ -49,6 +49,11 @@ kotlin {
         val jsMain by getting {
             dependsOn(commonMain)
         }
+        Targets.nativeTargets.forEach { target ->
+            getByName("${target}Main") {
+                dependsOn(commonMain)
+            }
+        }
     }
 }
 

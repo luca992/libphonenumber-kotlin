@@ -6,32 +6,29 @@ org-jetbrains-kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform"
 com-android-library = { id = "com.android.library", version.ref = "agp" }
 com-android-application = { id = "com.android.application", version.ref = "agp" }
 org-jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose-jb" }
+com-vanniktech-maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "vanniktech-publish" }
 dev-icerock-mobile-multiplatform-resources = { id = "dev.icerock.mobile.multiplatform-resources", version.ref = "multiplatform-resources" }
 org-kodein-mock-mockmp = { id = "org.kodein.mock.mockmp", version.ref = "mockmp" }
 
-
 [versions]
 
-androidx-espressoCore = "3.5.1"
-junit = "1.1.5"
 kotlin = "1.9.0"
 agp = "8.0.2"
 compose-jb = "1.4.3"
-
+vanniktech-publish = "0.25.3"
 okio = "3.5.0"
 multiplatform-resources = "0.23.0"
+mockmp = "1.15.0"
+kermit = "2.0.0-RC5"
 
 androidx-activity = "1.7.2"
-
+androidx-espressoCore = "3.5.1"
 androidx-lifecycle = "2.6.1"
 androidx-startup = "1.1.1"
 androidx-appcompat = "1.6.1"
-
+junit = "1.1.5"
 rules = "1.5.0"
 runner = "1.5.2"
-mockmp = "1.15.0"
-
-kermit = "2.0.0-RC5"
 
 [libraries]
 
