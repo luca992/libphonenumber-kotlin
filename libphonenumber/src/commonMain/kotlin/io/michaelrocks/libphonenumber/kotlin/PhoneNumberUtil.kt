@@ -3421,7 +3421,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
             if (number.length < MIN_LENGTH_FOR_NSN) {
                 return false
             }
-            return VALID_PHONE_NUMBER_PATTERN.matches(number)
+            return VALID_PHONE_NUMBER_PATTERN.matchEntire(number) != null
         }
 
         /**

@@ -982,7 +982,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
                 phoneUtil.findNumbers(text, defaultCountry, leniency, Long.MAX_VALUE).iterator()
             val match: PhoneNumberMatch? = if (iterator.hasNext()) iterator.next() else null
             assertNotNull(match, "Did not find a number in '$text'; expected '$number'")
-            val extracted = text.subSequence(match!!.start(), match.end())
+            val extracted = text.subSequence(match.start(), match.end())
             assertTrue(
                 start == match.start() && end == match.end(),
                 "Unexpected phone region in '$text'; extracted '$extracted'"
