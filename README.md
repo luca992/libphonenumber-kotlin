@@ -32,16 +32,18 @@ Google's libphonenumber is a great library but it has to major flaws when used o
 
 The goal of this library is to fix these two issues.
 
-Download
+Setup
 --------
 Gradle:
 ```groovy
 repositories {
-  mavenCentral()
+    mavenCentral()
+    // For snapshots
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
 }
 
 dependencies {
- // todo: publish to mavenCentral
+    implementation("io.github.luca992.libphonenumber-kotlin:libphonenumber:0.1.0-SNAPSHOT")
 }
 ```
 
