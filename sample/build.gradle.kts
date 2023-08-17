@@ -101,7 +101,7 @@ kotlin {
                 implementation(compose.material)
                 implementation(compose.runtime)
                 implementation(libs.dev.icerock.moko.resources)
-                implementation(project(":library"))
+                implementation(project(":libphonenumber"))
             }
         }
 

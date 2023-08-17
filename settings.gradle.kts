@@ -24,6 +24,6 @@ plugins {
     id("de.fayard.refreshVersions")
 }
 
-include(":library")
+include(":libphonenumber")
 include(":library-test-resources")
 include(":sample")
