@@ -37,23 +37,20 @@ class MetadataSourceImpl(
         metadataLoader: MetadataLoader?,
         metadataParser: MetadataParser?
     ) : this(
-        phoneMetadataResourceProvider,
-        BlockingMetadataBootstrappingGuard<CompositeMetadataContainer>(
+        phoneMetadataResourceProvider, BlockingMetadataBootstrappingGuard<CompositeMetadataContainer>(
             metadataLoader!!, metadataParser!!, CompositeMetadataContainer()
         )
     )
 
     override fun getMetadataForNonGeographicalRegion(countryCallingCode: Int): PhoneMetadata? {
         require(!isGeoEntity(countryCallingCode)) { "$countryCallingCode calling code belongs to a geo entity" }
-        return bootstrappingGuard
-            .getOrBootstrap(phoneMetadataResourceProvider.getFor(countryCallingCode))
-            .getMetadataBy(countryCallingCode)
+        return bootstrappingGuard.getOrBootstrap(phoneMetadataResourceProvider.getFor(countryCallingCode))
+            ?.getMetadataBy(countryCallingCode)
     }
 
     override fun getMetadataForRegion(regionCode: String?): PhoneMetadata? {
         require(isGeoEntity(regionCode!!)) { "$regionCode region code is a non-geo entity" }
-        return bootstrappingGuard
-            .getOrBootstrap(phoneMetadataResourceProvider.getFor(regionCode))
-            .getMetadataBy(regionCode)
+        return bootstrappingGuard.getOrBootstrap(phoneMetadataResourceProvider.getFor(regionCode))
+            ?.getMetadataBy(regionCode)
     }
 }

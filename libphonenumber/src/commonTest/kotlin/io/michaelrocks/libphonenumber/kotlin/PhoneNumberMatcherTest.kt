@@ -870,7 +870,7 @@ class PhoneNumberMatcherTest : TestMetadataTestCase() {
     ) {
         val expectedResult = phoneUtil.parse(number, region)
         assertNotNull(match, "Did not find a number in '$text'; expected $number")
-        assertEquals(expectedResult, match!!.number())
+        assertEquals(expectedResult, match.number())
         assertEquals(number, match.rawString())
     }
 

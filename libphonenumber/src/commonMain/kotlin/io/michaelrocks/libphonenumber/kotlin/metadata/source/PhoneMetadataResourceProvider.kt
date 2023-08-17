@@ -34,5 +34,5 @@ interface PhoneMetadataResourceProvider {
      * Returns phone metadata file path for the given key. Assumes that key.toString() is
      * well-defined.
      */
-    fun getFor(key: Any): AssetResource
+    fun getFor(key: Any): AssetResource?
 }

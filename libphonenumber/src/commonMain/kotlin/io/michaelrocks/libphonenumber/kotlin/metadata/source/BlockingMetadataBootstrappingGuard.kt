@@ -37,7 +37,8 @@ internal class BlockingMetadataBootstrappingGuard<T : MetadataContainer>(
             : MutableSet<AssetResource> = mutableSetOf()
 
 
-    override fun getOrBootstrap(phoneMetadataResource: AssetResource): T {
+    override fun getOrBootstrap(phoneMetadataResource: AssetResource?): T? {
+        phoneMetadataResource ?: return null
         if (!loadedFiles.contains(phoneMetadataResource)) {
             bootstrapMetadata(phoneMetadataResource)
         }

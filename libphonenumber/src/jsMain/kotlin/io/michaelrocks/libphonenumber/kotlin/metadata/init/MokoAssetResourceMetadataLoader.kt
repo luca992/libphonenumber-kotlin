@@ -23,8 +23,6 @@ import io.michaelrocks.libphonenumber.kotlin.io.InputStream
 import io.michaelrocks.libphonenumber.kotlin.io.OkioInputStream
 import okio.Buffer
 import okio.ByteString.Companion.decodeBase64
-import org.khronos.webgl.ArrayBuffer
-import org.khronos.webgl.Int8Array
 
 /**
  * A [MetadataLoader] implementation that reads phone number metadata files as classpath
@@ -32,14 +30,19 @@ import org.khronos.webgl.Int8Array
  */
 
 class MokoAssetResourceMetadataLoader : MetadataLoader {
-    override fun loadMetadata(phoneMetadataResource: AssetResource): InputStream {
-        val buffer = Buffer()
-        // webpack is configured to bundle the metadata files as base64 strings by using asset/inline
-        // So phoneMetadataResource.originalPath will actually be a base64 string of the file contents
-        // in this mode vs asset/resource which would be the path to the file
-        val base64Data = phoneMetadataResource.originalPath.decodeBase64()!!
-        buffer.write(base64Data.toByteArray())
-        return OkioInputStream(buffer)
+    override fun loadMetadata(phoneMetadataResource: AssetResource): InputStream? {
+        return try {
+            val buffer = Buffer()
+            // webpack is configured to bundle the metadata files as base64 strings by using asset/inline
+            // So phoneMetadataResource.originalPath will actually be a base64 string of the file contents
+            // in this mode vs asset/resource which would be the path to the file
+            val base64Data = phoneMetadataResource.originalPath.decodeBase64()!!
+            buffer.write(base64Data.toByteArray())
+            OkioInputStream(buffer)
+        } catch (t: Throwable) {
+            logger.v("Failed to load metadata from $phoneMetadataResource.path", t)
+            null
+        }
     }
 
     companion object {

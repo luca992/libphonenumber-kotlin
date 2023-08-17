@@ -30,10 +30,14 @@ import okio.buffer
  * resources.
  */
 class MokoAssetResourceMetadataLoader : MetadataLoader {
-    override fun loadMetadata(phoneMetadataResource: AssetResource): InputStream {
-        val path = phoneMetadataResource.path.toPath()
-        return OkioInputStream(FileSystem.SYSTEM.source(path).buffer())
-
+    override fun loadMetadata(phoneMetadataResource: AssetResource): InputStream? {
+        return try {
+            val path = phoneMetadataResource.path.toPath()
+            OkioInputStream(FileSystem.SYSTEM.source(path).buffer())
+        } catch (t: Throwable) {
+            logger.v("Failed to load metadata from $phoneMetadataResource.path", t)
+            null
+        }
     }
 
     companion object {

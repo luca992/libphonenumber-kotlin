@@ -32,5 +32,5 @@ interface MetadataBootstrappingGuard<T : MetadataContainer> {
      * @param phoneMetadataResource to read from
      * @return guarded [MetadataContainer]
      */
-    fun getOrBootstrap(phoneMetadataResource: AssetResource): T
+    fun getOrBootstrap(phoneMetadataResource: AssetResource?): T?
 }

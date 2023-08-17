@@ -27,8 +27,7 @@ import io.michaelrocks.libphonenumber.MR
 class SingleFileModeResourceProvider(
     private val phoneMetadataFileName: String, val assets: ResourceContainer<AssetResource> = MR.assets
 ) : PhoneMetadataResourceProvider {
-    override fun getFor(key: Any): AssetResource {
+    override fun getFor(key: Any): AssetResource? {
         return assets.getAssetByFilePath(phoneMetadataFileName)
-            ?: throw NotImplementedError("Couldn't get asset resource for key: $phoneMetadataFileName")
     }
 }

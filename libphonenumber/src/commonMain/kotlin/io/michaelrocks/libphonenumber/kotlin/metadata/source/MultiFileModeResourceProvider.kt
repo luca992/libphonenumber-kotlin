@@ -37,12 +37,11 @@ class MultiFileModeResourceProvider(
         phoneMetadataFileNamePrefix = phoneMetadataFileNameBase + "_"
     }
 
-    override fun getFor(key: Any): AssetResource {
+    override fun getFor(key: Any): AssetResource? {
         val keyAsString = key.toString()
         require(ALPHANUMERIC.matches(keyAsString)) { "Invalid key: $keyAsString" }
         val path = phoneMetadataFileNamePrefix + keyAsString
         return assets.getAssetByFilePath(path)
-            ?: throw NotImplementedError("Couldn't get asset resource for key: $keyAsString")
     }
 
     companion object {
