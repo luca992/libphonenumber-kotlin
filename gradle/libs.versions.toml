@@ -7,6 +7,8 @@ com-android-library = { id = "com.android.library", version.ref = "agp" }
 com-android-application = { id = "com.android.application", version.ref = "agp" }
 org-jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose-jb" }
 dev-icerock-mobile-multiplatform-resources = { id = "dev.icerock.mobile.multiplatform-resources", version.ref = "multiplatform-resources" }
+org-kodein-mock-mockmp = { id = "org.kodein.mock.mockmp", version.ref = "mockmp" }
+
 
 [versions]
 
@@ -27,6 +29,7 @@ androidx-appcompat = "1.6.1"
 
 rules = "1.5.0"
 runner = "1.5.2"
+mockmp = "1.15.0"
 
 kermit = "2.0.0-RC5"
 

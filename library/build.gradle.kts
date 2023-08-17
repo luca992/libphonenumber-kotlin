@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.org.jetbrains.kotlin.multiplatform)
     alias(libs.plugins.com.android.library)
     alias(libs.plugins.dev.icerock.mobile.multiplatform.resources)
-    id("org.kodein.mock.mockmp") version "1.15.0"
+    alias(libs.plugins.org.kodein.mock.mockmp)
     id("maven-publish")
     id("signing")
 }
