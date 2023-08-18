@@ -33,7 +33,7 @@ class RegexBasedMatcher private constructor() : MatcherApi {
         val nationalNumberPattern = numberDesc.nationalNumberPattern
         // We don't want to consider it a prefix match when matching non-empty input against an empty
         // pattern.
-        return if (nationalNumberPattern.length == 0) {
+        return if (nationalNumberPattern.isEmpty()) {
             false
         } else match(number, regexCache.getRegexForPattern(nationalNumberPattern), allowPrefixMatch);
     }

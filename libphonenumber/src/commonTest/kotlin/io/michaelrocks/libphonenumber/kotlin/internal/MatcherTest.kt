@@ -60,7 +60,7 @@ class MatcherTest {
     // set.
     private fun createDesc(nationalNumberPattern: String): PhoneNumberDesc {
         val desc = newBuilder()
-        if (nationalNumberPattern.length > 0) {
+        if (nationalNumberPattern.isNotEmpty()) {
             desc.setNationalNumberPattern(nationalNumberPattern)
         }
         return desc.build()

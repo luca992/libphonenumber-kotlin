@@ -335,41 +335,41 @@ class Phonemetadata private constructor() {
             return nationalNumberPattern == other.nationalNumberPattern && possibleLength_ == other.possibleLength_ && possibleLengthLocalOnly_ == other.possibleLengthLocalOnly_ && exampleNumber == other.exampleNumber
         }
 
-        override fun writeExternal(objectOutput: ObjectOutput) {
-            objectOutput.writeBoolean(hasNationalNumberPattern)
+        override fun writeExternal(out: ObjectOutput) {
+            out.writeBoolean(hasNationalNumberPattern)
             if (hasNationalNumberPattern) {
-                objectOutput.writeUTF(nationalNumberPattern)
+                out.writeUTF(nationalNumberPattern)
             }
             val possibleLengthSize = possibleLengthCount
-            objectOutput.writeInt(possibleLengthSize)
+            out.writeInt(possibleLengthSize)
             for (i in 0 until possibleLengthSize) {
-                objectOutput.writeInt(possibleLength_[i])
+                out.writeInt(possibleLength_[i])
             }
             val possibleLengthLocalOnlySize = possibleLengthLocalOnlyCount
-            objectOutput.writeInt(possibleLengthLocalOnlySize)
+            out.writeInt(possibleLengthLocalOnlySize)
             for (i in 0 until possibleLengthLocalOnlySize) {
-                objectOutput.writeInt(possibleLengthLocalOnly_[i])
+                out.writeInt(possibleLengthLocalOnly_[i])
             }
-            objectOutput.writeBoolean(hasExampleNumber)
+            out.writeBoolean(hasExampleNumber)
             if (hasExampleNumber) {
-                objectOutput.writeUTF(exampleNumber)
+                out.writeUTF(exampleNumber)
             }
         }
 
-        override fun readExternal(objectInput: ObjectInput) {
-            if (objectInput.readBoolean()) {
-                setNationalNumberPattern(objectInput.readUTF())
+        override fun readExternal(input: ObjectInput) {
+            if (input.readBoolean()) {
+                setNationalNumberPattern(input.readUTF())
             }
-            val possibleLengthSize = objectInput.readInt()
+            val possibleLengthSize = input.readInt()
             for (i in 0 until possibleLengthSize) {
-                possibleLength_.add(objectInput.readInt())
+                possibleLength_.add(input.readInt())
             }
-            val possibleLengthLocalOnlySize = objectInput.readInt()
+            val possibleLengthLocalOnlySize = input.readInt()
             for (i in 0 until possibleLengthLocalOnlySize) {
-                possibleLengthLocalOnly_.add(objectInput.readInt())
+                possibleLengthLocalOnly_.add(input.readInt())
             }
-            if (objectInput.readBoolean()) {
-                setExampleNumber(objectInput.readUTF())
+            if (input.readBoolean()) {
+                setExampleNumber(input.readUTF())
             }
         }
 
