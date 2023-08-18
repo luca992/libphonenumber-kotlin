@@ -168,7 +168,7 @@ class AsYouTypeFormatter internal constructor(
                 // so we discard it.
                 continue
             }
-            if (ELIGIBLE_FORMAT_PATTERN.matches(format.format)) {
+            if (ELIGIBLE_FORMAT_PATTERN.matchEntire(format.format) != null) {
                 possibleFormats.add(format)
             }
         }
@@ -395,7 +395,9 @@ class AsYouTypeFormatter internal constructor(
     }
 
     private fun isDigitOrLeadingPlusSign(nextChar: Char): Boolean {
-        return (nextChar.isDigit() || (accruedInput.length == 1 && PhoneNumberUtil.PLUS_CHARS_PATTERN.matches(nextChar.toString())))
+        return (nextChar.isDigit() || (accruedInput.length == 1 && PhoneNumberUtil.PLUS_CHARS_PATTERN.matchEntire(
+            nextChar.toString()
+        ) != null))
     }
 
     /**
@@ -405,7 +407,7 @@ class AsYouTypeFormatter internal constructor(
     fun attemptToFormatAccruedDigits(): String {
         for (numberFormat in possibleFormats) {
             val r: Regex = regexCache.getRegexForPattern(numberFormat.pattern)
-            if (r.matches(nationalNumber)) {
+            if (r.matchEntire(nationalNumber) != null) {
                 shouldAddSpaceAfterNationalPrefix = NATIONAL_PREFIX_SEPARATORS_PATTERN.containsMatchIn(
                     numberFormat.nationalPrefixFormattingRule
                 )

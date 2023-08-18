@@ -215,21 +215,18 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
                 ) {
                     false
                 } else {
-                    matcher.checkNumberGroupingIsValid(number,
-                        candidate,
-                        util,
-                        object : NumberGroupingChecker {
-                            override fun checkGroups(
-                                util: PhoneNumberUtil,
-                                number: PhoneNumber,
-                                normalizedCandidate: InplaceStringBuilder,
-                                expectedNumberGroups: Array<String>
-                            ): Boolean {
-                                return PhoneNumberMatcher.allNumberGroupsRemainGrouped(
-                                    util, number, normalizedCandidate, expectedNumberGroups
-                                )
-                            }
-                        })
+                    matcher.checkNumberGroupingIsValid(number, candidate, util, object : NumberGroupingChecker {
+                        override fun checkGroups(
+                            util: PhoneNumberUtil,
+                            number: PhoneNumber,
+                            normalizedCandidate: InplaceStringBuilder,
+                            expectedNumberGroups: Array<String>
+                        ): Boolean {
+                            return PhoneNumberMatcher.allNumberGroupsRemainGrouped(
+                                util, number, normalizedCandidate, expectedNumberGroups
+                            )
+                        }
+                    })
                 }
             }
         },
@@ -934,7 +931,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         var internationalPrefixForFormatting: String? = ""
         if (metadataForRegionCallingFrom.hasPreferredInternationalPrefix()) {
             internationalPrefixForFormatting = metadataForRegionCallingFrom.preferredInternationalPrefix
-        } else if (SINGLE_INTERNATIONAL_PREFIX.matches(internationalPrefix)) {
+        } else if (SINGLE_INTERNATIONAL_PREFIX.matchEntire(internationalPrefix) != null) {
             internationalPrefixForFormatting = internationalPrefix
         }
         val regionCode = getRegionCodeForCountryCode(countryCallingCode)
@@ -1230,9 +1227,10 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         // international prefix.
         if (metadataForRegionCallingFrom != null) {
             val internationalPrefix = metadataForRegionCallingFrom.internationalPrefix
-            internationalPrefixForFormatting = if (SINGLE_INTERNATIONAL_PREFIX.matches(internationalPrefix)) {
-                internationalPrefix
-            } else metadataForRegionCallingFrom.preferredInternationalPrefix
+            internationalPrefixForFormatting =
+                if (SINGLE_INTERNATIONAL_PREFIX.matchEntire(internationalPrefix) != null) {
+                    internationalPrefix
+                } else metadataForRegionCallingFrom.preferredInternationalPrefix
         }
         val formattedNumber = InplaceStringBuilder(rawInput)
         val regionCode = getRegionCodeForCountryCode(countryCode)
@@ -1331,7 +1329,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
                     numFormat.getLeadingDigitsPattern(size - 1)
                 ).matchesAt(nationalNumber, 0)
             ) {
-                if (regexCache.getRegexForPattern(numFormat.pattern).matches(nationalNumber)) {
+                if (regexCache.getRegexForPattern(numFormat.pattern).matchEntire(nationalNumber) != null) {
                     return numFormat
                 }
             }
@@ -1906,7 +1904,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         }
         val strippedNumber = InplaceStringBuilder(number)
         maybeStripExtension(strippedNumber)
-        return VALID_ALPHA_PHONE_PATTERN.matches(strippedNumber)
+        return VALID_ALPHA_PHONE_PATTERN.matchEntire(strippedNumber) != null
     }
 
     /**
@@ -2737,11 +2735,11 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         if (phoneContext == null) {
             return true
         }
-        return if (phoneContext.length == 0) {
+        return if (phoneContext.isEmpty()) {
             false
-        } else (RFC3966_GLOBAL_NUMBER_DIGITS_PATTERN.matches(phoneContext) || RFC3966_DOMAINNAME_PATTERN.matches(
+        } else (RFC3966_GLOBAL_NUMBER_DIGITS_PATTERN.matchEntire(phoneContext) != null || RFC3966_DOMAINNAME_PATTERN.matchEntire(
             phoneContext
-        ))
+        ) != null)
 
         // Does phone-context value match pattern of global-number-digits or domainname
     }
@@ -3441,7 +3439,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
          * normalized in place
          */
         fun normalize(number: InplaceStringBuilder): InplaceStringBuilder {
-            if (VALID_ALPHA_PHONE_PATTERN.matches(number)) {
+            if (VALID_ALPHA_PHONE_PATTERN.matchEntire(number) != null) {
                 number.replaceRange(0, number.length, normalizeHelper(number, ALPHA_PHONE_MAPPINGS, true))
             } else {
                 number.replaceRange(0, number.length, normalizeDigitsOnly(number))
@@ -3617,9 +3615,9 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
          */
         @JvmStatic
         fun formattingRuleHasFirstGroupOnly(nationalPrefixFormattingRule: String): Boolean {
-            return (nationalPrefixFormattingRule.length == 0 || FIRST_GROUP_ONLY_PREFIX_PATTERN.matches(
+            return (nationalPrefixFormattingRule.isEmpty() || FIRST_GROUP_ONLY_PREFIX_PATTERN.matchEntire(
                 nationalPrefixFormattingRule
-            ))
+            ) != null)
         }
 
         private fun ensureMetadataIsNonNull(phoneMetadata: PhoneMetadata?, message: String) {

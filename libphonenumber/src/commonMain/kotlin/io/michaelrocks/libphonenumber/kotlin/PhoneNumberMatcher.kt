@@ -224,7 +224,7 @@ class PhoneNumberMatcher(
         try {
             // Check the candidate doesn't contain any formatting which would indicate that it really
             // isn't a phone number.
-            if (!MATCHING_BRACKETS!!.matches(candidate) || PUB_PAGES.find(candidate) != null) {
+            if (MATCHING_BRACKETS!!.matchEntire(candidate) == null || PUB_PAGES.find(candidate) != null) {
                 return null
             }
 

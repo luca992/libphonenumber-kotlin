@@ -48,7 +48,7 @@ class RegexBasedMatcher private constructor() : MatcherApi {
             return if (!regex.matchesAt(number, 0)) {
                 false
             } else {
-                if (regex.matches(number)) true else allowPrefixMatch
+                if (regex.matchEntire(number) != null) true else allowPrefixMatch
             }
         }
     }
