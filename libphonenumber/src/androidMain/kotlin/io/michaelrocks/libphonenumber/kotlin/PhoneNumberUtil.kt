@@ -16,7 +16,6 @@ import io.michaelrocks.libphonenumber.kotlin.metadata.source.AssetsMetadataLoade
  * @param context  Android [Context] used to load metadata. This should not be null.
  * @return  a PhoneNumberUtil instance
  */
-fun PhoneNumberUtil.Companion.createInstance(context: Context?): PhoneNumberUtil {
-    requireNotNull(context) { "context could not be null." }
+fun PhoneNumberUtil.Companion.createInstance(context: Context): PhoneNumberUtil {
     return createInstance(AssetsMetadataLoader(context.assets))
 }
