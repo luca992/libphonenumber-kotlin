@@ -102,6 +102,7 @@ kotlin {
                 implementation(compose.runtime)
                 implementation(libs.dev.icerock.moko.resources)
                 implementation(project(":libphonenumber"))
+                implementation(project(":libphonenumber-compose"))
             }
         }
 
@@ -190,11 +191,11 @@ compose.desktop.nativeApplication {
 
 android {
     namespace = "io.luca992.libphonenumber.sample"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         minSdk = 24
-        targetSdk = 33
+        targetSdk = 34
     }
 
     compileOptions {

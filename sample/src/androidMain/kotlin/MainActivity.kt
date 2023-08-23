@@ -12,7 +12,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val util = remember { PhoneNumberUtil.createInstance(applicationContext) }
-            App(util, "Android")
+            App("Android")
         }
     }
 }
