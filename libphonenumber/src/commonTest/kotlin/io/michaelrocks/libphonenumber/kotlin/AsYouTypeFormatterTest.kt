@@ -32,7 +32,7 @@ import kotlin.test.assertEquals
 class AsYouTypeFormatterTest : TestMetadataTestCase() {
 
     override val metadataLoader: MetadataLoader
-        get() = defaultMetadataLoader
+        get() = defaultMetadataLoader()
 
     @Test
     fun testInvalidRegion() {

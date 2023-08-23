@@ -32,7 +32,7 @@ import kotlin.test.assertTrue
  */
 class ShortNumberInfoTest : TestMetadataTestCase() {
     override val metadataLoader: MetadataLoader
-        get() = defaultMetadataLoader
+        get() = defaultMetadataLoader()
 
     private val shortInfo = createInstance(metadataLoader).shortNumberInfo
 

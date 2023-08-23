@@ -30,7 +30,7 @@ import kotlin.test.*
  * node is present for every phone number description.
  */
 class ExampleNumbersTest {
-    private val metadataDependenciesProvider = DefaultMetadataDependenciesProvider(defaultMetadataLoader)
+    private val metadataDependenciesProvider = DefaultMetadataDependenciesProvider(defaultMetadataLoader())
     private val phoneNumberUtil = PhoneNumberUtil.createInstance(metadataDependenciesProvider.metadataLoader)
     private val shortNumberInfo: ShortNumberInfo = phoneNumberUtil.shortNumberInfo!!
     private val shortNumberMetadataSource = metadataDependenciesProvider.shortNumberMetadataSource

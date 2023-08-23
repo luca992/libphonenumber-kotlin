@@ -14,9 +14,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.intl.Locale
 import io.michaelrocks.libphonenumber.kotlin.PhoneNumberUtil
+import io.michaelrocks.libphonenumber.kotlin.metadata.defaultMetadataLoader
 
 @Composable
-fun App(util: PhoneNumberUtil, platform: String) {
+fun App(platform: String) {
+    val phoneNumberUtil = remember { PhoneNumberUtil.createInstance(defaultMetadataLoader()) }
     var text by remember { mutableStateOf("Hello, World!") }
     var examplePhoneNumberToFormat by remember { mutableStateOf("8005551212") }
     var examplePhoneNumberFormatted by remember { mutableStateOf(false) }
@@ -38,9 +40,9 @@ fun App(util: PhoneNumberUtil, platform: String) {
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Button(onClick = {
-                    val phoneNumber = util.parse(examplePhoneNumberToFormat, region)
+                    val phoneNumber = phoneNumberUtil.parse(examplePhoneNumberToFormat, region)
                     examplePhoneNumberToFormat =
-                        util.format(phoneNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL)
+                        phoneNumberUtil.format(phoneNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL)
                     examplePhoneNumberFormatted = true
                 }) {
                     Text(if (!examplePhoneNumberFormatted) "Click to format" else "Formatted")
@@ -56,7 +58,7 @@ fun App(util: PhoneNumberUtil, platform: String) {
                     modifier = Modifier.fillMaxWidth(),
                     label = { Text("AsYouTypeFormatter Input") },
                     singleLine = true,
-                    visualTransformation = PhoneNumberVisualTransformation(util, region),
+                    visualTransformation = PhoneNumberVisualTransformation(phoneNumberUtil, region),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
                 )
             }

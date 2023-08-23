@@ -32,7 +32,7 @@ import kotlin.test.*
 class PhoneNumberMatcherTest : TestMetadataTestCase() {
 
     override val metadataLoader: MetadataLoader
-        get() = defaultMetadataLoader
+        get() = defaultMetadataLoader()
 
     @Throws(Exception::class)
     @Test
