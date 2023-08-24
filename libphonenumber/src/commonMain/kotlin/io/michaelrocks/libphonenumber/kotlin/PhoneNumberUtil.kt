@@ -3344,7 +3344,7 @@ class PhoneNumberUtil internal constructor(// A source of metadata for different
         // We append optionally the extension pattern to the end here, as a valid phone number may
         // have an extension prefix appended, followed by 1 or more digits.
         private val VALID_PHONE_NUMBER_PATTERN =
-            Regex("^$VALID_PHONE_NUMBER(?:$EXTN_PATTERNS_FOR_PARSING)?$", REGEX_FLAGS)
+            Regex("$VALID_PHONE_NUMBER(?:$EXTN_PATTERNS_FOR_PARSING)?", REGEX_FLAGS)
 
         @JvmField
         val NON_DIGITS_PATTERN = Regex("(\\D+)")
