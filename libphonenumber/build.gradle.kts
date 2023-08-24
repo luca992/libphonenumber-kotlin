@@ -28,7 +28,9 @@ object Targets {
 }
 
 kotlin {
-    androidTarget()
+    androidTarget {
+        publishAllLibraryVariants()
+    }
     jvm()
     js(IR) {
         browser()
@@ -119,12 +121,6 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-        }
-    }
-
-    sourceSets {
-        named("test") {
-            java.srcDirs("src/androidUnitTest/java")
         }
     }
 

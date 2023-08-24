@@ -11,7 +11,9 @@ group = project.property("GROUP") as String
 version = project.property("VERSION_NAME") as String
 
 kotlin {
-    androidTarget()
+    androidTarget {
+        publishAllLibraryVariants()
+    }
     jvm("desktop")
     js(IR) {
         browser()
