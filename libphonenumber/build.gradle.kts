@@ -106,7 +106,7 @@ kotlin {
 }
 
 android {
-    namespace = "io.michaelrocks.libphonenumber.android"
+    namespace = "io.michaelrocks.libphonenumber.kotlin"
     compileSdk = 33
 
     defaultConfig {

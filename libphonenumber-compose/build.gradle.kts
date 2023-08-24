@@ -81,7 +81,7 @@ kotlin {
 
 
 android {
-    namespace = "io.luca992.libphonenumber.compose"
+    namespace = "io.luca992.libphonenumber.kotlin.compose"
     compileSdk = 33
 
     defaultConfig {
