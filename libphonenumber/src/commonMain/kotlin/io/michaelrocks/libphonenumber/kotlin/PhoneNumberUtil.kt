@@ -17,7 +17,7 @@
 package io.michaelrocks.libphonenumber.kotlin
 
 import co.touchlab.kermit.Logger
-import io.michaelrocks.libphonenumber.android.AsYouTypeFormatter
+import io.michaelrocks.libphonenumber.kotlin.AsYouTypeFormatter
 import io.michaelrocks.libphonenumber.kotlin.*
 import io.michaelrocks.libphonenumber.kotlin.CountryCodeToRegionCodeMap.countryCodeToRegionCodeMap
 import io.michaelrocks.libphonenumber.kotlin.PhoneNumberMatcher.NumberGroupingChecker
