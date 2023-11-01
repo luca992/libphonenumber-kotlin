@@ -18,7 +18,9 @@ import io.michaelrocks.libphonenumber.kotlin.metadata.defaultMetadataLoader
 
 @Composable
 fun App(platform: String) {
-    val phoneNumberUtil = phoneNumberUtil()
+    val phoneNumberUtil: PhoneNumberUtil by remember {
+        mutableStateOf(PhoneNumberUtil.createInstance(defaultMetadataLoader()))
+    }
     var text by remember { mutableStateOf("Hello, World!") }
     var examplePhoneNumberToFormat by remember { mutableStateOf("8005551212") }
     var examplePhoneNumberFormatted by remember { mutableStateOf(false) }

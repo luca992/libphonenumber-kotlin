@@ -102,7 +102,6 @@ kotlin {
                 implementation(compose.runtime)
                 implementation(libs.dev.icerock.moko.resources)
                 implementation(project(":libphonenumber"))
-                implementation(project(":libphonenumber-compose"))
             }
         }
 

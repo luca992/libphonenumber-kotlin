@@ -80,6 +80,9 @@ kotlin {
         }
         val androidMain by getting {
             dependsOn(jvmCommonMain)
+            dependencies {
+                implementation(libs.androidx.startup.runtime)
+            }
         }
         val nonJvmMain by creating {
             dependsOn(commonMain)
