@@ -25,6 +25,8 @@ androidx-activity = "1.8.0"
 androidx-lifecycle = "2.6.2"
 androidx-startup = "1.1.1"
 androidx-appcompat = "1.6.1"
+androidx-runner = "1.5.2"
+
 
 [libraries]
 
@@ -36,5 +38,6 @@ androidx-activity-compose = { module = "androidx.activity:activity-compose", ver
 androidx-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "androidx-lifecycle" }
 androidx-startup-runtime = { module = "androidx.startup:startup-runtime", version.ref = "androidx-startup" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
+androidx-runner = { module = "androidx.test:runner", version.ref = "androidx-runner" }
 
 co-touchlab-kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }

@@ -93,9 +93,13 @@ kotlin {
         val jsMain by getting {
             dependsOn(nonJvmMain)
         }
-        val androidUnitTest by getting {
+        val androidInstrumentedTest by getting {
             dependsOn(jvmCommonTest)
+            dependencies {
+                implementation(libs.androidx.runner)
+            }
         }
+        val androidUnitTest by getting {}
         val nativeMain by creating {
             dependsOn(nonJvmMain)
         }
@@ -115,10 +119,11 @@ kotlin {
 
 android {
     namespace = "io.michaelrocks.libphonenumber.kotlin"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
-        minSdk = 21
+        minSdk = 23
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
