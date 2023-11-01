@@ -12,9 +12,9 @@ org-kodein-mock-mockmp = { id = "org.kodein.mock.mockmp", version.ref = "mockmp"
 
 [versions]
 
-kotlin = "1.9.10"
+kotlin = "1.9.20"
 agp = "8.1.2"
-compose-jb = "1.5.3"
+compose-jb = "1.5.10"
 vanniktech-publish = "0.25.3"
 okio = "3.6.0"
 multiplatform-resources = "0.23.0"
@@ -26,7 +26,6 @@ androidx-lifecycle = "2.6.2"
 androidx-startup = "1.1.1"
 androidx-appcompat = "1.6.1"
 androidx-runner = "1.5.2"
-
 
 [libraries]
 
