@@ -68,6 +68,9 @@ kotlin {
         }
         val jvmCommonTest by creating {
             dependsOn(commonTest)
+            dependencies {
+                implementation(kotlin("test-junit"))
+            }
         }
         val jvmMain by getting {
             dependsOn(jvmCommonMain)

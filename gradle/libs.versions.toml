@@ -12,30 +12,21 @@ org-kodein-mock-mockmp = { id = "org.kodein.mock.mockmp", version.ref = "mockmp"
 
 [versions]
 
-kotlin = "1.9.0"
-agp = "8.0.2"
-compose-jb = "1.5.0-rc04"
+kotlin = "1.9.10"
+agp = "8.1.2"
+compose-jb = "1.5.3"
 vanniktech-publish = "0.25.3"
-okio = "3.5.0"
+okio = "3.6.0"
 multiplatform-resources = "0.23.0"
 mockmp = "1.15.0"
-kermit = "2.0.0-RC5"
+kermit = "2.0.2"
 
-androidx-activity = "1.7.2"
-androidx-espressoCore = "3.5.1"
-androidx-lifecycle = "2.6.1"
+androidx-activity = "1.8.0"
+androidx-lifecycle = "2.6.2"
 androidx-startup = "1.1.1"
 androidx-appcompat = "1.6.1"
-junit = "1.1.5"
-rules = "1.5.0"
-runner = "1.5.2"
 
 [libraries]
-
-androidx-junit = { module = "androidx.test.ext:junit", version.ref = "junit" }
-androidx-rules = { module = "androidx.test:rules", version.ref = "rules" }
-androidx-runner = { module = "androidx.test:runner", version.ref = "runner" }
-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidx-espressoCore" }
 
 com-squareup-okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 dev-icerock-moko-resources = { module = "dev.icerock.moko:resources", version.ref = "multiplatform-resources" }

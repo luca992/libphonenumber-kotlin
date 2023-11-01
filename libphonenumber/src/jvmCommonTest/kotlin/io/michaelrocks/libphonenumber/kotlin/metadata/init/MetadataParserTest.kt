@@ -19,11 +19,11 @@ package io.michaelrocks.libphonenumber.kotlin.metadata.init
 import io.michaelrocks.libphonenumber.kotlin.Phonemetadata
 import io.michaelrocks.libphonenumber.kotlin.metadata.PhoneMetadataCollectionUtil
 import io.michaelrocks.libphonenumber.kotlin.utils.assertThrows
-import org.junit.Test
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream
 import java.nio.charset.StandardCharsets
+import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
