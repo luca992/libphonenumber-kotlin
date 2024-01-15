@@ -155,6 +155,7 @@ multiplatformResources {
 
 mockmp {
     usesHelper = true
+    installWorkaround() // (3)
 }
 
 // https://youtrack.jetbrains.com/issue/KT-46466
