@@ -17,7 +17,7 @@ agp = "8.2.1"
 compose-jb = "1.5.11"
 vanniktech-publish = "0.27.0"
 okio = "3.7.0"
-multiplatform-resources = "0.24.0-alpha-1"
+multiplatform-resources = "0.24.0-alpha-2"
 mockmp = "1.16.0"
 kermit = "2.0.2"
 
