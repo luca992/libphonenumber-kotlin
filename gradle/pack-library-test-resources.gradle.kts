@@ -1,5 +1,5 @@
 val rootProjectAbsPath = rootProject.projectDir.absolutePath
-val path = """"$rootProjectAbsPath/libphonenumber/build/generated/moko/jsMain/iomichaelrockslibphonenumber/res""""
+val path = """"$rootProjectAbsPath/libphonenumber/build/generated/moko-resources/jsMain/res""""
 val webpackConfig = File(projectDir, "webpack.config.d/pack-library-resources-generated.js")
 
 fun createWebpackConfig() {
@@ -10,7 +10,7 @@ const mokoResourcePath = path.resolve($path);
 config.module.rules.push({
     test: /(ShortNumberMetadataProto_|PhoneNumberMetadataProto_|PhoneNumberMetadataProtoForTesting_|PhoneNumberAlternateFormatsProto_)[^.]+${'$'}/,
     include: [
-        path.resolve(mokoResourcePath, "files"),
+        path.resolve(mokoResourcePath, "assets"),
     ],
     type: 'asset/inline',
     generator: {
