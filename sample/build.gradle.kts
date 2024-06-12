@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.konan.file.File as KonanFile
 
 plugins {
     alias(libs.plugins.org.jetbrains.kotlin.multiplatform)
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.org.jetbrains.compose)
     alias(libs.plugins.com.android.application)
     alias(libs.plugins.dev.icerock.mobile.multiplatform.resources)
@@ -80,17 +81,17 @@ kotlin {
         }
     }
 
-    cocoapods {
-        summary = "Shared code for the sample"
-        homepage = "https://github.com/luca992/libphonenumber-kotlin"
-        ios.deploymentTarget = "14.1"
-        podfile = project.file("../sampleIosApp/Podfile")
-        framework {
-            baseName = "shared"
-            isStatic = true
-        }
-        extraSpecAttributes["resources"] = "['src/commonMain/resources/**', 'src/iosMain/resources/**']"
-    }
+//    cocoapods {
+//        summary = "Shared code for the sample"
+//        homepage = "https://github.com/luca992/libphonenumber-kotlin"
+//        ios.deploymentTarget = "14.1"
+//        podfile = project.file("../sampleIosApp/Podfile")
+//        framework {
+//            baseName = "shared"
+//            isStatic = true
+//        }
+//        extraSpecAttributes["resources"] = "['src/commonMain/resources/**', 'src/iosMain/resources/**']"
+//    }
 
 
     sourceSets {
@@ -101,7 +102,7 @@ kotlin {
                 implementation(compose.material)
                 implementation(compose.runtime)
                 implementation(libs.dev.icerock.moko.resources)
-                implementation(project(":libphonenumber"))
+                api(project(":libphonenumber"))
             }
         }
 

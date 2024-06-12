@@ -5,6 +5,7 @@
 org-jetbrains-kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 com-android-library = { id = "com.android.library", version.ref = "agp" }
 com-android-application = { id = "com.android.application", version.ref = "agp" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 org-jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose-jb" }
 com-vanniktech-maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "vanniktech-publish" }
 dev-icerock-mobile-multiplatform-resources = { id = "dev.icerock.mobile.multiplatform-resources", version.ref = "multiplatform-resources" }
@@ -12,19 +13,19 @@ org-kodein-mock-mockmp = { id = "org.kodein.mock.mockmp", version.ref = "mockmp"
 
 [versions]
 
-kotlin = "1.9.22"
+kotlin = "2.0.0"
 agp = "8.2.2"
-compose-jb = "1.5.12"
+compose-jb = "1.6.11"
 vanniktech-publish = "0.27.0"
-okio = "3.7.0"
-multiplatform-resources = "0.24.0-alpha-3"
+okio = "3.9.0"
+multiplatform-resources = "0.24.0"
 mockmp = "1.17.0"
-kermit = "2.0.3"
+kermit = "2.0.4"
 
-androidx-activity = "1.8.2"
-androidx-lifecycle = "2.7.0"
+androidx-activity = "1.9.0"
+androidx-lifecycle = "2.8.1"
 androidx-startup = "1.1.1"
-androidx-appcompat = "1.6.1"
+androidx-appcompat = "1.7.0"
 androidx-runner = "1.5.2"
 
 [libraries]

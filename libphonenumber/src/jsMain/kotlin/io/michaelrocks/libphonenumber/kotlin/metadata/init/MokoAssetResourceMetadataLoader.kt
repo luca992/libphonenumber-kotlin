@@ -36,6 +36,7 @@ class MokoAssetResourceMetadataLoader : MetadataLoader {
             // webpack is configured to bundle the metadata files as base64 strings by using asset/inline
             // So phoneMetadataResource.originalPath will actually be a base64 string of the file contents
             // in this mode vs asset/resource which would be the path to the file
+            console.log("phoneMetadataResource" + "${phoneMetadataResource.originalPath}")
             val base64Data = phoneMetadataResource.originalPath.decodeBase64()!!
             buffer.write(base64Data.toByteArray())
             OkioInputStream(buffer)

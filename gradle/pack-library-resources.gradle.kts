@@ -1,6 +1,8 @@
 val rootProjectAbsPath = rootProject.projectDir.absolutePath
-val path = """"$rootProjectAbsPath/sample/build/generated/moko-resources/jsMain/res""""
+val path = """"$rootProjectAbsPath/libphonenumber/build/processedResources/js/main""""
 val webpackConfig = File(projectDir, "webpack.config.d/pack-library-resources-generated.js")
+
+println("rootProjectAbsPath: $path")
 
 fun createWebpackConfig() {
     val configText = """const path = require('path');
