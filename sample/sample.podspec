@@ -1,20 +1,20 @@
 Pod::Spec.new do |spec|
     spec.name                     = 'sample'
     spec.version                  = '1.0-SNAPSHOT'
-    spec.homepage                 = ''
+    spec.homepage                 = 'https://github.com/luca992/libphonenumber-kotlin'
     spec.source                   = { :http=> ''}
     spec.authors                  = ''
     spec.license                  = ''
-    spec.summary                  = ''
-    spec.vendored_frameworks      = 'build/cocoapods/framework/sample.framework'
+    spec.summary                  = 'Shared code for the sample'
+    spec.vendored_frameworks      = 'build/cocoapods/framework/shared.framework'
     spec.libraries                = 'c++'
+    spec.ios.deployment_target    = '14.1'
                 
                 
-                
-    if !Dir.exist?('build/cocoapods/framework/sample.framework') || Dir.empty?('build/cocoapods/framework/sample.framework')
+    if !Dir.exist?('build/cocoapods/framework/shared.framework') || Dir.empty?('build/cocoapods/framework/shared.framework')
         raise "
 
-        Kotlin framework 'sample' doesn't exist yet, so a proper Xcode project can't be generated.
+        Kotlin framework 'shared' doesn't exist yet, so a proper Xcode project can't be generated.
         'pod install' should be executed after running ':generateDummyFramework' Gradle task:
 
             ./gradlew :sample:generateDummyFramework
@@ -28,7 +28,7 @@ Pod::Spec.new do |spec|
                 
     spec.pod_target_xcconfig = {
         'KOTLIN_PROJECT_PATH' => ':sample',
-        'PRODUCT_MODULE_NAME' => 'sample',
+        'PRODUCT_MODULE_NAME' => 'shared',
     }
                 
     spec.script_phases = [
@@ -50,5 +50,5 @@ Pod::Spec.new do |spec|
             SCRIPT
         }
     ]
-    spec.resources = ['build/compose/cocoapods/compose-resources']
+    spec.resources = ['src/commonMain/resources/**', 'src/iosMain/resources/**']
 end
