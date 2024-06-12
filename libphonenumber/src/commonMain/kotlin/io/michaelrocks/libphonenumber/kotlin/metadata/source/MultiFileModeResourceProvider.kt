@@ -18,10 +18,9 @@ package io.michaelrocks.libphonenumber.kotlin.metadata.source
 
 import dev.icerock.moko.resources.AssetResource
 import dev.icerock.moko.resources.ResourceContainer
+import dev.icerock.moko.resources.getAssetByFilePath
 import io.michaelrocks.libphonenumber.MR
 
-// TODO: Remove after https://github.com/icerockdev/moko-resources/pull/550 is merged
-expect fun ResourceContainer<AssetResource>.getAssetByFilePath(filePath: String): AssetResource?
 
 /**
  * [PhoneMetadataResourceProvider] implementation which appends key as a suffix to the

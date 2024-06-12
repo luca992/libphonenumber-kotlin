@@ -1,3 +1,3 @@
 package io.michaelrocks.libphonenumber.kotlin.io
 
-actual typealias Closeable = java.io.Closeable
+//actual typealias Closeable = java.io.Closeable

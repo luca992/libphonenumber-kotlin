@@ -29,15 +29,15 @@ class DefaultMetadataDependenciesProvider @JvmOverloads constructor(metadataLoad
     val metadataParser = newLenientParser()
     val metadataLoader: MetadataLoader
     val phoneNumberMetadataFileNameProvider: PhoneMetadataResourceProvider = MultiFileModeResourceProvider(
-        "io/michaelrocks/libphonenumber/android/data/PhoneNumberMetadataProto"
+        "PhoneNumberMetadataProto"
     )
     val phoneNumberMetadataSource: MetadataSource
     val shortNumberMetadataFileNameProvider: PhoneMetadataResourceProvider = MultiFileModeResourceProvider(
-        "io/michaelrocks/libphonenumber/android/data/ShortNumberMetadataProto"
+        "ShortNumberMetadataProto"
     )
     val shortNumberMetadataSource: RegionMetadataSource
     val alternateFormatsMetadataFileNameProvider: PhoneMetadataResourceProvider = MultiFileModeResourceProvider(
-        "io/michaelrocks/libphonenumber/android/data/PhoneNumberAlternateFormatsProto"
+        "PhoneNumberAlternateFormatsProto"
     )
     val alternateFormatsMetadataSource: FormattingMetadataSource
 
