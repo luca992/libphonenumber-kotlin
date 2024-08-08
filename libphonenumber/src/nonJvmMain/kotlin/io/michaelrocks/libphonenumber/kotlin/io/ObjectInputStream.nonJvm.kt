@@ -6,9 +6,12 @@ import okio.EOFException
 import okio.IOException
 import kotlin.math.min
 
+actual fun getPlatformObjectInputStream(inputStream: InputStream): ObjectInputStream {
+    return OkioObjectInputStream(inputStream)
+}
+
 // Based on BlockDataInputStream
-actual open class ObjectInputStream actual constructor(val inputStream: InputStream) : InputStream(), ObjectInput,
-    ObjectStreamConstants {
+class OkioObjectInputStream(val inputStream: InputStream) : ObjectInputStream {
 
     val bufferedSource: BufferedSource
         get() = (inputStream as OkioInputStream).bufferedSource
@@ -43,8 +46,7 @@ actual open class ObjectInputStream actual constructor(val inputStream: InputStr
     }
 
     private fun getShortFromByteArray(byteArray: ByteArray, startIndex: Int): Short {
-        return ((byteArray[startIndex].toInt() and 0xFF) shl 8 or
-                (byteArray[startIndex + 1].toInt() and 0xFF)).toShort()
+        return ((byteArray[startIndex].toInt() and 0xFF) shl 8 or (byteArray[startIndex + 1].toInt() and 0xFF)).toShort()
     }
 
     private fun getIntFromByteArray(byteArray: ByteArray, startIndex: Int): Int {
@@ -163,19 +165,19 @@ actual open class ObjectInputStream actual constructor(val inputStream: InputStr
         return if (end >= 0) buf[pos++].toInt() and 0xFF else -1
     }
 
-    actual override fun readFully(b: ByteArray?) {
+    override fun readFully(b: ByteArray?) {
         b?.let { bufferedSource.readFully(it) }
     }
 
-    actual override fun readFully(b: ByteArray?, off: Int, len: Int) {
+    override fun readFully(b: ByteArray?, off: Int, len: Int) {
         throw Exception("readFully: Not yet implemented")
     }
 
-    actual override fun skipBytes(n: Int): Int {
+    override fun skipBytes(n: Int): Int {
         throw Exception("skipBytes: Not yet implemented")
     }
 
-    actual override fun readBoolean(): Boolean {
+    override fun readBoolean(): Boolean {
         val v = read()
         if (v < 0) {
             throw EOFException()
@@ -183,7 +185,7 @@ actual open class ObjectInputStream actual constructor(val inputStream: InputStr
         return v != 0
     }
 
-    actual override fun readByte(): Byte {
+    override fun readByte(): Byte {
         val v = read()
         if (v < 0) {
             throw EOFException()
@@ -191,15 +193,15 @@ actual open class ObjectInputStream actual constructor(val inputStream: InputStr
         return v.toByte()
     }
 
-    actual override fun readUnsignedByte(): Int {
+    override fun readUnsignedByte(): Int {
         throw Exception("readUnsignedByte: Not yet implemented")
     }
 
-    actual override fun readShort(): Short {
+    override fun readShort(): Short {
         throw Exception("readShort: Not yet implemented")
     }
 
-    actual override fun readUnsignedShort(): Int {
+    override fun readUnsignedShort(): Int {
         if (end - pos < 2) {
             val ch1 = read()
             val ch2 = read()
@@ -211,11 +213,11 @@ actual open class ObjectInputStream actual constructor(val inputStream: InputStr
         return v
     }
 
-    actual override fun readChar(): Char {
+    override fun readChar(): Char {
         throw Exception("readChar: Not yet implemented")
     }
 
-    actual override fun readInt(): Int {
+    override fun readInt(): Int {
         if (end - pos < 4) {
             val ch1 = read()
             val ch2 = read()
@@ -229,23 +231,23 @@ actual open class ObjectInputStream actual constructor(val inputStream: InputStr
         return v
     }
 
-    actual override fun readLong(): Long {
+    override fun readLong(): Long {
         throw Exception("readLong: Not yet implemented")
     }
 
-    actual override fun readFloat(): Float {
+    override fun readFloat(): Float {
         throw Exception("readFloat: Not yet implemented")
     }
 
-    actual override fun readDouble(): Double {
+    override fun readDouble(): Double {
         throw Exception("readDouble: Not yet implemented")
     }
 
-    actual override fun readLine(): String {
+    override fun readLine(): String {
         throw Exception("readLine: Not yet implemented")
     }
 
-    actual override fun readUTF(): String {
+    override fun readUTF(): String {
         val length = readUnsignedShort().toLong()
         return readUTFBody(length)
     }
@@ -308,9 +310,7 @@ actual open class ObjectInputStream actual constructor(val inputStream: InputStr
                             440123
                             throw Exception("UTFDataFormatException")
                         }
-                        cbuf[cpos++] = (b1 and 0x0F shl 12 or
-                                (b2 and 0x3F shl 6) or
-                                (b3 and 0x3F shl 0)).toChar()
+                        cbuf[cpos++] = (b1 and 0x0F shl 12 or (b2 and 0x3F shl 6) or (b3 and 0x3F shl 0)).toChar()
                     }
 
                     else -> throw Exception("UTFDataFormatException")// 10xx xxxx, 1111 xxxx
@@ -319,8 +319,7 @@ actual open class ObjectInputStream actual constructor(val inputStream: InputStr
         } catch (ex: IndexOutOfBoundsException) {
             outOfBounds = true
         } finally {
-            if (outOfBounds || pos - start > utflen) {
-                /*
+            if (outOfBounds || pos - start > utflen) {/*
                      * Fix for 4450867: if a malformed utf char causes the
                      * conversion loop to scan past the expected end of the utf
                      * string, only consume the expected number of utf bytes.
@@ -381,7 +380,7 @@ actual open class ObjectInputStream actual constructor(val inputStream: InputStr
         }
     }
 
-    actual override fun close() {
+    override fun close() {
         inputStream.close()
     }
 
