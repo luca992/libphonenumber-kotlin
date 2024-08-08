@@ -1,3 +1,8 @@
 package io.michaelrocks.libphonenumber.kotlin.io
 
-actual typealias InputStream = java.io.InputStream
+class JavaInputStream(val javaInputStream: java.io.InputStream) : InputStream {
+
+    override fun close() {
+        javaInputStream.close()
+    }
+}

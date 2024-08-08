@@ -221,65 +221,65 @@ multiplatformResources {
 }
 
 //// todo: Remove when resolved: https://github.com/icerockdev/moko-resources/issues/372
-//tasks.withType<KotlinNativeLink>()
-//    .matching { linkTask -> linkTask.binary is AbstractExecutable }
-//    .configureEach {
-//        val task: KotlinNativeLink = this
-//
-//        doLast {
-//            val binary: NativeBinary = task.binary
-//            val outputDir: File = task.outputFile.get().parentFile
-//            task.libraries
-//                .filter { library -> library.extension == "klib" }
-//                .filter(File::exists)
-//                .forEach { inputFile ->
-//                    val klibKonan = KonanFile(inputFile.path)
-//                    val klib = KotlinLibraryLayoutImpl(
-//                        klib = klibKonan,
-//                        component = "default"
-//                    )
-//                    val layout = klib.extractingToTemp
-//
-//                    // extracting bundles
-//                    layout
-//                        .resourcesDir
-//                        .absolutePath
-//                        .let(::File)
-//                        .listFiles(FileFilter { it.extension == "bundle" })
-//                        // copying bundles to app
-//                        ?.forEach { bundleFile ->
-//                            logger.info("${bundleFile.absolutePath} copying to $outputDir")
-//                            bundleFile.copyRecursively(
-//                                target = File(outputDir, bundleFile.name),
-//                                overwrite = true
-//                            )
-//                        }
-//                }
-//        }
-//    }
-//
-//tasks.withType<AbstractNativeMacApplicationPackageAppDirTask> {
-//    val task: AbstractNativeMacApplicationPackageAppDirTask = this
-//
-//    doLast {
-//        val execFile: File = task.executable.get().asFile
-//        val execDir: File = execFile.parentFile
-//        val destDir: File = task.destinationDir.asFile.get()
-//        val bundleID: String = task.bundleID.get()
-//
-//        val outputDir = File(destDir, "$bundleID.app/Contents/Resources")
-//        outputDir.mkdirs()
-//
-//        execDir.listFiles().orEmpty()
-//            .filter { it.extension == "bundle" }
-//            .forEach { bundleFile ->
-//                logger.info("${bundleFile.absolutePath} copying to $outputDir")
-//                bundleFile.copyRecursively(
-//                    target = File(outputDir, bundleFile.name),
-//                    overwrite = true
-//                )
-//            }
-//    }
-//}
+tasks.withType<KotlinNativeLink>()
+    .matching { linkTask -> linkTask.binary is AbstractExecutable }
+    .configureEach {
+        val task: KotlinNativeLink = this
+
+        doLast {
+            val binary: NativeBinary = task.binary
+            val outputDir: File = task.outputFile.get().parentFile
+            task.libraries
+                .filter { library -> library.extension == "klib" }
+                .filter(File::exists)
+                .forEach { inputFile ->
+                    val klibKonan = KonanFile(inputFile.path)
+                    val klib = KotlinLibraryLayoutImpl(
+                        klib = klibKonan,
+                        component = "default"
+                    )
+                    val layout = klib.extractingToTemp
+
+                    // extracting bundles
+                    layout
+                        .resourcesDir
+                        .absolutePath
+                        .let(::File)
+                        .listFiles(FileFilter { it.extension == "bundle" })
+                        // copying bundles to app
+                        ?.forEach { bundleFile ->
+                            logger.info("${bundleFile.absolutePath} copying to $outputDir")
+                            bundleFile.copyRecursively(
+                                target = File(outputDir, bundleFile.name),
+                                overwrite = true
+                            )
+                        }
+                }
+        }
+    }
+
+tasks.withType<AbstractNativeMacApplicationPackageAppDirTask> {
+    val task: AbstractNativeMacApplicationPackageAppDirTask = this
+
+    doLast {
+        val execFile: File = task.executable.get().asFile
+        val execDir: File = execFile.parentFile
+        val destDir: File = task.destinationDir.asFile.get()
+        val bundleID: String = task.bundleID.get()
+
+        val outputDir = File(destDir, "$bundleID.app/Contents/Resources")
+        outputDir.mkdirs()
+
+        execDir.listFiles().orEmpty()
+            .filter { it.extension == "bundle" }
+            .forEach { bundleFile ->
+                logger.info("${bundleFile.absolutePath} copying to $outputDir")
+                bundleFile.copyRecursively(
+                    target = File(outputDir, bundleFile.name),
+                    overwrite = true
+                )
+            }
+    }
+}
 
 apply(from = "$rootDir/gradle/pack-library-resources.gradle.kts")

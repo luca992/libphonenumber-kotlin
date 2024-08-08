@@ -21,6 +21,7 @@ import io.michaelrocks.libphonenumber.kotlin.Phonemetadata
 import io.michaelrocks.libphonenumber.kotlin.Phonemetadata.PhoneMetadata
 import io.michaelrocks.libphonenumber.kotlin.io.InputStream
 import io.michaelrocks.libphonenumber.kotlin.io.ObjectInputStream
+import io.michaelrocks.libphonenumber.kotlin.io.getPlatformObjectInputStream
 import okio.IOException
 import kotlin.jvm.JvmStatic
 
@@ -40,7 +41,7 @@ class MetadataParser private constructor(private val strictMode: Boolean) {
         }
         var ois: ObjectInputStream? = null
         return try {
-            ois = ObjectInputStream(source)
+            ois = getPlatformObjectInputStream(source)
             val phoneMetadataCollection = Phonemetadata.PhoneMetadataCollection()
             phoneMetadataCollection.readExternal(ois)
             val phoneMetadata = phoneMetadataCollection.metadataList
