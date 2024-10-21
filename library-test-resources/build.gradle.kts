@@ -34,6 +34,7 @@ kotlin {
     for (target in Targets.nativeTargets) {
         targets.add(presets.getByName(target).createTarget(target))
     }
+    applyDefaultHierarchyTemplate()
     sourceSets {
         all {
             languageSettings.optIn("kotlin.ExperimentalStdlibApi")
@@ -41,17 +42,6 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(libs.dev.icerock.moko.resources)
-            }
-        }
-        val jvmMain by getting {
-            dependsOn(commonMain)
-        }
-        val jsMain by getting {
-            dependsOn(commonMain)
-        }
-        Targets.nativeTargets.forEach { target ->
-            getByName("${target}Main") {
-                dependsOn(commonMain)
             }
         }
     }
