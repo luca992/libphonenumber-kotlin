@@ -27,6 +27,6 @@ class AssetsMetadataLoader(private val assetManager: AssetManager) : MetadataLoa
             assetManager.open(phoneMetadataResource.path)
         } catch (exception: IOException) {
             null
-        }
+        } as InputStream?
     }
 }

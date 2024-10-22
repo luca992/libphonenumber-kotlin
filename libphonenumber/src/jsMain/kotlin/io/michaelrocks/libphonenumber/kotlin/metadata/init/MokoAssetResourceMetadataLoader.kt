@@ -17,7 +17,6 @@
 package io.michaelrocks.libphonenumber.kotlin.metadata.init
 
 import co.touchlab.kermit.Logger
-import dev.icerock.moko.resources.AssetResource
 import io.michaelrocks.libphonenumber.kotlin.MetadataLoader
 import io.michaelrocks.libphonenumber.kotlin.io.InputStream
 import io.michaelrocks.libphonenumber.kotlin.io.OkioInputStream

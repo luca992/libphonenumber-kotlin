@@ -16,7 +16,6 @@
  */
 package io.michaelrocks.libphonenumber.kotlin.metadata.source
 
-import dev.icerock.moko.resources.AssetResource
 
 /**
  * Abstraction responsible for inferring the metadata file name.
@@ -34,5 +33,5 @@ interface PhoneMetadataResourceProvider {
      * Returns phone metadata file path for the given key. Assumes that key.toString() is
      * well-defined.
      */
-    fun getFor(key: Any): AssetResource?
+    fun getFor(key: Any): String?
 }
