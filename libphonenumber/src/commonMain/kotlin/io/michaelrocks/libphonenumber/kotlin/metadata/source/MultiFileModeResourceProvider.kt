@@ -16,11 +16,6 @@
  */
 package io.michaelrocks.libphonenumber.kotlin.metadata.source
 
-import dev.icerock.moko.resources.AssetResource
-import dev.icerock.moko.resources.ResourceContainer
-import dev.icerock.moko.resources.getAssetByFilePath
-import io.michaelrocks.libphonenumber.MR
-
 
 /**
  * [PhoneMetadataResourceProvider] implementation which appends key as a suffix to the
@@ -28,7 +23,6 @@ import io.michaelrocks.libphonenumber.MR
  */
 class MultiFileModeResourceProvider(
     phoneMetadataFileNameBase: String,
-    val assets: ResourceContainer<AssetResource> = MR.assets
 ) : PhoneMetadataResourceProvider {
     private val phoneMetadataFileNamePrefix: String
 
@@ -36,11 +30,11 @@ class MultiFileModeResourceProvider(
         phoneMetadataFileNamePrefix = phoneMetadataFileNameBase + "_"
     }
 
-    override fun getFor(key: Any): AssetResource? {
+    override fun getFor(key: Any): String? {
         val keyAsString = key.toString()
         require(ALPHANUMERIC.matchEntire(keyAsString) != null) { "Invalid key: $keyAsString" }
         val path = phoneMetadataFileNamePrefix + keyAsString
-        return assets.getAssetByFilePath(path)
+        return "files/$path"
     }
 
     companion object {

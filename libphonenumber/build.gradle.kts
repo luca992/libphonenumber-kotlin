@@ -1,11 +1,13 @@
 import com.vanniktech.maven.publish.SonatypeHost
+import org.gradle.kotlin.dsl.implementation
 
 plugins {
     alias(libs.plugins.org.jetbrains.kotlin.multiplatform)
     alias(libs.plugins.com.android.library)
-    alias(libs.plugins.dev.icerock.mobile.multiplatform.resources)
     alias(libs.plugins.org.kodein.mock.mockmp)
     alias(libs.plugins.com.vanniktech.maven.publish)
+    alias(libs.plugins.org.jetbrains.compose)
+    alias(libs.plugins.compose.compiler)
 }
 
 group = project.property("GROUP") as String
@@ -47,12 +49,14 @@ kotlin {
     sourceSets {
         all {
             languageSettings.optIn("kotlin.ExperimentalStdlibApi")
+            languageSettings.optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
         }
         val commonMain by getting {
             dependencies {
                 implementation(libs.com.squareup.okio)
                 implementation(libs.co.touchlab.kermit)
-                implementation(libs.dev.icerock.moko.resources)
+                implementation(compose.runtime)
+                implementation(compose.components.resources)
             }
         }
         val commonTest by getting {
@@ -147,10 +151,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-}
-
-multiplatformResources {
-    resourcesPackage = "io.michaelrocks.libphonenumber"
 }
 
 mockmp {

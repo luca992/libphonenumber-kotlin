@@ -16,19 +16,16 @@
  */
 package io.michaelrocks.libphonenumber.kotlin.metadata.source
 
-import dev.icerock.moko.resources.AssetResource
-import dev.icerock.moko.resources.ResourceContainer
-import dev.icerock.moko.resources.getAssetByFilePath
-import io.michaelrocks.libphonenumber.MR
+import io.github.luca992.libphonenumber_kotlin.libphonenumber.generated.resources.Res
 
 /**
  * [PhoneMetadataResourceProvider] implementation that returns the same metadata file name for
  * each key
  */
 class SingleFileModeResourceProvider(
-    private val phoneMetadataFileName: String, val assets: ResourceContainer<AssetResource> = MR.assets
+    private val phoneMetadataFileName: String
 ) : PhoneMetadataResourceProvider {
-    override fun getFor(key: Any): AssetResource? {
-        return assets.getAssetByFilePath(phoneMetadataFileName)
+    override fun getFor(key: Any): String? {
+        return Res.getUri("files/$phoneMetadataFileName")
     }
 }

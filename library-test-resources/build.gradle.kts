@@ -1,6 +1,9 @@
+import org.gradle.kotlin.dsl.implementation
+
 plugins {
     alias(libs.plugins.org.jetbrains.kotlin.multiplatform)
-    alias(libs.plugins.dev.icerock.mobile.multiplatform.resources)
+    alias(libs.plugins.org.jetbrains.compose)
+    alias(libs.plugins.compose.compiler)
 }
 
 
@@ -38,15 +41,12 @@ kotlin {
     sourceSets {
         all {
             languageSettings.optIn("kotlin.ExperimentalStdlibApi")
+            languageSettings.optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
         }
         val commonMain by getting {
             dependencies {
-                implementation(libs.dev.icerock.moko.resources)
+                implementation(compose.components.resources)
             }
         }
     }
-}
-
-multiplatformResources {
-    resourcesPackage = "io.michaelrocks.libphonenumber.test"
 }
