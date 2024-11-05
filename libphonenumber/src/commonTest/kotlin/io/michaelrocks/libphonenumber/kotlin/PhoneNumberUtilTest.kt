@@ -31,8 +31,9 @@ import io.michaelrocks.libphonenumber.kotlin.metadata.source.MetadataSource
 import io.michaelrocks.libphonenumber.kotlin.util.InplaceStringBuilder
 import io.michaelrocks.libphonenumber.kotlin.utils.RegionCode
 import io.michaelrocks.libphonenumber.kotlin.utils.assertThrows
-import org.kodein.mock.Mock
-import org.kodein.mock.Mocker
+import io.mockative.MockState.Companion.mock
+import io.mockative.every
+import io.mockative.of
 import kotlin.test.*
 
 /**
@@ -48,17 +49,15 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
     override val metadataLoader: MetadataLoader
         get() = defaultMetadataLoader()
 
-    @Mock
-    lateinit var mockedMetadataSource: MetadataSource
+
+    val mockedMetadataSource = mock(of<MetadataSource>())
 
     lateinit var phoneNumberUtilWithMissingMetadata: PhoneNumberUtil
 
-    val mocker = Mocker()
 
     @BeforeTest
     fun setUp() {
-        mocker.reset() //(1)
-        this.injectMocks(mocker) //(2)
+        mockedMetadataSource.reset()
         phoneNumberUtilWithMissingMetadata = PhoneNumberUtil(
             mockedMetadataSource, DefaultMetadataDependenciesProvider(metadataLoader), countryCodeToRegionCodeMap
         )
@@ -3620,7 +3619,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
 
     @Test
     fun testGetMetadataForRegionForMissingMetadata() {
-        mocker.every { mockedMetadataSource.getMetadataForRegion(isAny()) } returns null
+        every { mockedMetadataSource.getMetadataForRegion(isAny()) } returns null
         assertThrows(
             MissingMetadataException::class
         ) { phoneNumberUtilWithMissingMetadata.getMetadataForRegion(RegionCode.US) }
@@ -3628,7 +3627,7 @@ class PhoneNumberUtilTest : TestMetadataTestCase() {
 
     @Test
     fun testGetMetadataForNonGeographicalRegionForMissingMetadata() {
-        mocker.every { mockedMetadataSource.getMetadataForNonGeographicalRegion(isAny()) } returns null
+        every { mockedMetadataSource.getMetadataForNonGeographicalRegion(isAny()) } returns null
         assertThrows(
             MissingMetadataException::class
         ) { phoneNumberUtilWithMissingMetadata.getMetadataForNonGeographicalRegion(800) }

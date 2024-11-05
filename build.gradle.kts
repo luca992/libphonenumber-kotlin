@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.com.android.library) apply false
     alias(libs.plugins.com.android.application) apply false
     alias(libs.plugins.dev.icerock.mobile.multiplatform.resources) apply false
-    alias(libs.plugins.org.kodein.mock.mockmp) apply false
+    alias(libs.plugins.io.mockative) apply false
     alias(libs.plugins.com.vanniktech.maven.publish) apply false
 }
 
