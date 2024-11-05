@@ -34,6 +34,7 @@ class ComposeResourceMetadataLoader : MetadataLoader {
     override fun loadMetadata(phoneMetadataResource: String): InputStream? {
         return try {
             val path = getPathOnDisk(phoneMetadataResource).toPath()
+            println("getPathOnDisk:$path")
             OkioInputStream(FileSystem.SYSTEM.source(path).buffer())
         } catch (t: Throwable) {
             logger.v("Failed to load metadata from $phoneMetadataResource.path", t)
@@ -41,12 +42,16 @@ class ComposeResourceMetadataLoader : MetadataLoader {
         }
     }
 
+    fun getPathInBundle(path: String): String {
+        // todo: support fallback path at bundle root?
+        return NSBundle.mainBundle.resourcePath + "/compose-resources/" + path
+    }
+
 
     // https://github.com/JetBrains/compose-multiplatform/blob/bf6b00e9a22bb9885a44581418b289afcfa81b5b/components/resources/library/src/macosMain/kotlin/org/jetbrains/compose/resources/ResourceReader.macos.kt#L8
     private fun getPathOnDisk(path: String): String {
         val fm = NSFileManager.defaultManager()
         val currentDirectoryPath = fm.currentDirectoryPath
-        println("currentDirectoryPath: $currentDirectoryPath")
         return listOf(
             //todo in future bundle resources with app and use all sourceSets (skikoMain, nativeMain)
             "$currentDirectoryPath/../libphonenumber/src/macosMain/composeResources/$path",
