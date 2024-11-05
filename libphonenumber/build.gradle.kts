@@ -1,10 +1,9 @@
 import com.vanniktech.maven.publish.SonatypeHost
-import org.gradle.kotlin.dsl.implementation
 
 plugins {
     alias(libs.plugins.org.jetbrains.kotlin.multiplatform)
     alias(libs.plugins.com.android.library)
-    alias(libs.plugins.org.kodein.mock.mockmp)
+    alias(libs.plugins.io.mockative)
     alias(libs.plugins.com.vanniktech.maven.publish)
     alias(libs.plugins.org.jetbrains.compose)
     alias(libs.plugins.compose.compiler)
@@ -121,6 +120,10 @@ kotlin {
     }
 }
 
+compose.resources {
+    publicResClass = true
+}
+
 android {
     namespace = "io.michaelrocks.libphonenumber.kotlin"
     compileSdk = 34
@@ -151,11 +154,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-}
-
-mockmp {
-    usesHelper = true
-    installWorkaround() // (3)
 }
 
 // https://youtrack.jetbrains.com/issue/KT-46466

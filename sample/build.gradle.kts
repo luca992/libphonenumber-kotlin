@@ -1,6 +1,7 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.tasks.AbstractNativeMacApplicationPackageAppDirTask
 import org.jetbrains.kotlin.gradle.plugin.mpp.AbstractExecutable
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBinary
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 import org.jetbrains.kotlin.library.impl.KotlinLibraryLayoutImpl
@@ -26,60 +27,17 @@ kotlin {
         browser()
         binaries.executable()
     }
-    macosX64 {
-        binaries {
-            executable {
-                entryPoint = "main"
-                freeCompilerArgs += listOf(
-                    "-linker-option", "-framework", "-linker-option", "Metal"
-                )
-            }
-        }
+    fun macosTargets(config: KotlinNativeTarget.() -> Unit) {
+        macosX64(config)
+        macosArm64(config)
     }
-    macosArm64 {
-        binaries {
-            executable {
-                entryPoint = "main"
-                freeCompilerArgs += listOf(
-                    "-linker-option", "-framework", "-linker-option", "Metal"
-                )
-            }
-        }
+    macosTargets {
+        binaries.executable()
     }
-    iosX64() {
-        binaries {
-            executable {
-                entryPoint = "main"
-                freeCompilerArgs += listOf(
-                    "-linker-option", "-framework", "-linker-option", "Metal",
-                    "-linker-option", "-framework", "-linker-option", "CoreText",
-                    "-linker-option", "-framework", "-linker-option", "CoreGraphics"
-                )
-            }
-        }
-    }
-    iosArm64() {
-        binaries {
-            executable {
-                entryPoint = "main"
-                freeCompilerArgs += listOf(
-                    "-linker-option", "-framework", "-linker-option", "Metal",
-                    "-linker-option", "-framework", "-linker-option", "CoreText",
-                    "-linker-option", "-framework", "-linker-option", "CoreGraphics"
-                )
-            }
-        }
-    }
-    iosSimulatorArm64() {
-        // TODO: remove after 1.5 release
-        binaries.forEach {
-            it.freeCompilerArgs += listOf(
-                "-linker-option", "-framework", "-linker-option", "Metal",
-                "-linker-option", "-framework", "-linker-option", "CoreText",
-                "-linker-option", "-framework", "-linker-option", "CoreGraphics",
-            )
-        }
-    }
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
+    applyDefaultHierarchyTemplate()
 
     cocoapods {
         summary = "Shared code for the sample"
@@ -126,37 +84,6 @@ kotlin {
                 implementation(compose.desktop.currentOs)
             }
         }
-
-        val jsMain by getting {
-            dependsOn(commonMain)
-            dependencies {
-            }
-        }
-
-        val nativeMain by creating {
-            dependsOn(commonMain)
-        }
-        val macosMain by creating {
-            dependsOn(nativeMain)
-        }
-        val macosX64Main by getting {
-            dependsOn(macosMain)
-        }
-        val macosArm64Main by getting {
-            dependsOn(macosMain)
-        }
-        val iosMain by creating {
-            dependsOn(nativeMain)
-        }
-        val iosSimulatorArm64Main by getting {
-            dependsOn(iosMain)
-        }
-        val iosX64Main by getting {
-            dependsOn(iosMain)
-        }
-        val iosArm64Main by getting {
-            dependsOn(iosMain)
-        }
     }
 }
 
@@ -171,12 +98,6 @@ compose.desktop {
         }
     }
 }
-
-
-compose.experimental {
-    web.application {}
-}
-
 
 
 compose.desktop.nativeApplication {

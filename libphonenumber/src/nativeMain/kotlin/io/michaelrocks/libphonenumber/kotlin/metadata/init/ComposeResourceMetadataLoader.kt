@@ -17,22 +17,23 @@
 package io.michaelrocks.libphonenumber.kotlin.metadata.init
 
 import co.touchlab.kermit.Logger
-import dev.icerock.moko.resources.AssetResource
 import io.michaelrocks.libphonenumber.kotlin.MetadataLoader
 import io.michaelrocks.libphonenumber.kotlin.io.InputStream
 import io.michaelrocks.libphonenumber.kotlin.io.OkioInputStream
 import okio.FileSystem
 import okio.Path.Companion.toPath
 import okio.buffer
+import org.jetbrains.compose.resources.MissingResourceException
+import platform.Foundation.*
 
 /**
  * A [MetadataLoader] implementation that reads phone number metadata files as classpath
  * resources.
  */
-class MokoAssetResourceMetadataLoader : MetadataLoader {
-    override fun loadMetadata(phoneMetadataResource: AssetResource): InputStream? {
+class ComposeResourceMetadataLoader : MetadataLoader {
+    override fun loadMetadata(phoneMetadataResource: String): InputStream? {
         return try {
-            val path = phoneMetadataResource.path.toPath()
+            val path = getPathOnDisk(phoneMetadataResource).toPath()
             OkioInputStream(FileSystem.SYSTEM.source(path).buffer())
         } catch (t: Throwable) {
             logger.v("Failed to load metadata from $phoneMetadataResource.path", t)
@@ -40,9 +41,24 @@ class MokoAssetResourceMetadataLoader : MetadataLoader {
         }
     }
 
+
+    // https://github.com/JetBrains/compose-multiplatform/blob/bf6b00e9a22bb9885a44581418b289afcfa81b5b/components/resources/library/src/macosMain/kotlin/org/jetbrains/compose/resources/ResourceReader.macos.kt#L8
+    private fun getPathOnDisk(path: String): String {
+        val fm = NSFileManager.defaultManager()
+        val currentDirectoryPath = fm.currentDirectoryPath
+        println("currentDirectoryPath: $currentDirectoryPath")
+        return listOf(
+            //todo in future bundle resources with app and use all sourceSets (skikoMain, nativeMain)
+            "$currentDirectoryPath/../libphonenumber/src/macosMain/composeResources/$path",
+            "$currentDirectoryPath/../libphonenumber/src/macosTest/composeResources/$path",
+            "$currentDirectoryPath/../libphonenumber/src/commonMain/composeResources/$path",
+            "$currentDirectoryPath/../libphonenumber/src/commonTest/composeResources/$path"
+        ).firstOrNull { p -> fm.fileExistsAtPath(p) } ?: throw MissingResourceException(path)
+    }
+
     companion object {
         private val logger = Logger.withTag(
-            MokoAssetResourceMetadataLoader::class.simpleName.toString()
+            ComposeResourceMetadataLoader::class.simpleName.toString()
         )
     }
 }
