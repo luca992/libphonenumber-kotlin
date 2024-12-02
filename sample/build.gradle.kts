@@ -1,4 +1,7 @@
+@file:OptIn(ExperimentalWasmDsl::class)
+
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
@@ -14,6 +17,10 @@ kotlin {
     androidTarget()
     jvm("desktop")
     js(IR) {
+        browser()
+        binaries.executable()
+    }
+    wasmJs {
         browser()
         binaries.executable()
     }
