@@ -35,7 +35,16 @@ import platform.Foundation.NSFileManager
 class ComposeResourceMetadataLoader : MetadataLoader {
     override fun loadMetadata(phoneMetadataResource: String): InputStream? {
         return try {
-            val path = Res.getUri(phoneMetadataResource).removePrefix("file://")
+            val fm = NSFileManager.defaultManager()
+            val currentDirectoryPath = fm.currentDirectoryPath
+            println("currentDirectoryPath: $currentDirectoryPath")
+            val path = if (currentDirectoryPath.endsWith("/sample")) {
+                // hack for macos
+                getPathOnDisk(phoneMetadataResource)
+            } else {
+                Res.getUri(phoneMetadataResource).removePrefix("file://")
+            }
+            println("loadMetadata path: $path")
             OkioInputStream(FileSystem.SYSTEM.source(path.toPath()).buffer())
         } catch (t: Throwable) {
             logger.v("Failed to load metadata from $phoneMetadataResource", t)
