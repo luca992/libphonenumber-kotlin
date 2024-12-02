@@ -12,22 +12,6 @@ plugins {
 group = project.property("GROUP") as String
 version = project.property("VERSION_NAME") as String
 
-object Targets {
-    // limited by moko resources https://github.com/icerockdev/moko-resources/issues/73
-    val iosTargets = arrayOf("iosArm64", "iosX64", "iosSimulatorArm64")
-    val tvosTargets = emptyArray<String>() // arrayOf("tvosArm64", "tvosX64", "tvosSimulatorArm64")
-    val watchosTargets =
-        arrayOf<String>(/*"watchosArm32", "watchosArm64", "watchosX64", "watchosSimulatorArm64", "watchosDeviceArm64"*/)
-    val macosTargets = arrayOf("macosX64", "macosArm64")
-    val darwinTargets = iosTargets + tvosTargets + watchosTargets + macosTargets
-
-    val linuxTargets = emptyArray<String>() // arrayOf("linuxX64", "linuxArm64")
-    val mingwTargets = emptyArray<String>() // arrayOf("mingwX64")
-    val androidTargets =
-        arrayOf<String>(/*"androidNativeArm32", "androidNativeArm64", "androidNativeX86", "androidNativeX64"*/)
-    val nativeTargets = linuxTargets + darwinTargets + mingwTargets + androidTargets
-}
-
 kotlin {
     androidTarget {
         publishLibraryVariants("release")
@@ -37,14 +21,9 @@ kotlin {
         browser()
         nodejs()
     }
-//    wasm{
-//        browser()
-//        nodejs()
-//        d8()
-//    }
-    for (target in Targets.nativeTargets) {
-        targets.add(presets.getByName(target).createTarget(target))
-    }
+    iosX64();iosArm64();iosSimulatorArm64()
+    macosX64();macosArm64()
+    applyDefaultHierarchyTemplate()
     sourceSets {
         all {
             languageSettings.optIn("kotlin.ExperimentalStdlibApi")
@@ -102,20 +81,8 @@ kotlin {
                 implementation(libs.androidx.runner)
             }
         }
-        val androidUnitTest by getting {}
-        val nativeMain by creating {
+        val nativeMain by getting {
             dependsOn(nonJvmMain)
-        }
-        val nativeTest by creating {
-            dependsOn(nonJvmTest)
-        }
-        Targets.nativeTargets.forEach { target ->
-            getByName("${target}Main") {
-                dependsOn(nativeMain)
-            }
-            getByName("${target}Test") {
-                dependsOn(nativeTest)
-            }
         }
     }
 }
