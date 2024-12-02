@@ -19,7 +19,6 @@ package io.michaelrocks.libphonenumber.kotlin.metadata.source
 import io.michaelrocks.libphonenumber.kotlin.MetadataLoader
 import io.michaelrocks.libphonenumber.kotlin.Phonemetadata.PhoneMetadata
 import io.michaelrocks.libphonenumber.kotlin.metadata.init.MetadataParser
-import kotlin.jvm.Synchronized
 
 /**
  * A blocking implementation of [MetadataBootstrappingGuard]. Can be used for both single-file
@@ -44,7 +43,7 @@ internal class BlockingMetadataBootstrappingGuard<T : MetadataContainer>(
         return metadataContainer
     }
 
-    @Synchronized
+//    @Synchronized
     private fun bootstrapMetadata(phoneMetadataResource: String) {
         // Additional check is needed because multiple threads could pass the first check when calling
         // getOrBootstrap() at the same time for unloaded metadata file

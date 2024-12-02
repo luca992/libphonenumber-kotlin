@@ -32,10 +32,10 @@ import io.michaelrocks.libphonenumber.kotlin.metadata.DefaultMetadataDependencie
 import io.michaelrocks.libphonenumber.kotlin.metadata.source.MetadataSource
 import io.michaelrocks.libphonenumber.kotlin.metadata.source.MetadataSourceImpl
 import io.michaelrocks.libphonenumber.kotlin.util.InplaceStringBuilder
+import kotlin.concurrent.Volatile
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmOverloads
 import kotlin.jvm.JvmStatic
-import kotlin.jvm.Volatile
 
 /**
  * Utility for international phone numbers. Functionality includes formatting, parsing and
