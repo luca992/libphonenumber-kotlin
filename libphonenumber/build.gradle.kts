@@ -39,8 +39,7 @@ kotlin {
         }
         val commonTest by getting {
             dependencies {
-                // need to make a separate module to import the resources because moko resources doesn't commonTest
-                // resources yet: https://github.com/icerockdev/moko-resources/issues/193
+                // todo: move test resources to commonTest
                 implementation(project(":library-test-resources"))
                 implementation(kotlin("test"))
             }
@@ -89,6 +88,7 @@ kotlin {
 
 compose.resources {
     publicResClass = true
+    generateResClass = always
 }
 
 android {
@@ -123,23 +123,9 @@ android {
     }
 }
 
-// https://youtrack.jetbrains.com/issue/KT-46466
-val dependsOnTasks = mutableListOf<String>()
-tasks.withType<AbstractPublishToMaven>().configureEach {
-    dependsOnTasks.add(this.name.replace("publish", "sign").replaceAfter("Publication", ""))
-    dependsOn(dependsOnTasks)
-}
-
 plugins.withId("com.vanniktech.maven.publish") {
     mavenPublishing {
         publishToMavenCentral(SonatypeHost.S01)
         signAllPublications()
     }
-}
-
-//apply(from = "$rootDir/gradle/pack-library-test-resources.gradle.kts")
-
-compose.resources {
-    publicResClass = true
-    generateResClass = always
 }

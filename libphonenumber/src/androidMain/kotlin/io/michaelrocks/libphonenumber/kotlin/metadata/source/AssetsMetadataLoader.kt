@@ -16,16 +16,21 @@
 package io.michaelrocks.libphonenumber.kotlin.metadata.source;
 
 import android.content.res.AssetManager
-import dev.icerock.moko.resources.AssetResource
+import io.github.luca992.libphonenumber_kotlin.libphonenumber.generated.resources.Res
 import io.michaelrocks.libphonenumber.kotlin.MetadataLoader
 import io.michaelrocks.libphonenumber.kotlin.io.InputStream
+import io.michaelrocks.libphonenumber.kotlin.io.JavaInputStream
+import kotlinx.coroutines.runBlocking
 import okio.IOException
 
 class AssetsMetadataLoader(private val assetManager: AssetManager) : MetadataLoader {
-    override fun loadMetadata(phoneMetadataResource: AssetResource): InputStream? {
+    override fun loadMetadata(phoneMetadataResource: String): InputStream? {
         return try {
-            assetManager.open(phoneMetadataResource.path)
+            val path = Res.getUri(phoneMetadataResource).removePrefix("file:///android_asset/")
+            println(path)
+            JavaInputStream(assetManager.open(path))
         } catch (exception: IOException) {
+            exception.printStackTrace()
             null
         } as InputStream?
     }

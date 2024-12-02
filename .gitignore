@@ -158,6 +158,4 @@ lint/tmp/
 .DS_Store
 .kotlin
 
-# moko-resources-generated
-moko-resources-generated.js
-pack-library-resources-generated.js
+
