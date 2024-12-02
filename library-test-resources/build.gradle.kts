@@ -11,11 +11,10 @@ kotlin {
         browser()
         nodejs()
     }
-//    wasm{
-//        browser()
-//        nodejs()
-//        d8()
-//    }
+    wasmJs {
+        browser()
+        nodejs()
+    }
     iosX64();iosArm64();iosSimulatorArm64()
     macosX64();macosArm64()
     applyDefaultHierarchyTemplate()

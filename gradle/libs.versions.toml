@@ -45,6 +45,7 @@ compose-jb = "1.7.1"
 ##      ⬆ = "1.8.0-dev1905"
 ##      ⬆ = "1.8.0-dev1916"
 ##      ⬆ = "1.8.0-dev1920"
+kotlinx-browser = "0.3"
 vanniktech-publish = "0.30.0"
 okio = "3.9.1"
 mockative = "3.0.1"
@@ -69,3 +70,4 @@ androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "a
 androidx-runner = { module = "androidx.test:runner", version.ref = "androidx-runner" }
 
 co-touchlab-kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
+kotlinx-browser = { module = "org.jetbrains.kotlinx:kotlinx-browser", version.ref = "kotlinx-browser" }

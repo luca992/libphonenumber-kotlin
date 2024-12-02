@@ -1,4 +1,7 @@
+@file:OptIn(ExperimentalWasmDsl::class)
+
 import com.vanniktech.maven.publish.SonatypeHost
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
     alias(libs.plugins.org.jetbrains.kotlin.multiplatform)
@@ -21,9 +24,12 @@ kotlin {
         browser()
         nodejs()
     }
+    wasmJs {
+        browser()
+    }
     iosX64();iosArm64();iosSimulatorArm64()
     macosX64();macosArm64()
-    applyDefaultHierarchyTemplate()
+//    applyDefaultHierarchyTemplate()
     sourceSets {
         all {
             languageSettings.optIn("kotlin.ExperimentalStdlibApi")
@@ -80,8 +86,17 @@ kotlin {
                 implementation(libs.androidx.runner)
             }
         }
-        val nativeMain by getting {
+        val nativeMain by creating {
             dependsOn(nonJvmMain)
+        }
+        val wasmJsMain by getting {
+            dependsOn(nonJvmMain)
+            dependencies {
+                implementation(libs.kotlinx.browser)
+            }
+        }
+        val wasmJsTest by getting {
+            dependsOn(nonJvmTest)
         }
     }
 }
