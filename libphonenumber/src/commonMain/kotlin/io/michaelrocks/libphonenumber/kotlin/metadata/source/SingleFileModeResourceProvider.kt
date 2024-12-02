@@ -26,6 +26,7 @@ class SingleFileModeResourceProvider(
     private val phoneMetadataFileName: String
 ) : PhoneMetadataResourceProvider {
     override fun getFor(key: Any): String? {
+         println("SingleFileModeResourceProvider.getFor key: $key")
         return Res.getUri("files/$phoneMetadataFileName")
     }
 }

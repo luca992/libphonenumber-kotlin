@@ -137,4 +137,9 @@ plugins.withId("com.vanniktech.maven.publish") {
     }
 }
 
-apply(from = "$rootDir/gradle/pack-library-test-resources.gradle.kts")
+//apply(from = "$rootDir/gradle/pack-library-test-resources.gradle.kts")
+
+compose.resources {
+    publicResClass = true
+    generateResClass = always
+}
