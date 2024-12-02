@@ -17,6 +17,7 @@
 package io.michaelrocks.libphonenumber.kotlin.metadata.init
 
 import co.touchlab.kermit.Logger
+import io.github.luca992.libphonenumber_kotlin.libphonenumber.generated.resources.Res
 import io.michaelrocks.libphonenumber.kotlin.MetadataLoader
 import io.michaelrocks.libphonenumber.kotlin.io.InputStream
 import io.michaelrocks.libphonenumber.kotlin.io.OkioInputStream
@@ -24,7 +25,8 @@ import okio.FileSystem
 import okio.Path.Companion.toPath
 import okio.buffer
 import org.jetbrains.compose.resources.MissingResourceException
-import platform.Foundation.*
+import platform.Foundation.NSBundle
+import platform.Foundation.NSFileManager
 
 /**
  * A [MetadataLoader] implementation that reads phone number metadata files as classpath
@@ -33,11 +35,10 @@ import platform.Foundation.*
 class ComposeResourceMetadataLoader : MetadataLoader {
     override fun loadMetadata(phoneMetadataResource: String): InputStream? {
         return try {
-            val path = getPathOnDisk(phoneMetadataResource).toPath()
-            println("getPathOnDisk:$path")
-            OkioInputStream(FileSystem.SYSTEM.source(path).buffer())
+            val path = Res.getUri(phoneMetadataResource).removePrefix("file://")
+            OkioInputStream(FileSystem.SYSTEM.source(path.toPath()).buffer())
         } catch (t: Throwable) {
-            logger.v("Failed to load metadata from $phoneMetadataResource.path", t)
+            logger.v("Failed to load metadata from $phoneMetadataResource", t)
             null
         }
     }

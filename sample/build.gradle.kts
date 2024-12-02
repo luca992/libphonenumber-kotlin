@@ -1,20 +1,11 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.compose.desktop.application.tasks.AbstractNativeMacApplicationPackageAppDirTask
-import org.jetbrains.kotlin.gradle.plugin.mpp.AbstractExecutable
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBinary
-import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
-import org.jetbrains.kotlin.library.impl.KotlinLibraryLayoutImpl
-import java.io.File
-import java.io.FileFilter
-import org.jetbrains.kotlin.konan.file.File as KonanFile
 
 plugins {
     alias(libs.plugins.org.jetbrains.kotlin.multiplatform)
-    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.org.jetbrains.compose)
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.com.android.application)
-    kotlin("native.cocoapods")
 }
 
 version = "1.0-SNAPSHOT"
@@ -33,23 +24,19 @@ kotlin {
     macosTargets {
         binaries.executable()
     }
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
-    applyDefaultHierarchyTemplate()
-
-    cocoapods {
-        summary = "Shared code for the sample"
-        homepage = "https://github.com/luca992/libphonenumber-kotlin"
-        ios.deploymentTarget = "14.1"
-        podfile = project.file("../sampleIosApp/Podfile")
-        framework {
+    fun iosTargets(config: KotlinNativeTarget.() -> Unit) {
+        iosX64(config)
+        iosArm64(config)
+        iosSimulatorArm64(config)
+    }
+    iosTargets {
+        binaries.framework {
             baseName = "shared"
             isStatic = true
         }
-        extraSpecAttributes["resources"] = "['src/commonMain/resources/**', 'src/iosMain/resources/**']"
     }
 
+    applyDefaultHierarchyTemplate()
 
     sourceSets {
         val commonMain by getting {
@@ -58,6 +45,7 @@ kotlin {
                 implementation(compose.foundation)
                 implementation(compose.material)
                 implementation(compose.runtime)
+                implementation(compose.components.resources)
                 api(project(":libphonenumber"))
             }
         }
@@ -114,7 +102,7 @@ android {
 
     defaultConfig {
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
     }
 
     compileOptions {
@@ -135,5 +123,7 @@ android {
     }
 }
 
-
-apply(from = "$rootDir/gradle/pack-library-resources.gradle.kts")
+compose.resources {
+    publicResClass = true
+    generateResClass = always
+}
