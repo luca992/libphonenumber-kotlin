@@ -2,6 +2,7 @@
 
 import com.vanniktech.maven.publish.SonatypeHost
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 
 plugins {
     alias(libs.plugins.org.jetbrains.kotlin.multiplatform)
@@ -18,6 +19,7 @@ version = project.property("VERSION_NAME") as String
 kotlin {
     androidTarget {
         publishLibraryVariants("release")
+        instrumentedTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
     }
     jvm()
     js(IR) {
@@ -54,9 +56,6 @@ kotlin {
         }
         val jvmCommonTest by creating {
             dependsOn(commonTest)
-            dependencies {
-                implementation(kotlin("test-junit"))
-            }
         }
         val jvmMain by getting {
             dependsOn(jvmCommonMain)

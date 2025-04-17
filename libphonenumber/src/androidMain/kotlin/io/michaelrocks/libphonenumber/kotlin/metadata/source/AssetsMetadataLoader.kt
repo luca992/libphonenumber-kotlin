@@ -20,8 +20,8 @@ import io.github.luca992.libphonenumber_kotlin.libphonenumber.generated.resource
 import io.michaelrocks.libphonenumber.kotlin.MetadataLoader
 import io.michaelrocks.libphonenumber.kotlin.io.InputStream
 import io.michaelrocks.libphonenumber.kotlin.io.JavaInputStream
-import kotlinx.coroutines.runBlocking
 import okio.IOException
+import org.jetbrains.compose.resources.MissingResourceException
 
 class AssetsMetadataLoader(private val assetManager: AssetManager) : MetadataLoader {
     override fun loadMetadata(phoneMetadataResource: String): InputStream? {
@@ -32,6 +32,8 @@ class AssetsMetadataLoader(private val assetManager: AssetManager) : MetadataLoa
         } catch (exception: IOException) {
             exception.printStackTrace()
             null
-        } as InputStream?
+        } catch (exception: MissingResourceException) {
+            null
+        }
     }
 }
