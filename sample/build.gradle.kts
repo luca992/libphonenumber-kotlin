@@ -105,7 +105,7 @@ compose.desktop.nativeApplication {
 
 android {
     namespace = "io.luca992.libphonenumber.sample"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 24

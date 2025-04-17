@@ -19,7 +19,6 @@ package io.michaelrocks.libphonenumber.kotlin
 import io.michaelrocks.libphonenumber.kotlin.metadata.DefaultMetadataDependenciesProvider
 import io.michaelrocks.libphonenumber.kotlin.metadata.source.MetadataSourceImpl
 import io.michaelrocks.libphonenumber.kotlin.metadata.source.MultiFileModeResourceProvider
-import io.michaelrocks.libphonenumber.test.MR
 
 /**
  * Root class for PhoneNumberUtil tests that depend on the test metadata file.
@@ -48,7 +47,7 @@ abstract class TestMetadataTestCase {
      */
     protected val phoneUtil: PhoneNumberUtil = PhoneNumberUtil(
         MetadataSourceImpl(
-            MultiFileModeResourceProvider(TEST_METADATA_FILE_PREFIX, MR.assets),
+            MultiFileModeResourceProvider(TEST_METADATA_FILE_PREFIX),
             metadataDependenciesProvider.metadataLoader,
             metadataDependenciesProvider.metadataParser
         ), metadataDependenciesProvider, CountryCodeToRegionCodeMapForTesting.countryCodeToRegionCodeMap
@@ -56,6 +55,6 @@ abstract class TestMetadataTestCase {
 
     companion object {
         private const val TEST_METADATA_FILE_PREFIX =
-            "io/michaelrocks/libphonenumber/kotlin/data/PhoneNumberMetadataProtoForTesting"
+            "PhoneNumberMetadataProtoForTesting"
     }
 }

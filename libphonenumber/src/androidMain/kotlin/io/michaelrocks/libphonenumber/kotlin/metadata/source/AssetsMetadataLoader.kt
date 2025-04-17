@@ -26,7 +26,7 @@ import okio.IOException
 class AssetsMetadataLoader(private val assetManager: AssetManager) : MetadataLoader {
     override fun loadMetadata(phoneMetadataResource: String): InputStream? {
         return try {
-            val path = Res.getUri(phoneMetadataResource).removePrefix("file:///android_asset/")
+            val path = Res.getUri("files/$phoneMetadataResource").removePrefix("file:///android_asset/")
             println(path)
             JavaInputStream(assetManager.open(path))
         } catch (exception: IOException) {
