@@ -49,10 +49,10 @@ class ComposeResourceMetadataLoader : MetadataLoader {
     }
 
 
-    override fun loadMetadata(phoneMetadataResourceUri: String): InputStream? {
+    override fun loadMetadata(phoneMetadataResource: String): InputStream? {
         return try {
             val buffer = Buffer()
-            val path = Res.getUri("files/$phoneMetadataResourceUri")
+            val path = Res.getUri("files/$phoneMetadataResource")
             console.log("loadMetadata path: $path")
             val result = fetchFileSynchronously(path)
             return if (result != null) {
@@ -63,7 +63,7 @@ class ComposeResourceMetadataLoader : MetadataLoader {
                 null
             }
         } catch (t: Throwable) {
-            logger.v("Failed to load metadata from $phoneMetadataResourceUri.path", t)
+            logger.v("Failed to load metadata from $phoneMetadataResource.path", t)
             null
         }
     }
