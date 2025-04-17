@@ -43,7 +43,7 @@ repositories {
 }
 
 dependencies {
-    implementation("io.github.luca992.libphonenumber-kotlin:libphonenumber:0.1.4")
+    implementation("io.github.luca992.libphonenumber-kotlin:libphonenumber:0.1.5")
 }
 ```
 
