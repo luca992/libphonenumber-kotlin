@@ -15,14 +15,14 @@ jobs:
           distribution: temurin
           java-version: 19
       - uses: gradle/gradle-build-action@v2
-      - run: ./gradlew check
+      - run: ./gradlew build
 
   test:
-    name: Test
+    name: Test Android
     runs-on: macos-latest
     strategy:
       matrix:
-        api-level: [ 21, 29 ]
+        api-level: [ 21, 35 ]
         target: [ default ]
         arch: [ x86_64 ]
     needs:
