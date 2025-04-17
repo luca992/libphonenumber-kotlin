@@ -107,7 +107,7 @@ compose.resources {
 
 android {
     namespace = "io.michaelrocks.libphonenumber.kotlin"
-    compileSdk = 36
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 23

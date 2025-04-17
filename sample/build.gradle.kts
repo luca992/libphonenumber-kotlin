@@ -105,28 +105,19 @@ compose.desktop.nativeApplication {
 
 android {
     namespace = "io.luca992.libphonenumber.sample"
-    compileSdk = 36
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 24
         targetSdk = 35
     }
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
 
     sourceSets {
         named("main") {
             manifest.srcFile("src/androidMain/AndroidManifest.xml")
             res.srcDirs("src/androidMain/res", "src/commonMain/resources")
         }
-    }
-    // https://kotlinlang.org/docs/gradle-configure-project.html#gradle-java-toolchains-support
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 
