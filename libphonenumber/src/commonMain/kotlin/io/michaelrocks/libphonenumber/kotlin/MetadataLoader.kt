@@ -31,9 +31,9 @@ interface MetadataLoader {
      * Returns an input stream corresponding to the metadata to load. This method may be called
      * concurrently so implementations must be thread-safe.
      *
-     * @param phoneMetadataResourceUri the path relative to the composeResources directory
+     * @param phoneMetadataResource the file name in composeResources/files directory
      * @return  the input stream for the metadata file. The library will close this stream
      * after it is done. Return null in case the metadata file could not be found
      */
-    fun loadMetadata(phoneMetadataResourceUri: String): InputStream?
+    fun loadMetadata(phoneMetadataResource: String): InputStream?
 }
