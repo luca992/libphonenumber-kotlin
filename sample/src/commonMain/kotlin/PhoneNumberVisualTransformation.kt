@@ -12,8 +12,7 @@ const val WAIT: Char = ';'
 const val PAUSE: Char = ','
 
 class PhoneNumberVisualTransformation(
-    phoneNumberUtil: PhoneNumberUtil,
-    countryCode: String = Locale.current.region
+    phoneNumberUtil: PhoneNumberUtil, countryCode: String = Locale.current.region
 ) : VisualTransformation {
 
     private val phoneNumberFormatter = phoneNumberUtil.getAsYouTypeFormatter(countryCode)
@@ -22,17 +21,21 @@ class PhoneNumberVisualTransformation(
         val transformation = reformat(text, text.length)
 
         return TransformedText(
-            AnnotatedString(transformation.formatted.orEmpty()),
-            object : OffsetMapping {
+            AnnotatedString(transformation.formatted), object : OffsetMapping {
                 override fun originalToTransformed(offset: Int): Int {
-                    return transformation.originalToTransformed[offset.coerceIn(transformation.originalToTransformed.indices)]
+                    // safe lookup, fall back to last mapped index
+                    return transformation.originalToTransformed.getOrElse(offset) {
+                        transformation.originalToTransformed.last()
+                    }
                 }
 
                 override fun transformedToOriginal(offset: Int): Int {
-                    return transformation.transformedToOriginal[offset.coerceIn(transformation.transformedToOriginal.indices)]
+                    // safe lookup, fall back to last mapped index
+                    return transformation.transformedToOriginal.getOrElse(offset) {
+                        transformation.transformedToOriginal.last()
+                    }
                 }
-            }
-        )
+            })
     }
 
     private fun isNonSeparator(c: Char): Boolean {
@@ -63,25 +66,37 @@ class PhoneNumberVisualTransformation(
         if (lastNonSeparator.code != 0) {
             formatted = getFormattedNumber(lastNonSeparator, hasCursor)
         }
+        val raw = formatted.orEmpty()
         val originalToTransformed = mutableListOf<Int>()
         val transformedToOriginal = mutableListOf<Int>()
-        var specialCharsCount = 0
-        formatted?.forEachIndexed { index, char ->
-            if (!isNonSeparator(char)) {
-                specialCharsCount++
-                transformedToOriginal.add(index - specialCharsCount)
+        var originalIndex = 0
+
+        raw.forEachIndexed { index, char ->
+            if (isNonSeparator(char)) {
+                // map each digit position
+                if (originalIndex < s.length) {
+                    originalToTransformed.add(index)
+                    transformedToOriginal.add(originalIndex)
+                    originalIndex++
+                } else {
+                    // fallback if somehow past end
+                    originalToTransformed.add(index)
+                    transformedToOriginal.add(s.length)
+                }
             } else {
-                originalToTransformed.add(index)
-                transformedToOriginal.add(index - specialCharsCount)
+                // for separators, map back to the next original index
+                transformedToOriginal.add(originalIndex.coerceAtMost(s.length))
             }
         }
-        originalToTransformed.add(originalToTransformed.maxOrNull()?.plus(1) ?: 0)
-        transformedToOriginal.add(transformedToOriginal.maxOrNull()?.plus(1) ?: 0)
 
-        return Transformation(formatted, originalToTransformed, transformedToOriginal)
+        // map end-of-text
+        originalToTransformed.add(raw.length)
+        transformedToOriginal.add(s.length)
+
+        return Transformation(raw, originalToTransformed, transformedToOriginal)
     }
 
-    private fun getFormattedNumber(lastNonSeparator: Char, hasCursor: Boolean): String? {
+    private fun getFormattedNumber(lastNonSeparator: Char, hasCursor: Boolean): String {
         return if (hasCursor) {
             phoneNumberFormatter.inputDigitAndRememberPosition(lastNonSeparator)
         } else {
@@ -90,8 +105,6 @@ class PhoneNumberVisualTransformation(
     }
 
     private data class Transformation(
-        val formatted: String?,
-        val originalToTransformed: List<Int>,
-        val transformedToOriginal: List<Int>
+        val formatted: String, val originalToTransformed: List<Int>, val transformedToOriginal: List<Int>
     )
 }
