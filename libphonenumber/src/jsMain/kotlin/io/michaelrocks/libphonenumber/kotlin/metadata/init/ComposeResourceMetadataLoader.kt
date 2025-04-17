@@ -56,7 +56,7 @@ class ComposeResourceMetadataLoader : MetadataLoader {
             // Use dynamic import to avoid webpack errors in browser
             val fs = if (isNode) js("require('fs')") else null
             if (fs == null) {
-                console.error("Failed to load fs module in Node.js")
+                logger.e("Failed to load fs module in Node.js")
                 return null
             }
             val buffer = fs.readFileSync(path)
@@ -64,7 +64,7 @@ class ComposeResourceMetadataLoader : MetadataLoader {
             val length = uint8Array.length as Int
             ByteArray(length) { i -> (uint8Array[i] as Int).toByte() }
         } catch (e: Throwable) {
-            console.error("Failed to read file in Node.js: ${e.message}")
+            logger.e("Failed to read file in Node.js: ${e.message}")
             null
         }
     }
