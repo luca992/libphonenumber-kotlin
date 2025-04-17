@@ -28,7 +28,7 @@ class MultiFileModeFileNameProviderTest {
     @Test
     fun test_getFor_shouldAppendKeyToTheBase() {
         val metadataFileName = metadataFileNameProvider.getFor("key1")
-        assertEquals("some/file_key1", metadataFileName?.originalPath)
+        assertEquals("some/file_key1", metadataFileName)
     }
 
     @Test

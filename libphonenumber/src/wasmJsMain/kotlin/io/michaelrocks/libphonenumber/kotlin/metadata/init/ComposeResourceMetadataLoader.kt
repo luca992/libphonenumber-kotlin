@@ -52,7 +52,7 @@ class ComposeResourceMetadataLoader : MetadataLoader {
     override fun loadMetadata(phoneMetadataResource: String): InputStream? {
         return try {
             val buffer = Buffer()
-            val path = Res.getUri(phoneMetadataResource)
+            val path = Res.getUri("files/$phoneMetadataResource")
             println("loadMetadata path: $path")
             val result = fetchFileSynchronously(path)
             return if (result != null) {

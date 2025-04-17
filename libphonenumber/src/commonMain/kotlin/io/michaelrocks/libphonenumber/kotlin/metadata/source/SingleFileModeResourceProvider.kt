@@ -16,8 +16,6 @@
  */
 package io.michaelrocks.libphonenumber.kotlin.metadata.source
 
-import io.github.luca992.libphonenumber_kotlin.libphonenumber.generated.resources.Res
-
 /**
  * [PhoneMetadataResourceProvider] implementation that returns the same metadata file name for
  * each key
@@ -26,7 +24,6 @@ class SingleFileModeResourceProvider(
     private val phoneMetadataFileName: String
 ) : PhoneMetadataResourceProvider {
     override fun getFor(key: Any): String? {
-         println("SingleFileModeResourceProvider.getFor key: $key")
-        return Res.getUri("files/$phoneMetadataFileName")
+        return phoneMetadataFileName
     }
 }

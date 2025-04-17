@@ -6,7 +6,7 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 plugins {
     alias(libs.plugins.org.jetbrains.kotlin.multiplatform)
     alias(libs.plugins.com.android.library)
-    alias(libs.plugins.io.mockative)
+    alias(libs.plugins.dev.mokkery)
     alias(libs.plugins.com.vanniktech.maven.publish)
     alias(libs.plugins.org.jetbrains.compose)
     alias(libs.plugins.compose.compiler)
@@ -29,7 +29,7 @@ kotlin {
     }
     iosX64();iosArm64();iosSimulatorArm64()
     macosX64();macosArm64()
-//    applyDefaultHierarchyTemplate()
+    applyDefaultHierarchyTemplate()
     sourceSets {
         all {
             languageSettings.optIn("kotlin.ExperimentalStdlibApi")
@@ -45,8 +45,7 @@ kotlin {
         }
         val commonTest by getting {
             dependencies {
-                // todo: move test resources to commonTest
-                implementation(project(":library-test-resources"))
+                implementation(compose.components.resources)
                 implementation(kotlin("test"))
             }
         }
@@ -86,7 +85,7 @@ kotlin {
                 implementation(libs.androidx.runner)
             }
         }
-        val nativeMain by creating {
+        val nativeMain by getting {
             dependsOn(nonJvmMain)
         }
         val wasmJsMain by getting {
@@ -108,7 +107,7 @@ compose.resources {
 
 android {
     namespace = "io.michaelrocks.libphonenumber.kotlin"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 23

@@ -16,7 +16,6 @@
  */
 package io.michaelrocks.libphonenumber.kotlin.metadata.source
 
-import io.mockative.Mockable
 
 /** A source of phone metadata split by different regions.  */
 interface MetadataSource : RegionMetadataSource, NonGeographicalEntityMetadataSource

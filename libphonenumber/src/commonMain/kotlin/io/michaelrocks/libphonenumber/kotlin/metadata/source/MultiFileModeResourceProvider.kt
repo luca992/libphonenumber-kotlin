@@ -34,8 +34,7 @@ class MultiFileModeResourceProvider(
         println("MultiFileModeResourceProvider.getFor key: $key")
         val keyAsString = key.toString()
         require(ALPHANUMERIC.matchEntire(keyAsString) != null) { "Invalid key: $keyAsString" }
-        val path = phoneMetadataFileNamePrefix + keyAsString
-        return "files/$path"
+        return phoneMetadataFileNamePrefix + keyAsString
     }
 
     companion object {

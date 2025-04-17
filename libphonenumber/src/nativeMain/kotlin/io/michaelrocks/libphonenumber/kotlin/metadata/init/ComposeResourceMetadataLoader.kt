@@ -38,11 +38,11 @@ class ComposeResourceMetadataLoader : MetadataLoader {
             val fm = NSFileManager.defaultManager()
             val currentDirectoryPath = fm.currentDirectoryPath
             println("currentDirectoryPath: $currentDirectoryPath")
-            val path = if (currentDirectoryPath.endsWith("/sample")) {
-                // hack for macos
-                getPathOnDisk(phoneMetadataResource)
+            // hack for macOS/iOS check if path ends with /sample to run the sample or /libphonenumber for tests to run
+            val path = if (currentDirectoryPath.endsWith("/sample") || currentDirectoryPath.endsWith("/libphonenumber")) {
+                getPathOnDisk("files/$phoneMetadataResource")
             } else {
-                Res.getUri(phoneMetadataResource).removePrefix("file://")
+                Res.getUri("files/$phoneMetadataResource").removePrefix("file://")
             }
             println("loadMetadata path: $path")
             OkioInputStream(FileSystem.SYSTEM.source(path.toPath()).buffer())

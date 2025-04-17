@@ -17,6 +17,7 @@
 package io.michaelrocks.libphonenumber.kotlin.metadata.init
 
 import io.michaelrocks.libphonenumber.kotlin.Phonemetadata
+import io.michaelrocks.libphonenumber.kotlin.io.JavaInputStream
 import io.michaelrocks.libphonenumber.kotlin.metadata.PhoneMetadataCollectionUtil
 import io.michaelrocks.libphonenumber.kotlin.utils.assertThrows
 import java.io.ByteArrayInputStream
@@ -37,7 +38,7 @@ class MetadataParserTest {
 
     @Test
     fun test_parse_shouldThrowExceptionForEmptyInput() {
-        val emptyInput: InputStream = ByteArrayInputStream(ByteArray(0))
+        val emptyInput = JavaInputStream(ByteArrayInputStream(ByteArray(0)))
         assertThrows(
             IllegalStateException::class
         ) { metadataParser.parse(emptyInput) }
@@ -45,7 +46,7 @@ class MetadataParserTest {
 
     @Test
     fun test_parse_shouldThrowExceptionForInvalidInput() {
-        val invalidInput: InputStream = ByteArrayInputStream("Some random input".toByteArray(StandardCharsets.UTF_8))
+        val invalidInput = JavaInputStream(ByteArrayInputStream("Some random input".toByteArray(StandardCharsets.UTF_8)))
         assertThrows(
             IllegalStateException::class
         ) { metadataParser.parse(invalidInput) }
@@ -54,10 +55,10 @@ class MetadataParserTest {
     @Throws(IOException::class)
     @Test
     fun test_parse_shouldParseValidInput() {
-        val input: InputStream = PhoneMetadataCollectionUtil.toInputStream(
+        val input = JavaInputStream(PhoneMetadataCollectionUtil.toInputStream(
             Phonemetadata.PhoneMetadataCollection.newBuilder()
                 .addMetadata(Phonemetadata.PhoneMetadata.newBuilder().setId("id").build())
-        )
+        ))
         val actual: Collection<Phonemetadata.PhoneMetadata> = metadataParser.parse(input)
         assertEquals(1, actual.size)
     }

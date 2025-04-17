@@ -20,7 +20,6 @@ import co.touchlab.kermit.Logger
 import io.michaelrocks.libphonenumber.kotlin.MetadataLoader
 import io.michaelrocks.libphonenumber.kotlin.io.InputStream
 import io.michaelrocks.libphonenumber.kotlin.io.JavaInputStream
-import org.jetbrains.compose.resources.MissingResourceException
 
 /**
  * A [MetadataLoader] implementation that reads phone number metadata files as classpath
@@ -28,19 +27,16 @@ import org.jetbrains.compose.resources.MissingResourceException
  */
 class ClassPathResourceMetadataLoader : MetadataLoader {
     override fun loadMetadata(phoneMetadataResource: String): InputStream? {
-        return JavaInputStream(
-            getResourceAsStream(
-                "composeResources/io.github.luca992.libphonenumber_kotlin.libphonenumber.generated.resources/" +
-                        phoneMetadataResource
-            )
-        )
+        val stream = getResourceAsStream(
+            "composeResources/io.github.luca992.libphonenumber_kotlin.libphonenumber.generated.resources/files/" +
+                    phoneMetadataResource
+        ) ?: return null
+        return JavaInputStream(stream)
     }
 
-    private fun getResourceAsStream(path: String): java.io.InputStream {
+    private fun getResourceAsStream(path: String): java.io.InputStream? {
         val classLoader = getClassLoader()
-        return classLoader.getResourceAsStream(path) ?: throw MissingResourceException(
-            path
-        )
+        return classLoader.getResourceAsStream(path)
     }
 
     private fun getClassLoader(): ClassLoader {
