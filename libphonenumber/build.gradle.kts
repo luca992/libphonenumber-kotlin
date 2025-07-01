@@ -138,7 +138,7 @@ android {
 
 plugins.withId("com.vanniktech.maven.publish") {
     mavenPublishing {
-        publishToMavenCentral(SonatypeHost.S01)
+        publishToMavenCentral()
         signAllPublications()
     }
 }
