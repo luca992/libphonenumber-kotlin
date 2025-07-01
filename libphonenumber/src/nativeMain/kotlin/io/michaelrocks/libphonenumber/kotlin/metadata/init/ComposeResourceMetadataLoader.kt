@@ -44,8 +44,9 @@ class ComposeResourceMetadataLoader : MetadataLoader {
             } else {
                 Res.getUri("files/$phoneMetadataResource").removePrefix("file://")
             }
-            println("loadMetadata path: $path")
-            OkioInputStream(FileSystem.SYSTEM.source(path.toPath()).buffer())
+            val unescapedPath = path.replace("%20", " ")
+            println("loadMetadata path: $unescapedPath")
+            OkioInputStream(FileSystem.SYSTEM.source(unescapedPath.toPath()).buffer())
         } catch (t: Throwable) {
             logger.v("Failed to load metadata from $phoneMetadataResource", t)
             null
