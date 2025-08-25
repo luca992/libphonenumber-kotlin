@@ -1,6 +1,6 @@
-@file:OptIn(ExperimentalWasmDsl::class)
+@file:OptIn(ExperimentalWasmDsl::class, ExperimentalKotlinGradlePluginApi::class)
 
-import com.vanniktech.maven.publish.SonatypeHost
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 
@@ -29,8 +29,8 @@ kotlin {
     wasmJs {
         browser()
     }
-    iosX64();iosArm64();iosSimulatorArm64()
-    macosX64();macosArm64()
+    iosX64(); iosArm64(); iosSimulatorArm64()
+    macosX64(); macosArm64()
     applyDefaultHierarchyTemplate()
     sourceSets {
         all {
@@ -133,12 +133,5 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }
-}
-
-plugins.withId("com.vanniktech.maven.publish") {
-    mavenPublishing {
-        publishToMavenCentral()
-        signAllPublications()
     }
 }
