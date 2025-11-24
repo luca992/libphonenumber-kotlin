@@ -5,7 +5,7 @@ on:
       - release
 jobs:
   publish:
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-latest
     name: Build and Publish Release
     steps:
       - name: Checkout Repository
