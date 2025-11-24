@@ -1,3 +1,5 @@
+import de.fayard.refreshVersions.core.StabilityLevel
+
 rootProject.name = "libphonenumber-kotlin"
 
 pluginManagement {
@@ -22,6 +24,13 @@ dependencyResolutionManagement {
 
 plugins {
     id("de.fayard.refreshVersions")
+}
+
+refreshVersions {
+    rejectVersionIf {
+        @Suppress("UnstableApiUsage")
+        candidate.stabilityLevel >= StabilityLevel.Beta
+    }
 }
 
 include(":libphonenumber")
